@@ -103,3 +103,8 @@ api_server = {{ contrail_api_interface_address }}
 api_base_url = /
 auth_host_ip = {{ kolla_internal_vip_address }}
 {% endif %}
+
+{% if public_protocol != internal_protocol and kolla_external_fqdn != kolla_internal_fqdn %}
+[oslo_middleware]
+enable_proxy_headers_parsing = True
+{% endif %}
