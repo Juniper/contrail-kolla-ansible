@@ -1,0 +1,7 @@
+---
+- include: config.yml
+  when: inventory_hostname in groups['ironic-api']
+
+- name: Flush Handlers
+  meta: flush_handlers
+  when: inventory_hostname in groups['ironic-api']

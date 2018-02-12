@@ -1,0 +1,27 @@
+---
+- name: Ensuring config directories exist
+  file:
+    path: "{{ item }}"
+    state: "directory"
+    recurse: yes
+  with_items:
+    - "{{ node_config_directory }}/ironic-notification-manager"
+    - "/var/log/contrail"
+    - "/etc/contrail"
+
+- name: Check ironic-notification-manager container
+  kolla_docker:
+    action: "compare_container"
+    common_options: "{{ docker_common_options }}"
+    name: "ironic_notification_manager"
+    image: "{{ ironic_notification_manager_image_full }}"
+    volumes: "/var/log/contrail/"
+    environment: "{{ ironic_env | combine(rabbitmq_env) | combine(auth_env) }}"
+  register: check_ironic_notification_manager_container
+  when:
+    - action != "config"
+    - enable_ironic | bool
+    - enable_ironic_notifications | bool
+    - "{{ inventory_hostname in groups['ironic-api'] }}"
+  notify:
+    - "Restart ironic-notification-manager container"
