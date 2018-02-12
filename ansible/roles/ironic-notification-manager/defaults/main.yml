@@ -1,0 +1,50 @@
+---
+####################
+# Docker
+####################
+# ironic_notification_manager_image_full: "opencontrailnightly/contrail-openstack-ironic-notification-manager:master-20180131150536-centos7-ocata"
+ironic_notification_manager_log_file: "/var/log/ironic/ironic-notification-manager.log"
+ironic_notification_manager_log_level: "SYS_INFO"
+ironic_notification_manager_introspect_port: "8110"
+
+####################
+# OpenStack
+####################
+ironic_notification_level: "debug"
+ironic_nodes: "{% for host in groups['ironic-api'] %}{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+default_project_domain_name: "Default"
+default_project_domain_id: "default"
+default_user_domain_name: "Default"
+default_user_domain_id: "default"
+
+####################
+# Environment Vars
+####################
+rabbitmq_nodes: "{% for host in groups['rabbitmq'] %}{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}{% if not loop.last %},{% endif %}{% endfor %}"
+rabbitmq_env:
+  RABBITMQ_NODES: "{{ rabbitmq_nodes }}"
+  RABBITMQ_NODE_PORT: "{{ rabbitmq_port }}"
+  RABBITMQ_USER: "{{ rabbitmq_user }}"
+  RABBITMQ_PASSWORD: "{{ rabbitmq_password }}"
+
+auth_env:
+  KEYSTONE_AUTH_ADMIN_USER: "{{ openstack_auth['username'] }}"
+  KEYSTONE_AUTH_ADMIN_TENANT: "{{ openstack_auth['project_name'] }}"
+  KEYSTONE_AUTH_ADMIN_PASSWORD: "{{ openstack_auth['password'] }}"
+  KEYSTONE_AUTH_USER_DOMAIN_NAME: "{{ default_user_domain_name }}"
+  KEYSTONE_AUTH_PROJECT_DOMAIN_NAME: "{{ default_project_domain_name }}"
+  KEYSTONE_AUTH_URL_VERSION: "/v3"
+  KEYSTONE_AUTH_HOST: "{{ kolla_internal_fqdn }}"
+  KEYSTONE_AUTH_PROTO: "{{ admin_protocol }}"
+  KEYSTONE_AUTH_ADMIN_PORT: "{{ keystone_admin_port }}"
+  KEYSTONE_AUTH_PUBLIC_PORT: "{{ keystone_public_port }}"
+  KEYSTONE_AUTH_REGION_NAME: "{{ openstack_region_name }}"
+
+ironic_env:
+  CLOUD_ORCHESTRATOR: "openstack"
+  AUTH_MODE: "keystone"
+  CONTROLLER_NODES: "{{ opencontrail_collector_ip }}"
+  IRONIC_SERVER_IP: "{{ groups['ironic-api'][0] }}"
+  IRONIC_SERVER_PORT: "{{ ironic_api_port }}"
+  IRONIC_NOTIFICATION_LEVEL: "{{ ironic_notification_level }}"
+

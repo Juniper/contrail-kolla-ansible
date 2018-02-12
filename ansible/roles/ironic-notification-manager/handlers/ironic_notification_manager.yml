@@ -1,0 +1,15 @@
+---
+- name: Restart ironic-notification-manager container
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "ironic_notification_manager"
+    image: "{{ ironic_notification_manager_image_full }}"
+    volumes: "/var/log/contrail/"
+    environment: "{{ ironic_env | combine(rabbitmq_env) | combine(auth_env) }}"
+  when:
+    - action != "config"
+    - enable_ironic | bool
+    - enable_ironic_notifications | bool
+    - inventory_hostname in groups['ironic-api']
+    - check_ironic_notification_manager_container.get('changed',false)

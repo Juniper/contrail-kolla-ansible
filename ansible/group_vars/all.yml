@@ -31,6 +31,14 @@ nova_compute_opencontrail_init_image_full: "opencontrailnightly/contrail-opensta
 # heat plugin. "no" means pure openstack heat - without contrail heat plugin
 enable_heat_opencontrail: "yes"
 
+# contrail_additions: When enable_ironic is set to "yes", the ironic notification
+# manager service container is deployed. By default this will be set to known
+# upstream working containers. These should be overridden in globals.yml
+# ironic_notification_manager_image_full: "opencontrailnightly/contrail-openstack-ironic-notification-manager:master-20180131150536-centos7-ocata"
+ironic_notification_manager_log_file: "/var/log/ironic/ironic-notification-manager.log"
+ironic_notification_manager_log_level: "SYS_INFO"
+ironic_notification_manager_introspect_port: "8110"
+
 # contrail_additions : IP address where contrail-api is listening on - on an
 # all-in-one, it will be same as kolla_internal_vip_address
 contrail_api_interface_address: "{{ kolla_internal_vip_address }}"
@@ -61,6 +69,7 @@ opencontrail_api_server_ip: "{{ contrail_api_interface_address }}"
 opencontrail_api_server_port: "8082"
 opencontrail_collector_ip: "{{ contrail_api_interface_address }}"
 opencontrail_collector_port: "8081"
+opencontrail_collector_listen_port: "8086"
 
 ####################### CONTRAIL ADDITIONS - END ###########################
 
