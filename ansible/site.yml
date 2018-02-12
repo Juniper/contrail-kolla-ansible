@@ -224,6 +224,18 @@
         tags: ironic,
         when: enable_ironic | bool }
 
+- name: Apply role ironic-notification-manager
+  hosts:
+    - ironic-api
+  serial: '{{ serial|default("0") }}'
+  roles:
+    - { role: ironic-notification-manager,
+        tags: ironic-notification-manager,
+        when:
+          - enable_ironic | bool
+          - enable_ironic_notifications | bool
+      }
+
 - name: Apply role cinder
   hosts:
     - ceph-mon

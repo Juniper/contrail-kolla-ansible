@@ -1,0 +1,27 @@
+---
+- name: Running ironic notification manager service inside container
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    image: "{{ ironic_notification_manager_image_full }}"
+    environment:
+      OS_AUTH_URL: "{{ openstack_auth.auth_url }}"
+      OS_IDENTITY_API_VERSION: "3"
+      OS_USERNAME: "{{ openstack_auth.username }}"
+      OS_PASSWORD: "{{ openstack_auth.password }}"
+      OS_PROJECT_NAME: "{{ openstack_auth.project_name }}"
+      AUTH_MODE: "keystone"
+      CONTROLLER_NODES: "{{ }}"
+    labels:
+      BOOTSTRAP:
+    name: "ironic_notifcation_manager"
+    restart_policy: "on-failure"
+    volumes:
+      - /var/log/contrail:/var/log/contrail
+      - /etc/contrail/analytics:/etc/contrail
+  when:
+    - enable_ironic | bool
+    - enable_ironic_notifications | bool
+
+

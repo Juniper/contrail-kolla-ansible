@@ -1,0 +1,9 @@
+---
+- include: pull.yml
+  when: inventory_hostname in groups['ironic-api']
+
+- include: config.yml
+  when: inventory_hostname in groups['ironic-api']
+
+- include: start.yml
+  when: inventory_hostname in groups['ironic-api']

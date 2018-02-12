@@ -1,0 +1,14 @@
+---
+####################
+# Docker
+####################
+# ironic_notification_manager_image_full: "opencontrailnightly/contrail-openstack-ironic-notification-manager:master-20180131150536-centos7-ocata"
+ironic_notification_manager_log_file: "/var/log/ironic/ironic-notification-manager.log"
+ironic_notification_manager_log_level: "SYS_INFO"
+ironic_notification_manager_introspect_port: "8110"
+
+####################
+# OpenStack
+####################
+ironic_notification_level: "debug"
+

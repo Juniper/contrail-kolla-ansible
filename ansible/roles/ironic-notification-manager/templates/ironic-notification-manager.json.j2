@@ -1,0 +1,18 @@
+{
+    "command": "python /usr/bin/python ironic-notification-manager --conf_file /etc/contrail/ironic-notification-manager.conf --conf_file /etc/contrail/contrail-keystone-auth.conf",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/ironic-notification-manager.conf",
+            "dest": "/etc/contrail/ironic-notification-manager.conf",
+            "owner": "ironic",
+            "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/contrail-keystone-auth.conf",
+            "dest": "/etc/contrail/contrail-keystone-auth.conf",
+            "owner": "ironic",
+            "perm": "0600",
+            "optional": true
+        }
+    ]
+}

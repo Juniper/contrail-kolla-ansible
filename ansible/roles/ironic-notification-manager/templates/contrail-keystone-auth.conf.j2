@@ -1,0 +1,12 @@
+{% if enable_ironic | bool and enable_ironic_notifications | bool %}
+[KEYSTONE]
+auth_url = {{ keystone_admin_url }}
+admin_user = {{ openstack_auth.username }}
+admin_password = {{ keystone_admin_password }}
+admin_tenant_name = admin
+insecure = false
+auth_type = password
+user_domain_name = Default
+project_domain_name = {{ keystone_admin_project_domain_name }}
+region_name: "{{ openstack_region_name }}"
+{% endif %}

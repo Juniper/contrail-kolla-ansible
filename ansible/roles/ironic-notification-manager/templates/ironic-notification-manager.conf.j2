@@ -1,0 +1,18 @@
+{% if enable_ironic | bool and enable_ironic_notifications | bool %}
+[DEFAULTS]
+log_file = {{ ironic_notification_manager_log_file }}
+log_level = {{ ironic_notification_manager_log_level }}
+log_local = 1
+rabbit_server = {% for host in groups['rabbitmq'] %}{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ rabbitmq_port }}{% if not loop.last %},{% endif %}{% endfor %}
+rabbit_port = {{ rabbitmq_port }}
+rabbit_user = {{ rabbitmq_user }}
+rabbit_password = {{ rabbitmq_password }}
+{% if orchestration_engine != 'KUBERNETES' %}
+ironic_server_ip = {{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}
+{% else %}
+ironic_server_ip = 0.0.0.0
+{% endif %}
+ironic_server_port = {{ ironic_api_port }}
+collectors = {{ opencontrail_collector_ip }}:{{ opencontrail_collector_listen_port }}
+introspect_port = {{ ironic_notification_manager_introspect_port }}
+{% endif %}
