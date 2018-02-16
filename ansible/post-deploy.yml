@@ -6,4 +6,4 @@
         src: "roles/common/templates/admin-openrc.sh.j2"
         dest: "{{ node_config_directory }}/admin-openrc.sh"
       #run_once: True
-      connection: local
+      #connection: local
