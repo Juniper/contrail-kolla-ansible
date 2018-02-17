@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "bf3e73b7_724c22c7",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-02-17T17:22:39Z",
+      "side": 1,
+      "message": "It will be good if we can have the logs in the same directory/volume as other kolla logs. For other kolla containers the log configurations are done in fluentd container. You can raise another bug for now to integrate logs of this new container into the kolla logs scheme. We can follow the same configuration as used by rabbitmq for example.",
+      "revId": "861a81a3bbdff64c137a340d25660b10961a1866",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
