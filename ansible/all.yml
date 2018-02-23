@@ -1,6 +1,8 @@
 ---
 - hosts: all
   tasks:
+  - name: Force error
+    nonexistent_module: {}
   - name: Import variables
     include_vars:
       dir: ../etc/kolla

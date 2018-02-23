@@ -9,7 +9,7 @@
   serial: '{{ serial|default("0") }}'
   gather_facts: false
   tasks:
-    - setup:
+    - nonexistentone:
   tags: always
 
 # NOTE(pbourke): This case covers deploying subsets of hosts using --limit. The
