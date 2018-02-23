@@ -2,10 +2,20 @@
 - name: Post-deploy playbook for contrail
   hosts: control
   tasks:
-  - name: Install python clients for openstack components
-    package:
+  - name: Install prerequisites to install openstack clients
+    yum:
       name: "{{ item }}"
       state: latest
+    ignore_errors: yes
+    with_items:
+      - gcc
+      - python-devel
+
+  - name: Install python clients for openstack components
+    pip:
+      name: "{{ item }}"
+      state: latest
+    ignore_errors: yes
     with_items:
       - python-openstackclient
       - python-heatclient
