@@ -3,7 +3,7 @@
   hosts: control
   tasks:
   - name: Install python clients for openstack components
-    package:
+    pip:
       name: "{{ item }}"
       state: latest
     with_items:

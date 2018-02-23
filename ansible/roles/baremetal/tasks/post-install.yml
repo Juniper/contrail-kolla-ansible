@@ -47,11 +47,29 @@
   when: docker_registry in item.value and p.stat.exists
   with_dict: "{{ docker_daemon }}"
 
+- name: check if registry is already in
+  set_fact:
+    is_contrail_registry_in: True
+  when:
+    - contrail_docker_registry is defined
+    - contrail_docker_registry in item.value and p.stat.exists
+  with_dict: "{{ docker_daemon }}"
+
 - name: add registry to list
   set_fact:
     new_docker_registries: "{{ item.value }} + [ '{{ docker_registry }}' ]"
     added: True
   when: (item.key == "insecure-registries" and is_registry_in is undefined)
+  with_dict: "{{ docker_daemon }}"
+
+- name: add contrail registry to list if required
+  set_fact:
+    new_docker_registries: "{{ new_docker_registries|default([]) }} + {{ item.value }} + [ '{{ contrail_docker_registry }}' ]"
+    added: True
+  when:
+    - contrail_docker_registry is defined
+    - item.key == "insecure-registries"
+    - is_contrail_registry_in is undefined
   with_dict: "{{ docker_daemon }}"
 
 - name: create registry list
