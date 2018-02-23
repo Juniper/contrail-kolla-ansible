@@ -74,9 +74,6 @@
     - "{{ node_custom_config }}/ironic/pxelinux.default"
     - "{{ node_custom_config }}/ironic/{{ inventory_hostname }}/pxelinux.default"
     - "pxelinux.default.j2"
-  when:
-    - inventory_hostname in groups['ironic-inspector']
-    - enable_ironic_inspector | bool
 
 - name: Copying ironic-agent kernel and initramfs
   copy:
@@ -85,9 +82,6 @@
   with_items:
     - "ironic-agent.kernel"
     - "ironic-agent.initramfs"
-  when:
-    - inventory_hostname in groups['ironic-inspector']
-    - enable_ironic_inspector | bool
 
 - name: Check if policies shall be overwritten
   local_action: stat path="{{ node_custom_config }}/ironic/policy.json"
