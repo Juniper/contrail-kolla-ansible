@@ -206,7 +206,7 @@ nova_compute_opencontrail_init_image_full: "opencontrailnightly/contrail-opensta
 #enable_searchlight: "no"
 #enable_senlin: "no"
 #enable_solum: "no"
-#enable_swift: "no"
+#enable_swift: "yes"
 #enable_telegraf: "no"
 #enable_tacker: "no"
 #enable_tempest: "no"

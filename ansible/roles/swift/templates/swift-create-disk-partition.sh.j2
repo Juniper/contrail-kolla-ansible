@@ -1,0 +1,20 @@
+#!/bin/bash
+{% if disk_list is defined %}
+# <WARNING ALL DATA ON DISK will be LOST!>
+index=0
+for d in {{ disk_list }}; do
+    parted /dev/${d} -s -- mklabel gpt mkpart KOLLA_SWIFT_DATA 1 -1
+    sudo mkfs.xfs -f -L d${index} /dev/${d}1
+    (( index++ ))
+done
+{% else %}
+index=0
+for d in swift_lb1 swift_lb2 swift_lb3; do
+    free_device=$(losetup -f)
+    fallocate -l  5G /var/cache/$d
+    losetup $free_device /var/cache/$d
+    parted $free_device -s -- mklabel gpt mkpart KOLLA_SWIFT_DATA 1 -1
+    sudo mkfs.xfs -f -L d${index} ${free_device}p1
+    (( index++ ))
+done
+{% endif %}
