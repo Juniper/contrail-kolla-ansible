@@ -39,13 +39,13 @@ auth_plugin = password
 project_domain_id = default
 user_domain_id = default
 project_name = service
+delay_auth_decision = 1
 username = {{ swift_keystone_user }}
 password = {{ swift_keystone_password }}
 
 memcache_security_strategy = ENCRYPT
 memcache_secret_key = {{ memcache_secret_key }}
 memcached_servers = {% for host in groups['memcached'] %}{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
-delay_auth_decision = 1
 
 [filter:keystoneauth]
 use = egg:swift#keystoneauth

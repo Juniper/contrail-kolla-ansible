@@ -5,6 +5,12 @@
         inventory_hostname in groups['swift-object-server'] or
         inventory_hostname in groups['swift-proxy-server']
 
+- include: disk_and_ring.yml
+  when: inventory_hostname in groups['swift-account-server'] or
+        inventory_hostname in groups['swift-container-server'] or
+        inventory_hostname in groups['swift-object-server'] or
+        inventory_hostname in groups['swift-proxy-server']
+
 - include: config.yml
   when: inventory_hostname in groups['swift-account-server'] or
         inventory_hostname in groups['swift-container-server'] or
