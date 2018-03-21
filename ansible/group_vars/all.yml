@@ -27,6 +27,7 @@ enable_neutron_opencontrail: "yes"
 neutron_opencontrail_init_image_full: "opencontrailnightly/contrail-openstack-neutron-init:master-20180131150536-centos7-ocata"
 nova_compute_opencontrail_init_image_full: "opencontrailnightly/contrail-openstack-compute-init:master-20180131150536-centos7-ocata"
 ironic_notification_manager_image_full: "opencontrailnightly/contrail-openstack-ironic-notification-manager:master-20180221082342-centos7-ocata"
+heat_opencontrail_init_image_full: "opencontrailnightly/contrail-openstack-heat-init:ocata-master-34"
 
 # contrail_additions : Ideally leave this to yes if you want the opencontrail
 # heat plugin. "no" means pure openstack heat - without contrail heat plugin

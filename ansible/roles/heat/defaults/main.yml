@@ -25,6 +25,8 @@ heat_services:
     group: heat-engine
     enabled: true
     image: "{{ heat_engine_image_full }}"
+    environment:
+        PYTHONPATH: "{% if enable_heat_opencontrail == 'yes' %}/opt/plugin/site-packages{% endif %}"
     volumes:
       - "{{ node_config_directory }}/heat-engine/:{{ container_config_directory }}/:ro"
       - "/etc/localtime:/etc/localtime:ro"
