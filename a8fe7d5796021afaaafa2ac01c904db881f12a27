@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_8114afa1",
+        "filename": "ansible/roles/swift/tasks/disk_and_ring.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 35
+      },
+      "writtenOn": "2018-03-21T03:09:15Z",
+      "side": 1,
+      "message": "what type of failures are you referring. As long as user has given a proper partition and storage nodes details, script is a recommended script from openstack",
+      "parentUuid": "5f2577a7_e1f49389",
+      "revId": "a8fe7d5796021afaaafa2ac01c904db881f12a27",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_c1f3d79d",
         "filename": "ansible/roles/swift/tasks/disk_and_ring.yml",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2018-03-21T02:48:59Z",
       "side": 1,
       "message": "We need to handle failures and bail out",
+      "revId": "a8fe7d5796021afaaafa2ac01c904db881f12a27",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_410ec78d",
+        "filename": "ansible/roles/swift/tasks/disk_and_ring.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 35
+      },
+      "writtenOn": "2018-03-21T03:09:15Z",
+      "side": 1,
+      "message": "what type of failures are you referring. As long as user has given a proper partition and storage nodes details, script is recommended from openstack",
+      "parentUuid": "5f2577a7_c1f3d79d",
       "revId": "a8fe7d5796021afaaafa2ac01c904db881f12a27",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
