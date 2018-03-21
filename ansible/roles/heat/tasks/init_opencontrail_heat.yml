@@ -1,0 +1,16 @@
+---
+- name: Running opencontrail init contrail for heat engine
+  vars:
+    heat_engine_svc: "{{ heat_services['heat-engine'] }}"
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    image: "{{ heat_opencontrail_init_image_full }}"
+    labels:
+      BOOTSTRAP:
+    name: "bootstrap_heat_opencontrail_plugin"
+    restart_policy: "never"
+    volumes: "opt_plugin:/opt/plugin/:ro"
+  when:
+    - heat_engine_svc.enabled | bool

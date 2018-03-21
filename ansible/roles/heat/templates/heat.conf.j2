@@ -4,7 +4,7 @@ debug = {{ heat_logging_debug }}
 log_dir = /var/log/kolla/heat
 
 {% if enable_heat_opencontrail | bool %}
-plugin_dirs = /usr/lib/python2.7/dist-packages/vnc_api/gen/heat/resources,/usr/lib/python2.7/dist-packages/contrail_heat/resources
+plugin_dirs = /opt/plugin/site-packages/vnc_api/gen/heat/resources,/opt/plugin/site-packages/contrail_heat/resources
 {% endif %}
 
 heat_watch_server_url = {{ public_protocol }}://{{ kolla_external_fqdn }}:{{ heat_api_cfn_port }}
