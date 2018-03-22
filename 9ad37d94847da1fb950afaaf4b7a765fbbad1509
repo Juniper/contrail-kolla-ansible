@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_1e5db579",
+        "filename": "ansible/roles/heat/tasks/bootstrap.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-03-22T18:16:39Z",
+      "side": 1,
+      "message": "This condition should be for \"enable_heat_opencontrail | bool\"",
+      "revId": "9ad37d94847da1fb950afaaf4b7a765fbbad1509",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
