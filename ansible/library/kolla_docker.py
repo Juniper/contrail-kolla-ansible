@@ -197,6 +197,13 @@ import traceback
 import docker
 
 
+def get_docker_client():
+    try:
+        return docker.Client
+    except AttributeError:
+        return docker.APIClient
+
+
 class DockerWorker(object):
 
     def __init__(self, module):
@@ -211,7 +218,7 @@ class DockerWorker(object):
             'version': self.params.get('api_version')
         }
 
-        self.dc = docker.Client(**options)
+        self.dc = get_docker_client()(**options)
 
     def generate_tls(self):
         tls = {'verify': self.params.get('tls_verify')}
@@ -482,10 +489,18 @@ class DockerWorker(object):
     def remove_container(self):
         if self.check_container():
             self.changed = True
-            self.dc.remove_container(
-                container=self.params.get('name'),
-                force=True
-            )
+            # NOTE(jeffrey4l): in some case, docker failed to remove container
+            # filesystem and raise error.  But the container info is
+            # disappeared already. If this happens, assume the container is
+            # removed.
+            try:
+                self.dc.remove_container(
+                    container=self.params.get('name'),
+                    force=True
+                )
+            except docker.errors.APIError:
+                if self.check_container():
+                    raise
 
     def generate_volumes(self):
         volumes = self.params.get('volumes')
@@ -665,7 +680,8 @@ class DockerWorker(object):
                 msg="No such container: {}".format(name))
         else:
             self.changed = True
-            self.dc.restart(name)
+            self.dc.stop(name)
+            self.dc.start(name)
 
     def create_volume(self):
         if not self.check_volume():
@@ -703,7 +719,7 @@ def generate_module():
                              'stop_container']),
         api_version=dict(required=False, type='str', default='auto'),
         auth_email=dict(required=False, type='str'),
-        auth_password=dict(required=False, type='str'),
+        auth_password=dict(required=False, type='str', no_log=True),
         auth_registry=dict(required=False, type='str'),
         auth_username=dict(required=False, type='str'),
         detach=dict(required=False, type='bool', default=True),

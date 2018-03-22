@@ -113,6 +113,7 @@ nova_services:
     image: "{{ nova_compute_image_full }}"
     privileged: True
     enabled: "{{ enable_nova_compute | bool }}"
+    ipc_mode: "host"
     volumes:
       - "{{ node_config_directory }}/nova-compute/:{{ container_config_directory }}/:ro"
       - "/etc/localtime:/etc/localtime:ro"
