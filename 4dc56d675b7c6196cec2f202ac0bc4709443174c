@@ -22,6 +22,30 @@
       "revId": "4dc56d675b7c6196cec2f202ac0bc4709443174c",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_abd413be",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 35
+      },
+      "writtenOn": "2018-03-26T17:03:38Z",
+      "side": 1,
+      "message": "who is using 8087? i dont see this port being used.",
+      "parentUuid": "5f2577a7_eb7c5bec",
+      "range": {
+        "startLine": 263,
+        "startChar": 26,
+        "endLine": 263,
+        "endChar": 30
+      },
+      "revId": "4dc56d675b7c6196cec2f202ac0bc4709443174c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
