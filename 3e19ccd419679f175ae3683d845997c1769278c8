@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_0c8b3d1f",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 3
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-03-27T08:51:04Z",
+      "side": 1,
+      "message": "this port is used by opendaylight in new version of kolla-ansible - https://github.com/openstack/kolla-ansible/blob/master/ansible/group_vars/all.yml#L310",
+      "range": {
+        "startLine": 263,
+        "startChar": 26,
+        "endLine": 263,
+        "endChar": 30
+      },
+      "revId": "3e19ccd419679f175ae3683d845997c1769278c8",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
