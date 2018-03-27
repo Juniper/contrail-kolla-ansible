@@ -20,6 +20,7 @@ disable_nova_compute_service: "no"
 # contrail_additions : Ideally leave this to yes if you want the opencontrail
 # neutron plugin. "no" means pure openstack neutron - without contrail neutron plugin
 enable_neutron_opencontrail: "yes"
+enable_swift_opencontrail: "yes"
 
 # When enable_neutron_opencontrail is set to "yes", then these two variables are
 # required. By default these are being set to known working container images.

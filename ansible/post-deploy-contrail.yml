@@ -39,3 +39,7 @@
     shell: docker exec horizon sed -i -e 's:/usr/share/openstack-dashboard/static:/var/lib/openstack-dashboard/static:g' /etc/apache2/conf-enabled/000-default.conf && docker exec horizon service apache2 reload
     ignore_errors: yes
     when: openstack_release == '4.0.0'
+
+  - name: Contrail default swift container and Temp-URL-Key creation
+    shell: docker exec kolla_toolbox bash -c 'source /var/lib/kolla/config_files/admin-openrc.sh; swift post -r '.r:*' contrail_container; swift post -m "Temp-URL-Key:mykey"'
+    when: enable_swift_opencontrail | bool
