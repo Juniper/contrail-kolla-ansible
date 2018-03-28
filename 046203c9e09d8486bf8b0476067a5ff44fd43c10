@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_8a5a6827",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-03-28T21:39:40Z",
+      "side": 1,
+      "message": "please remove the white spaces at the end of the lines.",
+      "revId": "046203c9e09d8486bf8b0476067a5ff44fd43c10",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
