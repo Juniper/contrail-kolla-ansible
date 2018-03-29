@@ -16,6 +16,24 @@
       "revId": "16b414ef6ab95a42f641d2f8292f1bf238aa2bee",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_0572eb11",
+        "filename": "ansible/roles/swift/tasks/disk_and_ring.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 35
+      },
+      "writtenOn": "2018-03-29T05:21:23Z",
+      "side": 1,
+      "message": "and what difference it makes if it runs again..",
+      "parentUuid": "5f2577a7_e5791ffc",
+      "revId": "16b414ef6ab95a42f641d2f8292f1bf238aa2bee",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
