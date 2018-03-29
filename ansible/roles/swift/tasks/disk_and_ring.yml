@@ -28,6 +28,8 @@
     src: swift-ring-builder.sh.j2
     dest: /bin/swift_ring_builder.sh
     mode: 0755
+  delegate_to: localhost
 
 - name: Creating swift rings
   command: /bin/swift_ring_builder.sh
+  delegate_to: localhost
