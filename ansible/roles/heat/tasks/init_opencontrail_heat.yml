@@ -11,6 +11,23 @@
       BOOTSTRAP:
     name: "bootstrap_heat_opencontrail_plugin"
     restart_policy: "never"
-    volumes: "opt_plugin:/opt/plugin/"
+    environment:
+      KEYSTONE_AUTH_ADMIN_USER: "{{ openstack_auth['username'] }}"
+      KEYSTONE_AUTH_ADMIN_TENANT: "{{ openstack_auth['project_name'] }}"
+      KEYSTONE_AUTH_ADMIN_PASSWORD: "{{ openstack_auth['password'] }}"
+      KEYSTONE_AUTH_USER_DOMAIN_NAME: "{{ default_user_domain_name }}"
+      KEYSTONE_AUTH_PROJECT_DOMAIN_NAME: "{{ default_project_domain_name }}"
+      KEYSTONE_AUTH_URL_VERSION: "/v3"
+      KEYSTONE_AUTH_HOST: "{{ kolla_internal_fqdn }}"
+      KEYSTONE_AUTH_PROTO: "{{ admin_protocol }}"
+      KEYSTONE_AUTH_ADMIN_PORT: "{{ keystone_admin_port }}"
+      KEYSTONE_AUTH_PUBLIC_PORT: "{{ keystone_public_port }}"
+      KEYSTONE_AUTH_REGION_NAME: "{{ openstack_region_name }}"
+      AUTH_MODE: "keystone"
+      CONFIG_NODES: "{{ opencontrail_api_server_ip }}"
+      CONFIG_API_PORT: "{{ opencontrail_api_server_port }}"
+    volumes:
+      - "opt_plugin:/opt/plugin/"
+      - "/etc/heat_init:/etc/contrail"
   when:
     - heat_engine_svc.enabled | bool

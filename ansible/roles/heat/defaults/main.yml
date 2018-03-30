@@ -31,6 +31,8 @@ heat_services:
       - "{{ node_config_directory }}/heat-engine/:{{ container_config_directory }}/:ro"
       - "/etc/localtime:/etc/localtime:ro"
       - "kolla_logs:/var/log/kolla/"
+      - "opt_plugin:/opt/plugin"
+      - "/etc/heat_init/vnc_api_lib.ini:/etc/contrail/vnc_api_lib.ini"
 
 ####################
 # Database
