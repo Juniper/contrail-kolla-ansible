@@ -11,6 +11,8 @@
       BOOTSTRAP:
     name: "bootstrap_heat_opencontrail_plugin"
     restart_policy: "never"
-    volumes: "opt_plugin:/opt/plugin/"
+    volumes:
+      - "opt_plugin:/opt/plugin/"
+      - "/etc/heat_init:/etc/contrail"
   when:
     - heat_engine_svc.enabled | bool
