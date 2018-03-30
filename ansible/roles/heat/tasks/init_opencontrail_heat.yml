@@ -11,6 +11,8 @@
       BOOTSTRAP:
     name: "bootstrap_heat_opencontrail_plugin"
     restart_policy: "never"
-    volumes: "opt_plugin:/opt/plugin/"
+    volumes:
+      - "opt_plugin:/opt/plugin/"
+      - "/etc/heat_init/vnc_api_lib.ini:/etc/contrail/vnc_api_lib.ini"
   when:
     - heat_engine_svc.enabled | bool
