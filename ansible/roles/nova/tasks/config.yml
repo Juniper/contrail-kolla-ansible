@@ -86,6 +86,23 @@
   notify:
     - "Restart {{ item.key }} container"
 
+- name: Copying over nova patch
+  vars:
+    service: "{{ nova_services['nova-compute'] }}"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ node_config_directory }}/nova-compute/{{ item.dest }}"
+  register: nova_confs
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_items:
+    - { src: "model.py.j2", dest: "model.py" }
+    - { src: "os_vif_util.py.j2", dest: "os_vif_util.py" }
+    - { src: "contrail-plugin.pth.j2", dest: "contrail-plugin.pth" }
+  notify:
+    - Restart nova-compute container
+
 - name: Copying over libvirt configuration
   vars:
     service: "{{ nova_services['nova-libvirt'] }}"

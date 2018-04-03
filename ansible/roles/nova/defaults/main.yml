@@ -114,6 +114,9 @@ nova_services:
     privileged: True
     enabled: "{{ enable_nova_compute | bool }}"
     ipc_mode: "host"
+    environment:
+        PYTHONPATH: "{% if neutron_plugin_agent == 'opencontrail' %}/opt/plugin/site-packages{% endif %}"
+        PATH: "{% if neutron_plugin_agent == 'opencontrail' %}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/plugin/bin{% endif %}"
     volumes:
       - "{{ node_config_directory }}/nova-compute/:{{ container_config_directory }}/:ro"
       - "/etc/localtime:/etc/localtime:ro"
@@ -125,6 +128,9 @@ nova_services:
       - "libvirtd:/var/lib/libvirt"
       - "nova_compute:/var/lib/nova/"
       - "{% if enable_cinder_backend_nfs | bool %}/var/lib/nova/mnt:/var/lib/nova/mnt:shared{% endif %}"
+      - "{% if neutron_plugin_agent == 'opencontrail' %}/etc/kolla/nova-compute/model.py:/usr/lib/python2.7/site-packages/nova/network/model.py:ro{% endif %}"
+      - "{% if neutron_plugin_agent == 'opencontrail' %}/etc/kolla/nova-compute/os_vif_util.py:/usr/lib/python2.7/site-packages/nova/network/os_vif_util.py:ro{% endif %}"
+      - "{% if neutron_plugin_agent == 'opencontrail' %}/etc/kolla/nova-compute/contrail-plugin.pth:/usr/lib/python2.7/site-packages/contrail-plugin.pth:ro{% endif %}"
       - "opt_plugin:/opt/plugin/"
   nova-compute-ironic:
     container_name: "nova_compute_ironic"
