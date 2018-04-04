@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_f4577b57",
+        "filename": "ansible/roles/nova/tasks/config.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-04-04T17:42:41Z",
+      "side": 1,
+      "message": "shouldn\u0027t we do this only when contrail plugin is used?",
+      "revId": "03af0db19ecb4ffd9cda4bfb8089fae9e314e91b",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
