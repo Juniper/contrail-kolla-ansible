@@ -1,0 +1,16 @@
+{% if enable_neutron_opencontrail | bool %}
+[APISERVER]
+api_server_ip = {{ contrail_api_interface_address }}
+api_server_port = 8082
+contrail_extensions = ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None,service-interface:None,vf-binding:None
+ 
+[COLLECTOR]
+analytics_api_ip = {{ contrail_api_interface_address }}
+analytics_api_port = 8081
+ 
+[KEYSTONE]
+auth_url = {{ keystone_admin_url }}
+admin_user= {{ openstack_auth.username }}
+admin_password= {{ keystone_admin_password }}
+admin_tenant_name=admin
+{% endif %}
