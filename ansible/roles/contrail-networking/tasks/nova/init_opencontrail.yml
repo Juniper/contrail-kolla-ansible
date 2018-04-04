@@ -1,0 +1,17 @@
+---
+- name: Running Nova opencontrail bootstrap container
+  vars:
+    nova_compute: "{{ nova_services['nova-compute'] }}"
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    image: "{{ nova_compute_opencontrail_init_image_full }}"
+    labels:
+      BOOTSTRAP:
+    name: "bootstrap_nova_compute_opencontrail_plugin"
+    restart_policy: "never"
+    volumes: "{{ nova_compute.volumes|reject('equalto', '')|list }}"
+  when:
+    - neutron_plugin_agent == 'opencontrail'
+    - inventory_hostname in groups['compute']

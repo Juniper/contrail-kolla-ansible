@@ -1,0 +1,10 @@
+---
+- include: config.yml
+
+- include: bootstrap.yml
+  when: inventory_hostname in groups['nova-api'] or
+        inventory_hostname in groups['compute']
+
+- name: Flush handlers
+  meta: flush_handlers
+

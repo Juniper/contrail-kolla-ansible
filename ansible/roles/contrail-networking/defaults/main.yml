@@ -1,0 +1,227 @@
+---
+####################
+# Contrail
+####################
+enable_contrail_networking: "no"
+
+####################
+# Heat
+####################
+
+heat_services:
+  heat-api:
+    container_name: heat_api
+    group: heat-api
+    enabled: true
+    image: "{{ heat_api_image_full }}"
+    volumes:
+      - "{{ node_config_directory }}/heat-api/:{{ container_config_directory }}/:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "kolla_logs:/var/log/kolla/"
+  heat-api-cfn:
+    container_name: heat_api_cfn
+    group: heat-api-cfn
+    enabled: true
+    image: "{{ heat_api_cfn_image_full }}"
+    volumes:
+      - "{{ node_config_directory }}/heat-api-cfn/:{{ container_config_directory }}/:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "kolla_logs:/var/log/kolla/"
+  heat-engine:
+    container_name: heat_engine
+    group: heat-engine
+    enabled: true
+    image: "{{ heat_engine_image_full }}"
+    environment:
+        PYTHONPATH: "{% if enable_heat_opencontrail == 'yes' %}/opt/plugin/site-packages{% endif %}"
+    volumes:
+      - "{{ node_config_directory }}/heat-engine/:{{ container_config_directory }}/:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "kolla_logs:/var/log/kolla/"
+
+heat_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-heat-api"
+heat_api_tag: "{{ openstack_release }}"
+heat_api_image_full: "{{ heat_api_image }}:{{ heat_api_tag }}"
+
+heat_api_cfn_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-heat-api-cfn"
+heat_api_cfn_tag: "{{ openstack_release }}"
+heat_api_cfn_image_full: "{{ heat_api_cfn_image }}:{{ heat_api_cfn_tag }}"
+
+heat_engine_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-heat-engine"
+heat_engine_tag: "{{ openstack_release }}"
+heat_engine_image_full: "{{ heat_engine_image }}:{{ heat_engine_tag }}"
+
+heat_database_name: "heat"
+heat_database_user: "heat"
+heat_database_address: "{{ kolla_internal_fqdn }}:{{ database_port }}"
+
+heat_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ heat_api_port }}/v1/%(tenant_id)s"
+heat_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ heat_api_port }}/v1/%(tenant_id)s"
+heat_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ heat_api_port }}/v1/%(tenant_id)s"
+heat_cfn_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ heat_api_cfn_port }}/v1"
+heat_cfn_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ heat_api_cfn_port }}/v1"
+heat_cfn_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ heat_api_cfn_port }}/v1"
+
+heat_logging_debug: "{{ openstack_logging_debug }}"
+
+heat_keystone_user: "heat"
+heat_stack_user_role: "heat_stack_user"
+heat_stack_owner_role: "heat_stack_owner"
+
+openstack_heat_auth: "{{ openstack_auth }}"
+
+####################
+# Nova
+####################
+
+nova_services:
+  nova-compute:
+    container_name: "nova_compute"
+    group: "compute"
+    image: "{{ nova_compute_image_full }}"
+    privileged: True
+    enabled: "{{ enable_nova_compute | bool }}"
+    ipc_mode: "host"
+    volumes:
+      - "{{ node_config_directory }}/nova-compute/:{{ container_config_directory }}/:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "/lib/modules:/lib/modules:ro"
+      - "/run:/run:shared"
+      - "/dev:/dev"
+      - "kolla_logs:/var/log/kolla/"
+      - "{% if enable_iscsid | bool %}iscsi_info:/etc/iscsi{% endif %}"
+      - "libvirtd:/var/lib/libvirt"
+      - "nova_compute:/var/lib/nova/"
+      - "{% if enable_cinder_backend_nfs | bool %}/var/lib/nova/mnt:/var/lib/nova/mnt:shared{% endif %}"
+      - "opt_plugin:/opt/plugin/"
+
+nova_compute_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-nova-compute"
+nova_compute_tag: "{{ openstack_release }}"
+nova_compute_image_full: "{{ nova_compute_image }}:{{ nova_compute_tag }}"
+
+nova_database_name: "nova"
+nova_database_user: "nova"
+nova_database_address: "{{ kolla_internal_fqdn }}:{{ database_port }}"
+
+nova_api_database_name: "nova_api"
+nova_api_database_user: "nova_api"
+nova_api_database_address: "{{ kolla_internal_fqdn }}:{{ database_port }}"
+
+nova_legacy_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2/%(tenant_id)s"
+nova_legacy_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2/%(tenant_id)s"
+nova_legacy_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2/%(tenant_id)s"
+
+nova_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1/%(tenant_id)s"
+nova_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ nova_api_port }}/v2.1/%(tenant_id)s"
+nova_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ nova_api_port }}/v2.1/%(tenant_id)s"
+
+placement_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ placement_api_port }}"
+placement_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ placement_api_port }}"
+placement_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ placement_api_port }}"
+
+nova_logging_debug: "{{ openstack_logging_debug }}"
+placement_keystone_user: "placement"
+openstack_nova_auth: "{{ openstack_auth }}"
+openstack_placement_auth: "{{ openstack_auth }}"
+nova_ssh_port: "8022"
+
+####################
+# Neutron
+####################
+
+neutron_services:
+  neutron-server:
+    container_name: "neutron_server"
+    image: "{{ neutron_server_image_full }}"
+    enabled: true
+    group: "neutron-server"
+    host_in_groups: "{{ True if orchestration_engine == 'KUBERNETES' else inventory_hostname in groups['neutron-server'] }}"
+    environment:
+        PYTHONPATH: "{% if neutron_plugin_agent == 'opencontrail' %}/opt/plugin/site-packages{% endif %}"
+    volumes:
+      - "{{ node_config_directory }}/neutron-server/:{{ container_config_directory }}/:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "kolla_logs:/var/log/kolla/"
+      - "opt_plugin:/opt/plugin/"
+
+neutron_server_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-neutron-server"
+neutron_server_tag: "{{ openstack_release }}"
+neutron_server_image_full: "{{ neutron_server_image }}:{{ neutron_server_tag }}"
+
+neutron_database_name: "neutron"
+neutron_database_user: "neutron"
+neutron_database_address: "{{ kolla_internal_fqdn }}:{{ database_port }}"
+
+dhcp_agents_per_network: 2
+min_l3_agents_per_router: 2
+max_l3_agents_per_router: 3
+
+neutron_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ neutron_server_port }}"
+neutron_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ neutron_server_port }}"
+neutron_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ neutron_server_port }}"
+
+neutron_logging_debug: "{{ openstack_logging_debug }}"
+neutron_bridge_name: "br-ex"
+openstack_neutron_auth: "{{ openstack_auth }}"
+
+extension_drivers:
+  - name: "qos"
+    enabled: "{{ enable_neutron_qos | bool }}"
+  - name: "port_security"
+    enabled: "{{ enable_tacker | bool or enable_designate | bool }}"
+  - name: "dns"
+    enabled: "{{ enable_designate | bool }}"
+
+neutron_extension_drivers: "{{ extension_drivers|selectattr('enabled', 'equalto', true)|list }}"
+
+neutron_notification_topics:
+  - name: notifications
+    enabled: "{{ enable_ceilometer | bool or enable_searchlight | bool }}"
+  - name: notifications_designate
+    enabled: "{{ enable_designate | bool }}"
+
+neutron_enabled_notification_topics: "{{ neutron_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+####################
+# Horizon
+####################
+
+horizon_services:
+  horizon:
+    container_name: horizon
+    group: horizon
+    enabled: true
+    image: "{{ horizon_image_full }}"
+    environment:
+      ENABLE_CLOUDKITTY: "{{ 'yes' if enable_horizon_cloudkitty | bool else 'no' }}"
+      ENABLE_FREEZER: "{{ 'yes' if enable_horizon_freezer | bool else 'no' }}"
+      ENABLE_IRONIC: "{{ 'yes' if enable_horizon_ironic | bool else 'no' }}"
+      ENABLE_KARBOR: "{{ 'yes' if enable_horizon_karbor | bool else 'no' }}"
+      ENABLE_MAGNUM: "{{ 'yes' if enable_horizon_magnum | bool else 'no' }}"
+      ENABLE_MANILA: "{{ 'yes' if enable_horizon_manila | bool else 'no' }}"
+      ENABLE_MISTRAL: "{{ 'yes' if enable_horizon_mistral | bool else 'no' }}"
+      ENABLE_MURANO: "{{ 'yes' if  enable_horizon_murano | bool else 'no' }}"
+      ENABLE_NEUTRON_LBAAS: "{{ 'yes' if enable_horizon_neutron_lbaas | bool else 'no' }}"
+      ENABLE_SAHARA: "{{ 'yes' if enable_horizon_sahara | bool else 'no' }}"
+      ENABLE_SEARCHLIGHT: "{{ 'yes' if enable_horizon_searchlight | bool else 'no' }}"
+      ENABLE_SENLIN: "{{ 'yes' if enable_horizon_senlin | bool else 'no' }}"
+      ENABLE_SOLUM: "{{ 'yes' if enable_horizon_solum | bool else 'no' }}"
+      ENABLE_TACKER: "{{ 'yes' if enable_horizon_tacker | bool else 'no' }}"
+      ENABLE_TROVE: "{{ 'yes' if enable_horizon_trove | bool else 'no' }}"
+      ENABLE_WATCHER: "{{ 'yes' if enable_horizon_watcher | bool else 'no' }}"
+    volumes:
+      - "{{ node_config_directory }}/horizon/:{{ container_config_directory }}/:ro"
+      - "/etc/localtime:/etc/localtime:ro"
+      - "kolla_logs:/var/log/kolla/"
+      - "/tmp:/tmp"
+
+horizon_database_name: "horizon"
+horizon_database_user: "horizon"
+horizon_database_address: "{{ kolla_internal_fqdn }}:{{ database_port }}"
+
+horizon_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kolla_install_type }}-horizon"
+horizon_tag: "{{ openstack_release }}"
+horizon_image_full: "{{ horizon_image }}:{{ horizon_tag }}"
+
+openstack_horizon_auth: "{'auth_url':'{{ openstack_auth.auth_url }}','username':'{{ openstack_auth.username }}','password':'{{ openstack_auth.password }}','project_name':'{{ openstack_auth.project_name }}'}"
+horizon_logging_debug: "{{ openstack_logging_debug }}"

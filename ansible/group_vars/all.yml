@@ -67,6 +67,7 @@ local_ssl_directory: "/etc/contrail_smgr/puppet/ssl"
 enable_ironic_inspector: "no"
 ironic_cleaning_network: "ironic-provision"
 
+enable_contrail_networking: "no"
 enable_contrail_horizon: "no"
 opencontrail_api_server_ip: "{{ contrail_api_interface_address }}"
 opencontrail_api_server_port: "8082"
