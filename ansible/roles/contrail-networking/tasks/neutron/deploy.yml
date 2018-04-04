@@ -1,0 +1,8 @@
+---
+- include: config.yml
+
+- include: bootstrap.yml
+  when: inventory_hostname in groups['neutron-server']
+
+- name: Flush Handlers
+  meta: flush_handlers

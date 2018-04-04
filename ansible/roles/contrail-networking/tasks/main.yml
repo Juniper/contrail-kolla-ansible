@@ -1,0 +1,16 @@
+---
+- include: "nova/{{ action }}.yml"
+  when: 
+    - enable_nova | bool
+
+- include: "neutron/{{ action }}.yml"
+  when:
+    - enable_neutron | bool
+
+- include: "heat/{{ action }}.yml"
+  when:
+    - enable_heat | bool
+
+- include: "horizon/{{ action }}.yml"
+  when:
+    - enable_horizon | bool

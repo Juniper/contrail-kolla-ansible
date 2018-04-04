@@ -1,0 +1,75 @@
+---
+# NOTE(awiddersheim): Gather facts for all hosts as a
+# first step since several plays below require them when
+# building their configurations. The below 'gather_facts'
+# set to 'false' is a bit confusing but this is to avoid
+# Ansible gathering facts twice.
+- name: Gather facts for all hosts
+  hosts: all
+  serial: '{{ serial|default("0") }}'
+  gather_facts: false
+  tasks:
+    - setup:
+  tags: always
+
+# NOTE(pbourke): This case covers deploying subsets of hosts using --limit. The
+# limit arg will cause the first play to gather facts only about that node,
+# meaning facts such as IP addresses for rabbitmq nodes etc. will be undefined
+# in the case of adding a single compute node.
+# We don't want to add the delegate parameters to the above play as it will
+# result in ((num_nodes-1)^2) number of SSHs when running for all nodes
+# which can be very inefficient.
+- name: Gather facts for all hosts (if using --limit)
+  hosts: all
+  serial: '{{ serial|default("0") }}'
+  gather_facts: false
+  tasks:
+    - setup:
+      delegate_facts: True
+      delegate_to: "{{ item }}"
+      with_items: "{{ groups['all'] }}"
+      when:
+        - (play_hosts | length) != (groups['all'] | length)
+
+- name: Detect openstack_release variable
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Get current kolla-ansible version number
+      local_action: command python -c "import pbr.version; print(pbr.version.VersionInfo('kolla-ansible'))"
+      register: kolla_ansible_version
+      changed_when: false
+      when: openstack_release == "auto"
+
+    - name: Set openstack_release variable
+      set_fact:
+        openstack_release: "{{ kolla_ansible_version.stdout }}"
+      when: openstack_release == "auto"
+  tags: always
+
+- name: Apply role contrail-networking
+  hosts:
+    - heat-api
+    - heat-api-cfn
+    - heat-engine
+    - neutron-server
+    - compute
+    - nova-api
+    - nova-conductor
+    - nova-consoleauth
+    - nova-novncproxy
+    - nova-scheduler
+    - horizon
+  roles:
+    - { role: contrail-networking,
+        tags: contrail-networking,
+        when: enable_contrail_networking | bool}
+
+- name: Apply role ironic-notification-manager
+  hosts:
+    - ironic-api
+  serial: '{{ serial|default("0") }}'
+  roles:
+    - { role: ironic-notification-manager,
+        tags: ironic-notification-manager,
+        when: enable_ironic | bool and enable_ironic_notifications | bool }
