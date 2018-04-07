@@ -15,7 +15,8 @@ enable_nova_compute: "yes"
 # containers.
 # Set this to "yes" when running contrail baremetal compute with contrail
 # containers <=4.x
-disable_nova_compute_service: "no"
+# with the TSN node on same host, it is being changed to yes now
+disable_nova_compute_service: "yes"
 
 # contrail_additions : Ideally leave this to yes if you want the opencontrail
 # neutron plugin. "no" means pure openstack neutron - without contrail neutron plugin

@@ -2,15 +2,6 @@
 - name: Post-deploy playbook for contrail
   hosts: control
   tasks:
-  - name: Install python clients for openstack components
-    package:
-      name: "{{ item }}"
-      state: latest
-    with_items:
-      - python-openstackclient
-      - python-heatclient
-      - python-ironicclient
-    when: disable_nova_compute_service | bool
 
   - name: Creating admin openrc file for kolla-toolbox
     template:
@@ -18,11 +9,21 @@
       dest: "{{ node_config_directory }}/kolla-toolbox/admin-openrc.sh"
 
   - name: Disable the nova-compute on the openstack container
-    shell: . /etc/kolla/admin-openrc.sh && nova service-disable {{ ansible_hostname }} nova-compute
-    ignore_errors: yes
+    command: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      compute service set  --disable {{ ansible_hostname }} nova-compute
     when:
       - enable_nova_compute | bool
       - disable_nova_compute_service | bool
+      - hostvars[inventory_hostname]['TSN_EVPN_MODE'] | bool
 
   - name: Run simple cell setup if required
     include: roles/nova/tasks/simple_cell_setup.yml
@@ -35,10 +36,6 @@
     #    tasks_from: simple_cell_setup
     #  when: not enable_nova_compute | bool
 
-  - name: Workaround for https://bugs.launchpad.net/bugs/1672741
-    shell: docker exec horizon sed -i -e 's:/usr/share/openstack-dashboard/static:/var/lib/openstack-dashboard/static:g' /etc/apache2/conf-enabled/000-default.conf && docker exec horizon service apache2 reload
-    ignore_errors: yes
-    when: openstack_release == '4.0.0'
 
   - name: Contrail default swift container and Temp-URL-Key creation
     shell: docker exec kolla_toolbox bash -c 'source /var/lib/kolla/config_files/admin-openrc.sh; swift post -r '.r:*' contrail_container; swift post -m "Temp-URL-Key:mykey"'
