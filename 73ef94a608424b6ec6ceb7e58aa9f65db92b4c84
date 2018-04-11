@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_c4d82e7c",
+        "filename": "ansible/roles/baremetal/defaults/main.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-04-11T16:21:53Z",
+      "side": 1,
+      "message": "I think this will just help the all-in-one case but will still not cover the case where the deployer node is different than the target nodes. We should ideally have these packages installed in the deployer node from the contrail-ansible-deployer repo. I am approving this now, but this should be corrected after the contrail-ansible-deployer changes to install these packages on the operator(deployer) node is done.",
+      "revId": "73ef94a608424b6ec6ceb7e58aa9f65db92b4c84",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
