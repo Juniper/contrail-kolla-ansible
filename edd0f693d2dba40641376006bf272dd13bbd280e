@@ -46,6 +46,30 @@
       "revId": "edd0f693d2dba40641376006bf272dd13bbd280e",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_67a17746",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 35
+      },
+      "writtenOn": "2018-04-12T16:33:07Z",
+      "side": 1,
+      "message": "ok.. I think we can remove enable_swift_opencontrail. but we can decide that later.. I will approve",
+      "parentUuid": "5f2577a7_27936f5d",
+      "range": {
+        "startLine": 47,
+        "startChar": 8,
+        "endLine": 47,
+        "endChar": 20
+      },
+      "revId": "edd0f693d2dba40641376006bf272dd13bbd280e",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
