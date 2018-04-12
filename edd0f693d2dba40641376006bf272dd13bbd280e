@@ -22,6 +22,30 @@
       "revId": "edd0f693d2dba40641376006bf272dd13bbd280e",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_27936f5d",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-04-12T14:36:36Z",
+      "side": 1,
+      "message": "because that is enabled by default irrespective of enable_swift. enable_swift is global, but whether you want contrail customizations is different. enable_swift will enable just vanilla open stack swift",
+      "parentUuid": "5f2577a7_c7d4ab22",
+      "range": {
+        "startLine": 47,
+        "startChar": 8,
+        "endLine": 47,
+        "endChar": 20
+      },
+      "revId": "edd0f693d2dba40641376006bf272dd13bbd280e",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
