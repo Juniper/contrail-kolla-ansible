@@ -113,6 +113,27 @@ serialproxy_port = {{ nova_serialproxy_port }}
 proxyclient_address = {{ hostvars[inventory_hostname]['ansible_' + api_interface]['ipv4']['address'] }}
 {% endif %}
 
+colon = ":"
+
+{% if inventory_hostname in groups['compute'] %}
+{% if hostvars[inventory_hostname]['sriov'] == 'True' %}
+{% if hostvars[inventory_hostname]['PHYSICAL_INTERFACE'] is defined %}
+{% if hostvars[inventory_hostname]['physnet'] is defined %}
+pci_passthrough_whitelist = { "devname"{{colon}} {{ hostvars[inventory_hostname]['PHYSICAL_INTERFACE'] }}, "physical_network"{{colon}} {{ hostvars[inventory_hostname]['physnet'] }}
+{% endif %}
+{% endif %}
+{% endif %}
+{% endif %}
+
+{% if inventory_hostname in groups['compute'] %}
+{% if hostvars[inventory_hostname]['sriov'] == 'True' %}
+scheduler_default_filters = PciPassthroughFilter
+scheduler_available_filters = nova.scheduler.filters.all_filters
+scheduler_available_fitlers = nova.scheduler.filters.pci_passthrough_filter.PciPassthroughFilter
+{% endif %}
+{% endif %}
+
+
 {% if service_name == "nova-compute-ironic" %}
 [ironic]
 username = {{ ironic_keystone_user }}
