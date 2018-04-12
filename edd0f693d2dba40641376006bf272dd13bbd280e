@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_c7d4ab22",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 35
+      },
+      "writtenOn": "2018-04-12T14:05:08Z",
+      "side": 1,
+      "message": "why do we need additional flag when we have enable_swift_opencontrail available",
+      "range": {
+        "startLine": 47,
+        "startChar": 8,
+        "endLine": 47,
+        "endChar": 20
+      },
+      "revId": "edd0f693d2dba40641376006bf272dd13bbd280e",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
