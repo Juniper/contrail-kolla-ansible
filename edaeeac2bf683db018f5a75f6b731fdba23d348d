@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_45ed37b5",
+        "filename": "ansible/roles/nova/templates/nova.conf.j2",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-04-18T15:39:33Z",
+      "side": 1,
+      "message": "the variable will not be defined in non sriov case",
+      "revId": "edaeeac2bf683db018f5a75f6b731fdba23d348d",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
