@@ -22,6 +22,7 @@
       compute service set  --disable {{ ansible_hostname }} nova-compute
     when:
       - enable_nova_compute | bool
+      - inventory_hostname in groups['compute']
       - disable_nova_compute_service | bool
       - hostvars[inventory_hostname]['TSN_EVPN_MODE'] is defined
       - hostvars[inventory_hostname]['TSN_EVPN_MODE'] | bool
