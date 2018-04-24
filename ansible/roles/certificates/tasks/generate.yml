@@ -12,30 +12,41 @@
     src: "{{ item }}.j2"
     dest: "{{ node_config_directory }}/certificates/{{ item }}"
   with_items:
-    - "openssl-kolla.cnf"
+    - "openssl-kolla-external.cnf"
+    - "openssl-kolla-internal.cnf"
 
 - name: Creating Key
   command: creates="{{ item }}" openssl genrsa -out {{ item }}
   with_items:
-    - "{{ node_config_directory }}/certificates/private/haproxy.key"
+    - "{{ node_config_directory }}/certificates/private/haproxy-external.key"
+    - "{{ node_config_directory }}/certificates/private/haproxy-internal.key"
 
 - name: Creating Server Certificate
-  command: creates="{{ item }}" openssl req -new -nodes -sha256 -x509 \
-    -subj "/C=US/ST=NC/L=RTP/O=kolla/CN={{ kolla_external_fqdn }}" \
-    -config {{ node_config_directory }}/certificates/openssl-kolla.cnf \
+  command: creates="{{ node_config_directory }}/certificates/private/haproxy-{{ item.type }}.crt" \
+    openssl req -new -nodes -sha256 -x509 \
+    -subj "/C=US/ST=NC/L=RTP/O=kolla/CN={{ item.cn }}" \
+    -config {{ node_config_directory }}/certificates/openssl-kolla-{{ item.type }}.cnf \
     -days 3650 \
     -extensions v3_req \
-    -key {{ node_config_directory }}/certificates/private/haproxy.key \
-    -out {{ item }}
+    -key {{ node_config_directory }}/certificates/private/haproxy-{{ item.type }}.key \
+    -out {{ node_config_directory }}/certificates/private/haproxy-{{ item.type }}.crt
   with_items:
-    - "{{ node_config_directory }}/certificates/private/haproxy.crt"
+    - { type: "external", cn: "{{ kolla_external_fqdn }}" }
+    - { type: "internal", cn: "{{ kolla_internal_fqdn }}" }
 
 - name: Creating CA Certificate File
   copy:
-    src: "{{ node_config_directory }}/certificates/private/haproxy.crt"
-    dest: "{{ node_config_directory }}/certificates/haproxy-ca.crt"
+    src: "{{ node_config_directory }}/certificates/private/{{ item.src_file }}"
+    dest: "{{ item.dst_file }}"
+  with_items:
+    - { src_file: "haproxy-external.crt", dst_file: "{{ kolla_external_fqdn_cacert }}" }
+    - { src_file: "haproxy-internal.crt", dst_file: "{{ kolla_internal_fqdn_cacert }}" }
 
 - name: Creating Server PEM File
   assemble:
     src: "{{ node_config_directory }}/certificates/private"
-    dest: "{{ node_config_directory }}/certificates/haproxy.pem"
+    dest: "{{ node_config_directory }}/certificates/{{ item.dst_file }}"
+    regexp: "{{ item.rg }}"
+  with_items:
+    - { rg: ".*external.*", dst_file: "haproxy.pem" }
+    - { rg: ".*internal.*", dst_file: "haproxy-internal.pem" }
