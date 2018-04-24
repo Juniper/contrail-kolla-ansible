@@ -25,9 +25,9 @@
     dest: "{{ item.dst }}"
     src: "{{ item.src }}"
   with_items:
-    - { dst: "/etc/nova/ssl/certs/nova.pem", src: "{{ local_ssl_directory }}/{{ ansible_hostname }}.pem" }
-    - { dst: "/etc/nova/ssl/certs/ca.pem", src: "{{ local_ssl_directory }}/ca-cert.pem" }
-    - { dst: "/etc/nova/ssl/private/novakey.pem", src: "{{ local_ssl_directory  + '/' + ansible_hostname + '-privkey.pem' }}" }
+    - { dst: "/etc/nova/ssl/certs/nova.pem", src: "{{ local_ssl_directory }}/certs/server.pem" }
+    - { dst: "/etc/nova/ssl/certs/ca.pem", src: "{{ local_ssl_directory }}/certs/ca-cert.pem" }
+    - { dst: "/etc/nova/ssl/private/novakey.pem", src: "{{ local_ssl_directory }}/private/server-privkey.pem" }
   when: metadata_ssl_enable | bool
 
 - name: Ensuring config directories exist
