@@ -2,10 +2,10 @@
 # The options in this file can be overridden in 'globals.yml'
 
 ####################### CONTRAIL ADDITIONS - BEGIN ###########################
-# contrail_additions :  Selectively enable or disable nova-compute. 
+# contrail_additions :  Selectively enable or disable nova-compute.
 # Set this to "yes" when contrail-compute is on a different node from openstack
-# and set this to "no" on an All-in-One node. 
-# If "Waiting for nova-compute service up" task fails or if VM creation fails, 
+# and set this to "no" on an All-in-One node.
+# If "Waiting for nova-compute service up" task fails or if VM creation fails,
 # this will most likely be the culprit
 enable_nova_compute: "yes"
 
@@ -481,6 +481,11 @@ haproxy_enable_external_vip: "{{ 'no' if kolla_external_vip_address == kolla_int
 kolla_enable_tls_external: "no"
 kolla_external_fqdn_cert: "{{ node_config_directory }}/certificates/haproxy.pem"
 kolla_external_fqdn_cacert: "{{ node_config_directory }}/certificates/haproxy-ca.crt"
+
+# TODO: in haproxy.cfg only nova metadata for now is supported
+kolla_enable_tls_internal: "no"
+kolla_internal_fqdn_cert: "{{ node_config_directory }}/certificates/haproxy-internal.pem"
+kolla_internal_fqdn_cacert: "{{ node_config_directory }}/certificates/haproxy-ca-internal.crt"
 
 
 ####################
