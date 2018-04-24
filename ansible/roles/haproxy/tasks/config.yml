@@ -43,8 +43,18 @@
 
 - name: Copying over haproxy.pem
   copy:
+    remote_src: true
     src: "{{ kolla_external_fqdn_cert }}"
     dest: "{{ node_config_directory }}/haproxy/{{ item }}"
   with_items:
     - "haproxy.pem"
   when: kolla_enable_tls_external | bool
+
+- name: Copying over haproxy-internal.pem
+  copy:
+    remote_src: true
+    src: "{{ kolla_internal_fqdn_cert }}"
+    dest: "{{ node_config_directory }}/haproxy/{{ item }}"
+  with_items:
+    - "haproxy-internal.pem"
+  when: kolla_enable_tls_internal | bool
