@@ -140,6 +140,8 @@
     src: "rsyncd.conf.j2"
     dest: "{{ node_config_directory }}/swift-rsyncd/rsyncd.conf"
 
+- include: disk_and_ring.yml
+
 - name: Copying over Swift ring files
   copy:
     src: "{{ node_custom_config }}/swift/{{ item }}"
@@ -152,6 +154,7 @@
     - "container.ring.gz"
     - "object.builder"
     - "object.ring.gz"
+  when: not enable_swift_opencontrail | bool
 
 - name: Check if policies shall be overwritten
   local_action: stat path="{{ node_custom_config }}/swift/policy.json"
