@@ -18,9 +18,6 @@ DOCKER_OPTS="$DOCKER_OPTS --storage-driver={{ docker_storage_driver }}"
 {% if docker_registry %}
 DOCKER_OPTS="$DOCKER_OPTS --insecure-registry  {{ docker_registry }}"
 {% endif %}
-{% if contrail_docker_registry %}
-DOCKER_OPTS="$DOCKER_OPTS --insecure-registry  {{ contrail_docker_registry }}"
-{% endif %}
 
 # If you need Docker to use an HTTP proxy, it can also be specified here.
 #export http_proxy="http://127.0.0.1:3128/"
