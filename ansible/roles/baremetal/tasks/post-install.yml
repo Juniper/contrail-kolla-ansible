@@ -1,98 +1,20 @@
 ---
-- name: register /etc/docker/daemon.json
-  stat:
-    path: /etc/docker/daemon.json
-  register: p
-
-- name: create /etc/docker directory
+- name: Ensure docker service directory exists
   file:
-    path: /etc/docker
-    state: directory
-    mode: 0755
+      path=/etc/systemd/system/docker.service.d
+      state=directory
+      recurse=yes
+  become: True
+  when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version > "14") or
+        (ansible_os_family == "RedHat") or (ansible_distribution == "Debian")
 
-- name: create emtpy /etc/docker/daemon.json is it doesn't exis
-  copy:
-    content: ""
-    dest: /etc/docker/daemon.json
-  when: not p.stat.exists
-
-- name: set registry string if it is the first one
-  set_fact:
-    new_reg: "{% raw %}{{% endraw %}\n \"insecure-registries\": [\"{{docker_registry}}\"]\n{% raw %}}{% endraw %}\n"
-  when: not p.stat.exists
-
-- name: add 1st registry entry to file
-  lineinfile:
-    dest: /etc/docker/daemon.json
-    line: "{{ new_reg |to_json}}"
-  when: not p.stat.exists
-
-- name: read /etc/docker/daemon.json if it exists
-  shell: cat /etc/docker/daemon.json
-  register: docker_daemon_file
-
-- name: set entries to json
-  set_fact:
-    docker_daemon: "{{ docker_daemon_file.stdout | from_json }}"
-
-- name: check if registry is already in
-  set_fact:
-    is_registry_in: True
-  when: docker_registry in item.value and p.stat.exists
-  with_dict: "{{ docker_daemon }}"
-
-- name: check if registry is already in
-  set_fact:
-    is_registry_in: True
-  when: docker_registry in item.value and p.stat.exists
-  with_dict: "{{ docker_daemon }}"
-
-- name: check if registry is already in
-  set_fact:
-    is_contrail_registry_in: True
-  when:
-    - contrail_docker_registry is defined
-    - contrail_docker_registry in item.value and p.stat.exists
-  with_dict: "{{ docker_daemon }}"
-
-- name: add registry to list
-  set_fact:
-    new_docker_registries: "{{ item.value }} + [ '{{ docker_registry }}' ]"
-    added: True
-  when: (item.key == "insecure-registries" and is_registry_in is undefined)
-  with_dict: "{{ docker_daemon }}"
-
-- name: add contrail registry to list if required
-  set_fact:
-    new_docker_registries: "{{ new_docker_registries|default([]) }} + {{ item.value }} + [ '{{ contrail_docker_registry }}' ]"
-    added: True
-  when:
-    - contrail_docker_registry is defined
-    - item.key == "insecure-registries"
-    - is_contrail_registry_in is undefined
-  with_dict: "{{ docker_daemon }}"
-
-- name: create registry list
-  set_fact:
-    new_docker_registries: "[ '{{ docker_registry }}' ]"
-  when: is_registry_in is undefined and added is undefined
-
-- name: create new registry string
-  set_fact:
-    reg_string: "{% raw %}{{% endraw %}\n \"insecure-registries\": [{% for arg1 in new_docker_registries %}\"{{arg1}}\"{% if not loop.last %},{% endif %}{% endfor %}]\n{% raw %}}{% endraw %}"
-  when: is_registry_in is undefined
-
-- name: empty existing file *danger danger*
-  copy:
-    content: ""
-    dest: /etc/docker/daemon.json
-  when: p.stat.exists and is_registry_in is undefined
-
-- name: write to /etc/docker/daemon.json
-  lineinfile:
-    dest: /etc/docker/daemon.json
-    line: "{{ reg_string |to_json}}"
-  when: p.stat.exists and is_registry_in is undefined
+- name: Configure docker service
+  become: True
+  template:
+     src=docker_systemd_service.j2
+     dest=/etc/systemd/system/docker.service.d/kolla.conf
+  when: (ansible_distribution == "Ubuntu" and ansible_distribution_major_version > "14") or
+        (ansible_os_family == "RedHat") or (ansible_distribution == "Debian")
 
 - name: Reload docker service file
   become: True
