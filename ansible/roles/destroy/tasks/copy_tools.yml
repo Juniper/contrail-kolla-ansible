@@ -4,27 +4,32 @@
     state: directory
     path: /tmp/kolla-cleanup/tools
 
+- set_fact:
+    file_path="{{ "../../../tools" if contrail_cleanup is defined else "../tools" }}"
+
+- debug: msg="{{ file_path }}"
+
 - name: Copying validate-docker-execute.sh file
   copy:
-    src: ../tools/validate-docker-execute.sh
+    src: "{{ file_path }}/validate-docker-execute.sh"
     dest: /tmp/kolla-cleanup/tools
     mode: 0755
 
 - name: Copying cleanup-containers file
   copy:
-    src: ../tools/cleanup-containers
+    src: "{{ file_path }}/cleanup-containers"
     dest: /tmp/kolla-cleanup/tools
     mode: 0755
 
 - name: Copying cleanup-host file
   copy:
-    src: ../tools/cleanup-host
+    src: "{{ file_path }}/cleanup-host"
     dest: /tmp/kolla-cleanup/tools
     mode: 0755
 
 - name: Copying cleanup-images file
   copy:
-    src: ../tools/cleanup-images
+    src: "{{ file_path }}/cleanup-images"
     dest: /tmp/kolla-cleanup/tools
     mode: 0755
   when:
