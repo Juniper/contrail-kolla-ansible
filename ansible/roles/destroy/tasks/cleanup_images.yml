@@ -3,3 +3,4 @@
   command: /tmp/kolla-cleanup/tools/cleanup-images
   when:
     - destroy_include_images | bool
+  ignore_errors: yes
