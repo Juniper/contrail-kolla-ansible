@@ -8,6 +8,10 @@
       src: "roles/common/templates/admin-openrc.sh.j2"
       dest: "{{ node_config_directory }}/kolla-toolbox/admin-openrc.sh"
 
+  - debug:
+      msg: "{{ hostvars[item].get('TSN_EVPN_MODE', "NOT_DEFINED") }}"
+    with_items: "{{ groups['compute'] }}"
+
   - name: Disable the nova-compute on the openstack container
     command: >
       docker exec kolla_toolbox openstack
@@ -19,12 +23,13 @@
       --os-username admin
       --os-password {{ keystone_admin_password }}
       --os-user-domain-name default
-      compute service set  --disable {{ ansible_hostname }} nova-compute
+      compute service set  --disable {{ hostvars[item].ansible_hostname }} nova-compute
     when:
       - enable_nova_compute | bool
       - disable_nova_compute_service | bool
-      - hostvars[inventory_hostname]['TSN_EVPN_MODE'] is defined
-      - hostvars[inventory_hostname]['TSN_EVPN_MODE'] | bool
+      - hostvars[item].TSN_EVPN_MODE is defined
+      - hostvars[item]['TSN_EVPN_MODE'] | bool
+    with_items: "{{ groups['compute'] }}"
 
   - name: Run simple cell setup if required
     include: roles/nova/tasks/simple_cell_setup.yml
