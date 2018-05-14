@@ -18,6 +18,8 @@ debian_pkg_install:
  - git
  - python-setuptools
  - ntp
+ - parted
+ - xfsprogs
 
 redhat_pkg_install:
  - epel-release
