@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_976e2394",
+        "filename": "ansible/roles/swift/templates/swift-create-disk-partition.sh.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-05-29T22:38:07Z",
+      "side": 1,
+      "message": "We should use \u0027swift_devices_mount_point\u0027 variable (defined in ansible/roles/swift/defaults/main.yml) instead of /srv/node.",
+      "revId": "4039df48af4df04d0afb3b0c940356c7794a88f7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_776df796",
+        "filename": "ansible/roles/swift/templates/swift-create-disk-partition.sh.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-05-29T22:38:07Z",
+      "side": 1,
+      "message": "same as above.",
+      "revId": "4039df48af4df04d0afb3b0c940356c7794a88f7",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
