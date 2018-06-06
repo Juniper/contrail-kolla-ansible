@@ -5,4 +5,7 @@
 
 - include_tasks: cleanup_images.yml
 
+# contrail_additions: Cleanup Contrail Images
+- include_tasks: cleanup_contrail.yml
+
 - include_tasks: cleanup_host.yml
