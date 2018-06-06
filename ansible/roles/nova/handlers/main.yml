@@ -280,6 +280,7 @@
     ipc_mode: "{{ service.ipc_mode | default(omit) }}"
     volumes: "{{ service.volumes|reject('equalto', '')|list }}"
     dimensions: "{{ service.dimensions }}"
+    environment: "{{ service.environment }}"
   when:
     - kolla_action != "config"
     - inventory_hostname in groups[service.group]
@@ -288,6 +289,7 @@
       or nova_conf.changed | bool
       or policy_overwriting.changed | bool
       or vcenter_ca_file | bool
+      or compute_rootwrap_conf | bool
       or nova_compute_container.changed | bool
 
 - name: Restart nova-compute-ironic container

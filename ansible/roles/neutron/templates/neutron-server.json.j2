@@ -1,5 +1,5 @@
 {
-    "command": "neutron-server --config-file /etc/neutron/neutron.conf {% if neutron_plugin_agent in ['openvswitch', 'linuxbridge', 'opendaylight'] %} --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --config-file /etc/neutron/neutron_lbaas.conf --config-file /etc/neutron/neutron_vpnaas.conf {% elif neutron_plugin_agent in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] %} --config-file /etc/neutron/plugins/vmware/nsx.ini {% endif %} --config-file /etc/neutron/fwaas_driver.ini",
+    "command": "neutron-server --config-file /etc/neutron/neutron.conf {% if neutron_plugin_agent in ['openvswitch', 'linuxbridge', 'opendaylight'] %} --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --config-file /etc/neutron/neutron_lbaas.conf --config-file /etc/neutron/neutron_vpnaas.conf {% elif neutron_plugin_agent in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] %} --config-file /etc/neutron/plugins/vmware/nsx.ini {% elif neutron_plugin_agent in ['opencontrail'] %} --config-file /etc/neutron/plugins/opencontrail/ContrailPlugin.ini {% endif %} --config-file /etc/neutron/fwaas_driver.ini",
     "config_files": [
         {
             "source": "{{ container_config_directory }}/neutron.conf",
@@ -39,6 +39,25 @@
             "perm": "0600"
         },
 {% endfor %}{% endif %}
+        {% if neutron_plugin_agent in ['opencontrail'] -%}
+        {
+            "source": "{{ container_config_directory }}/ContrailPlugin.ini",
+            "dest": "/etc/neutron/plugins/opencontrail/ContrailPlugin.ini",
+            "owner": "neutron",
+            "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/api-paste.ini",
+            "dest": "/etc/neutron/api-paste.ini",
+            "owner": "neutron",
+            "perm": "0600"
+        }{% if enable_haproxy|bool and kolla_enable_tls_external|bool %},
+        {
+            "source": "{{ container_config_directory }}/haproxy-ca.crt",
+            "dest": "/etc/neutron/haproxy-ca.crt",
+            "owner": "neutron",
+            "perm": "0600"
+        }{% endif %}{% endif %},
         {
             "source": "{{ container_config_directory }}/policy.json",
             "dest": "/etc/neutron/policy.json",
