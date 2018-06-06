@@ -4,8 +4,16 @@
 {
     "command": "/usr/sbin/in.tftpd --verbose --foreground --user root --address 0.0.0.0:69 --map-file /map-file /tftpboot",
     "config_files": [
+<<<<<<< HEAD
+<<<<<<< HEAD
 {% if groups['ironic-inspector'] | length > 0 %}
 {% if not enable_ironic_pxe_uefi | bool %}
+=======
+{% if enable_ironic_notifications | bool %}
+>>>>>>> 47b150e0b... remove copying of inspect kernel and initramfs
+=======
+{% if enable_ironic_inspector | bool %}
+>>>>>>> 3abd2bc68... enable ironic duing provisioning.
         {
             "source": "{{ container_config_directory }}/ironic-agent.kernel",
             "dest": "/tftpboot/ironic-agent.kernel",
@@ -26,6 +34,7 @@
             "perm": "0644"
         }
 {% endif %}
+<<<<<<< HEAD
     ],
     "permissions": [
         {
@@ -33,5 +42,7 @@
             "owner": "ironic:ironic",
             "recurse": true
         }
+=======
+>>>>>>> 47b150e0b... remove copying of inspect kernel and initramfs
     ]
 }

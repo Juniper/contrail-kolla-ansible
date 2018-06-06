@@ -3,4 +3,4 @@
 - fail: msg="neutron_plugin_agent must use openvswitch with Ironic"
   when:
     - enable_ironic | bool
-    - neutron_plugin_agent != "openvswitch"
+    - neutron_plugin_agent != "opencontrail"
