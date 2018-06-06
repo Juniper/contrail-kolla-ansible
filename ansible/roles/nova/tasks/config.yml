@@ -139,7 +139,6 @@
     - { src: "ssh_config.j2", dest: "ssh_config" }
   notify:
     - Restart nova-ssh container
-
 - name: Copying VMware vCenter CA file
   vars:
     service: "{{ nova_services['nova-compute'] }}"
@@ -154,6 +153,8 @@
     - service.enabled | bool
   notify:
     - Restart nova-compute container
+
+- include: config_opencontrail.yml
 
 - name: Copying over existing policy file
   become: true

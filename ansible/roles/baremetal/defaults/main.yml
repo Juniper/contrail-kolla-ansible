@@ -30,6 +30,8 @@ redhat_pkg_install:
  - git
  - python-setuptools
  - ntp
+ - parted
+ - xfsprogs
 
 ubuntu_pkg_removals:
  - lxd
