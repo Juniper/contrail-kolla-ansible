@@ -1,5 +1,5 @@
 [gerrit]
-host=review.openstack.org
+host=review.opencontrail.org
 port=29418
-project=openstack/kolla-ansible.git
-defaultbranch=stable/queens
+project=Juniper/contrail-kolla-ansible.git
+defaultbranch=contrail/queens
