@@ -1,0 +1,15 @@
+---
+- name: Copying over rootwrap.conf for nova-compute
+  become: true
+  vars:
+    service: "{{ nova_services['nova-compute'] }}"
+  copy:
+    src: "{{ role_path }}/templates/rootwrap.conf"
+    dest: "{{ node_config_directory }}/nova-compute/rootwrap.conf"
+    mode: "0640"
+  register: compute_rootwrap_conf
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  notify:
+    - Restart nova-compute container
