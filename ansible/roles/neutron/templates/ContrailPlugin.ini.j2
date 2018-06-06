@@ -1,0 +1,32 @@
+{% if neutron_plugin_agent == 'opencontrail' %}
+[APISERVER]
+api_server_port = {{ opencontrail_api_server_port }}
+{% if enable_haproxy|bool and kolla_enable_tls_external|bool %}
+api_server_ip = {{ kolla_external_vip_address }}
+use_ssl = True
+protocol = https
+cafile = /etc/neutron/haproxy-ca.crt
+{% if opencontrail_api_insecure|bool %}
+insecure = True
+{% endif %}
+{% else %}
+api_server_ip = {{ opencontrail_api_server_ip }}
+{% endif %}
+multi_tenancy = True
+contrail_extensions = ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None,service-interface:None,vf-binding:None
+
+[COLLECTOR]
+analytics_api_ip = {{ opencontrail_collector_ip.split(' ')[0] }}
+analytics_api_port = {{ opencontrail_collector_port }}
+
+[keystone_authtoken]
+auth_host = {{ kolla_internal_fqdn }}
+auth_port = {{ keystone_public_port }}
+auth_protocol = {{ internal_protocol }}
+admin_user = {{ openstack_auth['username'] }}
+admin_password = {{ openstack_auth['password'] }}
+admin_tenant_name = {{ openstack_auth['project_name'] }}
+insecure = True
+region_name = {{ openstack_region_name }}
+{% endif %}
+

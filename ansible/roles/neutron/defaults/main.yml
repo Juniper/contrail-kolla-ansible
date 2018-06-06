@@ -8,10 +8,13 @@ neutron_services:
     enabled: true
     group: "neutron-server"
     host_in_groups: "{{ inventory_hostname in groups['neutron-server'] }}"
+    environment:
+        PYTHONPATH: "{% if neutron_plugin_agent == 'opencontrail' %}/opt/plugin/site-packages{% endif %}"
     volumes:
       - "{{ node_config_directory }}/neutron-server/:{{ container_config_directory }}/:ro"
       - "/etc/localtime:/etc/localtime:ro"
       - "kolla_logs:/var/log/kolla/"
+      - "opt_plugin:/opt/plugin/"
     dimensions: "{{ neutron_server_dimensions }}"
   neutron-openvswitch-agent:
     container_name: "neutron_openvswitch_agent"
@@ -84,7 +87,7 @@ neutron_services:
     container_name: "neutron_dhcp_agent"
     image: "{{ neutron_dhcp_agent_image_full }}"
     privileged: True
-    enabled: "{{ neutron_plugin_agent not in [ 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
+    enabled: "{{ neutron_plugin_agent not in [ 'opencontrail', 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
     group: "neutron-dhcp-agent"
     host_in_groups: "{{ inventory_hostname in groups['neutron-dhcp-agent'] }}"
     volumes:
@@ -98,7 +101,7 @@ neutron_services:
     container_name: "neutron_l3_agent"
     image: "{{ neutron_l3_agent_image_full }}"
     privileged: True
-    enabled: "{{ neutron_plugin_agent not in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] and not enable_opendaylight_l3 | bool and not enable_onos | bool }}"
+    enabled: "{{ neutron_plugin_agent not in ['opencontrail', 'vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] and not enable_opendaylight_l3 | bool and not enable_onos | bool }}"
     host_in_groups: >-
       {{
       inventory_hostname in groups['neutron-l3-agent']
@@ -116,7 +119,7 @@ neutron_services:
     container_name: "neutron_lbaas_agent"
     image: "{{ neutron_lbaas_agent_image_full }}"
     privileged: True
-    enabled: "{{ enable_neutron_lbaas | bool and not enable_octavia | bool and neutron_plugin_agent not in ['vmware_nsxv', 'vmware_dvs'] }}"
+    enabled: "{{ enable_neutron_lbaas | bool and not enable_octavia | bool and neutron_plugin_agent not in ['opencontrail', 'vmware_nsxv', 'vmware_dvs'] }}"
     group: "neutron-lbaas-agent"
     host_in_groups: "{{ inventory_hostname in groups['neutron-lbaas-agent'] }}"
     volumes:
@@ -141,7 +144,7 @@ neutron_services:
     container_name: "neutron_metadata_agent"
     image: "{{ neutron_metadata_agent_image_full }}"
     privileged: True
-    enabled: "{{ neutron_plugin_agent not in [ 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
+    enabled: "{{ neutron_plugin_agent not in [ 'opencontrail', 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
     host_in_groups: >-
       {{
       inventory_hostname in groups['neutron-metadata-agent']

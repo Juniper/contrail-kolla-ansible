@@ -97,6 +97,8 @@
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
+    - enable_ironic_inspector | bool
+    - enable_ironic_dnsmasq | bool
   with_first_found:
     - "{{ node_custom_config }}/ironic/ironic-dnsmasq.conf"
     - "{{ node_custom_config }}/ironic/{{ inventory_hostname }}/ironic-dnsmasq.conf"
@@ -114,6 +116,7 @@
   become: true
   register: ironic_pxe_confs
   with_first_found:
+    - "{{ custom_ironic_pxe_default }}"
     - "{{ node_custom_config }}/ironic/pxelinux.default"
     - "{{ node_custom_config }}/ironic/{{ inventory_hostname }}/pxelinux.default"
     - "pxelinux.default.j2"
@@ -147,28 +150,44 @@
   notify:
     - Restart ironic-pxe container
 
-- name: Copying ironic-agent kernel and initramfs (PXE)
-  vars:
-    service: "{{ ironic_services['ironic-pxe'] }}"
-  copy:
-    src: "{{ node_custom_config }}/ironic/{{ item }}"
-    dest: "{{ node_config_directory }}/ironic-pxe/{{ item }}"
-    mode: "0660"
-  become: true
-  register: ironic_kernel
-  with_items:
-    - "ironic-agent.kernel"
-    - "ironic-agent.initramfs"
+#- name: Copying ironic-agent kernel and initramfs (PXE)
+#  vars:
+#    service: "{{ ironic_services['ironic-pxe'] }}"
+#  copy:
+#    src: "{{ node_custom_config }}/ironic/{{ item }}"
+#    dest: "{{ node_config_directory }}/ironic-pxe/{{ item }}"
+#    mode: "0660"
+#  become: true
+#  register: ironic_kernel
+#  with_items:
+#    - "ironic-agent.kernel"
+#    - "ironic-agent.initramfs"
+#  when:
+#    # Only required when Ironic inspector is in use.
+#    - groups['ironic-inspector'] | length > 0
+#    - inventory_hostname in groups['ironic-pxe']
+#    - inventory_hostname in groups[service.group]
+#    - service.enabled | bool
+#    - not enable_ironic_pxe_uefi | bool
+#    - not enable_ironic_ipxe | bool
+#  notify:
+#    - Restart ironic-pxe container
+
+- name: Create Ironic Images dict to download
+  set_fact:
+    ironic_images: "{{ ironic_images|default({})|combine({item.0: item.1}) }}"
+  with_together:
+    - ['ironic-agent.kernel','ironic-agent.initramfs']
+    - ["{{ ironic_deploy_kernel_image }}", "{{ ironic_deploy_initramfs_image }}"]
+
+- name: Download Ironic Deploy Image
+  get_url:
+    url: "{{ ironic_image_url }}/{{ item.value }}"
+    dest: "{{ node_config_directory }}/ironic-pxe/{{ item.key }}"
+  with_dict: "{{ ironic_images }}"
   when:
-    # Only required when Ironic inspector is in use.
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups['ironic-pxe']
-    - inventory_hostname in groups[service.group]
-    - service.enabled | bool
-    - not enable_ironic_pxe_uefi | bool
-    - not enable_ironic_ipxe | bool
-  notify:
-    - Restart ironic-pxe container
 
 - name: Copying ironic-agent kernel and initramfs (iPXE)
   vars:
