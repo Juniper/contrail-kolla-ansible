@@ -19,7 +19,7 @@ selinux_state: "permissive"
 docker_storage_driver: ""
 
 debian_pkg_install:
- - "{{ 'docker-ce' if ansible_architecture == 'aarch64' else 'docker-engine=1.12.*' }}"
+ - "{{ 'docker-ce' if ansible_architecture == 'aarch64' else 'docker-engine' }}"
  - git
  - python-setuptools
  - ntp
