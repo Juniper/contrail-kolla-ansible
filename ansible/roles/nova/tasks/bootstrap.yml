@@ -53,3 +53,6 @@
   when:
     - inventory_hostname in groups['compute']
     - nova_compute_virt_type == "xenapi"
+
+- include: init_opencontrail.yml
+  when: inventory_hostname in groups['compute']

@@ -75,7 +75,9 @@
     - "{{ node_custom_config }}/ironic/ironic-dnsmasq.conf"
     - "{{ node_custom_config }}/ironic/{{ inventory_hostname }}/ironic-dnsmasq.conf"
     - "ironic-dnsmasq.conf.j2"
-  when: inventory_hostname in groups['ironic-inspector']
+  when:
+    - inventory_hostname in groups['ironic-inspector']
+    - enable_ironic_inspector | bool
 
 - name: Copying pxelinux.cfg default
   template:
@@ -90,6 +92,7 @@
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups['ironic-pxe']
     - not enable_ironic_pxe_uefi | bool
+    - enable_ironic_inspector | bool
 
 - name: Copying ironic_pxe_uefi.cfg default
   template:
@@ -102,6 +105,7 @@
   when:
     - inventory_hostname in groups['ironic-pxe']
     - enable_ironic_pxe_uefi | bool
+    - enable_ironic_inspector | bool
 
 - name: Copying ironic-agent kernel and initramfs
   copy:
@@ -115,6 +119,7 @@
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups['ironic-pxe']
     - not enable_ironic_pxe_uefi | bool
+    - enable_ironic_inspector | bool
 
 - name: Copying over existing policy file
   template:

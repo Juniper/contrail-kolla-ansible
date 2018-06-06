@@ -54,6 +54,7 @@ ironic_inspector_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal
 ironic_inspector_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn }}:{{ ironic_inspector_port }}"
 
 ironic_logging_debug: "{{ openstack_logging_debug }}"
+ironic_notification_level: "debug"
 
 openstack_ironic_auth: "{{ openstack_auth }}"
 
