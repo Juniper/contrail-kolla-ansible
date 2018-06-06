@@ -101,8 +101,15 @@
     - "{{ node_custom_config }}/ironic/ironic-dnsmasq.conf"
     - "{{ node_custom_config }}/ironic/{{ inventory_hostname }}/ironic-dnsmasq.conf"
     - "ironic-dnsmasq.conf.j2"
+<<<<<<< HEAD
   notify:
     - Restart ironic-dnsmasq container
+=======
+  when:
+    - inventory_hostname in groups['ironic-inspector']
+    - enable_ironic_inspector | bool
+    - enable_ironic_dnsmasq | bool
+>>>>>>> 0794c7749... Partial-Bug: #1793618 - Initial commit to do ironic provision for Server Discovery
 
 - name: Copying pxelinux.cfg default
   vars:
@@ -114,6 +121,7 @@
   become: true
   register: ironic_pxe_confs
   with_first_found:
+    - "{{ custom_ironic_pxe_default }}"
     - "{{ node_custom_config }}/ironic/pxelinux.default"
     - "{{ node_custom_config }}/ironic/{{ inventory_hostname }}/pxelinux.default"
     - "pxelinux.default.j2"
