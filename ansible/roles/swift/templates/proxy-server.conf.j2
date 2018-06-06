@@ -40,14 +40,15 @@ auth_url = {{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_admin_po
 auth_type = password
 project_domain_id = {{ default_project_domain_id }}
 user_domain_id = {{ default_user_domain_id }}
+auth_plugin = password
 project_name = service
+delay_auth_decision = 1
 username = {{ swift_keystone_user }}
 password = {{ swift_keystone_password }}
 
 memcache_security_strategy = ENCRYPT
 memcache_secret_key = {{ memcache_secret_key }}
 memcached_servers = {% for host in groups['memcached'] %}{{ hostvars[host]['ansible_' + hostvars[host]['api_interface']]['ipv4']['address'] }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
-
 
 [filter:keystoneauth]
 use = egg:swift#keystoneauth
@@ -74,6 +75,9 @@ use = egg:swift#ratelimit
 
 [filter:gatekeeper]
 use = egg:swift#gatekeeper
+
+[filter:tempurl]
+use = egg:swift#tempurl
 
 [filter:slo]
 use = egg:swift#slo
