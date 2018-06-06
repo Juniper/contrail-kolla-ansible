@@ -17,6 +17,7 @@
     image: "{{ service.image }}"
     volumes: "{{ service.volumes }}"
     privileged: "{{ service.privileged | default(False) }}"
+    environment: "{{ service.environment }}"
   when:
     - action != "config"
     - service.enabled | bool
@@ -28,6 +29,7 @@
       or neutron_ml2_conf | changed
       or nsx_ini | changed
       or policy_json | changed
+      or contrailplugin_ini | changed
       or neutron_server_container | changed
 
 - name: Restart neutron-openvswitch-agent container
