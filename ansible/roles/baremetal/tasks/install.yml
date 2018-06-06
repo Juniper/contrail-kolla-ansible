@@ -64,7 +64,7 @@
 
 - name: Install docker SDK for python
   pip:
-    name: docker
+    name: docker-py
     state: latest
   become: True
 
