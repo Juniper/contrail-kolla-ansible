@@ -124,6 +124,7 @@ nova_services:
       - "libvirtd:/var/lib/libvirt"
       - "nova_compute:/var/lib/nova/"
       - "{% if enable_cinder_backend_nfs | bool %}/var/lib/nova/mnt:/var/lib/nova/mnt:shared{% endif %}"
+      - "opt_plugin:/opt/plugin/"
   nova-compute-ironic:
     container_name: "nova_compute_ironic"
     group: "nova-compute-ironic"
