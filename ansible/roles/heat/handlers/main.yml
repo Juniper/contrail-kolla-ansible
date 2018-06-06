@@ -59,6 +59,7 @@
     name: "{{ service.container_name }}"
     image: "{{ service.image }}"
     volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    environment: "{{ service.environment }}"
   when:
     - action != "config"
     - inventory_hostname in groups[service.group]

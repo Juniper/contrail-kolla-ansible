@@ -13,12 +13,22 @@ debug = {{ ironic_logging_debug }}
 
 log_dir = /var/log/kolla/ironic
 
-enabled_drivers = pxe_ipmitool
+admin_user = {{ openstack_auth.username }}
+admin_password = {{ keystone_admin_password }}
+
+enabled_drivers = pxe_ipmitool,agent_ipmitool
+default_network_interface=neutron
+enabled_network_interfaces=noop,flat,neutron
 
 transport_url = {{ rpc_transport_url }}
 
 [oslo_messaging_notifications]
+driver = messagingv2
 transport_url = {{ notify_transport_url }}
+{% if enable_ironic_notifications | bool %}
+notification_level = {{ ironic_notification_level }}
+{% endif %}
+
 
 {% if ironic_policy_file is defined %}
 [oslo_policy]
@@ -36,7 +46,9 @@ api_workers = {{ openstack_service_workers }}
 api_url = {{ internal_protocol }}://{{ kolla_internal_fqdn }}:{{ ironic_api_port }}
 automated_clean=false
 {% endif %}
-
+[pxe]
+pxe_append_params = nofb nomodeset vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }}
+tftp_server={{ kolla_internal_fqdn }}
 [database]
 connection = mysql+pymysql://{{ ironic_database_user }}:{{ ironic_database_password }}@{{ ironic_database_address }}/{{ ironic_database_name }}
 max_retries = -1
@@ -78,6 +90,7 @@ project_name = service
 username = {{ ironic_keystone_user }}
 password = {{ ironic_keystone_password }}
 cleaning_network = {{ ironic_cleaning_network }}
+provisioning_network=ironic-provision
 
 [inspector]
 enabled = true
@@ -95,5 +108,3 @@ deploy_logs_local_path = /var/log/kolla/ironic
 deploy_logs_storage_backend = local
 deploy_logs_collect = always
 
-[pxe]
-pxe_append_params = nofb nomodeset vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }}

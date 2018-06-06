@@ -20,6 +20,17 @@ metadata_listen_port = {{ nova_metadata_port }}
 # https://bugs.launchpad.net/kolla-ansible/+bug/1701564.
 firewall_driver = nova.virt.firewall.NoopFirewallDriver
 
+{% if metadata_ssl_enable | bool %}
+enabled_ssl_apis= metadata
+nova_metadata_protocol= https
+nova_metadata_insecure= True
+ssl_cert_file= /etc/nova/ssl/certs/nova.pem
+ssl_key_file= /etc/nova/ssl/private/novakey.pem
+ssl_ca_file= /etc/nova/ssl/certs/ca.pem
+{% endif %}
+
+use_neutron = True
+
 allow_resize_to_same_host = true
 
 {% if service_name == "nova-compute-ironic" %}
@@ -38,6 +49,19 @@ compute_driver = xenapi.XenAPIDriver
 {% else %}
 compute_driver = libvirt.LibvirtDriver
 {% endif %}
+
+{% if hostvars[inventory_hostname]['SRIOV'] is defined %}
+{% if hostvars[inventory_hostname]['SRIOV'] | bool %}
+{% if hostvars[inventory_hostname]['SRIOV_PHYS_NET'] is defined %}
+{% if hostvars[inventory_hostname]['SRIOV_PHYSICAL_INTERFACE'] is defined %}
+pci_passthrough_whitelist = {"devname": "{{ hostvars[inventory_hostname]['SRIOV_PHYSICAL_INTERFACE'] }}", "physical_network": "{{ hostvars[inventory_hostname]['SRIOV_PHYS_NET'] }}"}
+{% endif %}
+{% endif %}
+{% endif %}
+{% endif %}
+
+scheduler_default_filters = RetryFilter, AvailabilityZoneFilter, RamFilter, ComputeFilter, ComputeCapabilitiesFilter, ImagePropertiesFilter, PciPassthroughFilter
+scheduler_available_filters = nova.scheduler.filters.all_filters
 
 # Though my_ip is not used directly, lots of other variables use $my_ip
 my_ip = {{ api_interface_address }}
