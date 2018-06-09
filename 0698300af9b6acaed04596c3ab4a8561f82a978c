@@ -22,6 +22,30 @@
       "revId": "0698300af9b6acaed04596c3ab4a8561f82a978c",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_b1da2a75",
+        "filename": "ansible/roles/ironic-notification-manager/defaults/main.yml",
+        "patchSetId": 12
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-06-09T00:20:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f2577a7_0e32f95e",
+      "range": {
+        "startLine": 5,
+        "startChar": 145,
+        "endLine": 5,
+        "endChar": 146
+      },
+      "revId": "0698300af9b6acaed04596c3ab4a8561f82a978c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
