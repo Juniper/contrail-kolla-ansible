@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_7444b047",
+        "filename": "ansible/roles/nova/defaults/main.yml",
+        "patchSetId": 13
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 62
+      },
+      "writtenOn": "2018-06-10T21:53:27Z",
+      "side": 1,
+      "message": "Line 131 and 132 are not required as the changes are upstreamed in pike.",
+      "revId": "367380d0d59b7d0c7bf17eb95cd98f6387a9b8b9",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
