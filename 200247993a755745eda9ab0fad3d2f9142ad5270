@@ -1,0 +1,193 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_4f64494a",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "is it used?",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 25
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_6f6f0528",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "is it used?",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 24
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_2f67bd4f",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "is it used?",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 30
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_0f5ac181",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "why we should re-define these?",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 45
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_ef5c157e",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "it\u0027s better to drop this functionality and re-implement it in separate review if really needed.",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 19
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_cf571958",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "is it used?",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 23
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_8f7471ff",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "kolla-ansible runs this on localhost in queens",
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_ef83f5c9",
+        "filename": "ansible/roles/common/templates/admin-openrc.sh.j2",
+        "patchSetId": 17
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "why we need to change this?",
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_af696d25",
+        "filename": "ansible/roles/neutron/tasks/ironic-check.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-25T13:52:22Z",
+      "side": 1,
+      "message": "strange change. I think it should use both plugins",
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
