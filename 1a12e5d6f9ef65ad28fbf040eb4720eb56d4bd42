@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_6ca94022",
+        "filename": "ansible/roles/neutron/tasks/ironic-check.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-06-29T20:26:09Z",
+      "side": 1,
+      "message": "I think here should be \u0027and\u0027",
+      "range": {
+        "startLine": 6,
+        "startChar": 45,
+        "endLine": 6,
+        "endChar": 47
+      },
+      "revId": "1a12e5d6f9ef65ad28fbf040eb4720eb56d4bd42",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
