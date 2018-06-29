@@ -31,21 +31,9 @@ ironic_notification_manager_introspect_port: "8110"
 # all-in-one, it will be same as kolla_internal_vip_address
 contrail_api_interface_address: "{{ kolla_internal_vip_address }}"
 
-enable_keystone_v3: "yes"
-keystone_admin_project_name: "admin"
-keystone_admin_project_domain_name: "Default"
-
 # contrail_additions : We don't use neutron_l3_agent. Set this to "yes" if it is
 # needed for any reason
 enable_neutron_l3_agent: "no"
-
-# contrail_additions : metadata_ssl_enable is set to "yes" to support the SSL
-# encryption feature for vrouter when proxying.
-metadata_ssl_enable: "no"
-
-# contrail_additions : local_ssl_directory is set to the directory where the
-# <hostname>.pem, <hostname>-privkey.pem, ca-cert.pem files are present
-local_ssl_directory: "/etc/contrail_smgr/puppet/ssl"
 
 # contrail_additions : enable_ironic_inspector is set to "no" to control
 # ironic-inspector install and its usage.
