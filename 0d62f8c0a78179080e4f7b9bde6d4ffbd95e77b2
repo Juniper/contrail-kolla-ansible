@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "5f2577a7_9906e71b",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-07-03T11:38:37Z",
+      "side": 0,
+      "message": "I think that this flag is not needed also (and can be revisit later) + places where it\u0027s used can be cleaned",
+      "range": {
+        "startLine": 44,
+        "startChar": 0,
+        "endLine": 44,
+        "endChar": 25
+      },
+      "revId": "0d62f8c0a78179080e4f7b9bde6d4ffbd95e77b2",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
