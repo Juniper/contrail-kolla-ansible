@@ -25,6 +25,30 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_8c9fcc4e",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "yes. setting enable_swift to yes and setting enable_swift_opencontrail to no will allow users to use swift like how upstream kolla intended it to be used without contrail customizations. \n\nSame is the logic for enable_heat_opencontrail",
+      "parentUuid": "5f2577a7_4f64494a",
+      "range": {
+        "startLine": 6,
+        "startChar": 0,
+        "endLine": 6,
+        "endChar": 25
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_6f6f0528",
         "filename": "ansible/group_vars/all.yml",
         "patchSetId": 17
@@ -36,6 +60,30 @@
       "writtenOn": "2018-06-25T13:52:22Z",
       "side": 1,
       "message": "is it used?",
+      "range": {
+        "startLine": 20,
+        "startChar": 0,
+        "endLine": 20,
+        "endChar": 24
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_aca4c8a6",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "yes. see previous comment.",
+      "parentUuid": "5f2577a7_6f6f0528",
       "range": {
         "startLine": 20,
         "startChar": 0,
@@ -71,6 +119,30 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_6caa6071",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "Yes. in ContrailPlugin.ini.j2",
+      "parentUuid": "5f2577a7_2f67bd4f",
+      "range": {
+        "startLine": 32,
+        "startChar": 0,
+        "endLine": 32,
+        "endChar": 30
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_0f5ac181",
         "filename": "ansible/group_vars/all.yml",
         "patchSetId": 17
@@ -82,6 +154,30 @@
       "writtenOn": "2018-06-25T13:52:22Z",
       "side": 1,
       "message": "why we should re-define these?",
+      "range": {
+        "startLine": 35,
+        "startChar": 0,
+        "endLine": 36,
+        "endChar": 45
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_8ccd8c5e",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "shall remove this",
+      "parentUuid": "5f2577a7_0f5ac181",
       "range": {
         "startLine": 35,
         "startChar": 0,
@@ -117,6 +213,30 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_2c08d88f",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "We can remove this if you could confirm that the metadata ssl functionality does not work. I believe we added this during 4.X to support the metadata ssl support. Are you sure it does not work in 5.X?",
+      "parentUuid": "5f2577a7_ef5c157e",
+      "range": {
+        "startLine": 48,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 19
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_cf571958",
         "filename": "ansible/group_vars/all.yml",
         "patchSetId": 17
@@ -128,6 +248,30 @@
       "writtenOn": "2018-06-25T13:52:22Z",
       "side": 1,
       "message": "is it used?",
+      "range": {
+        "startLine": 55,
+        "startChar": 0,
+        "endLine": 55,
+        "endChar": 23
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_6cd8201d",
+        "filename": "ansible/group_vars/all.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "shall remove this",
+      "parentUuid": "5f2577a7_cf571958",
       "range": {
         "startLine": 55,
         "startChar": 0,
@@ -180,6 +324,30 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_ecdad048",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "we want to run this on the control nodes so that the kolla_toolbox container can be used to run open stack commands. If we do not store this in the kolla_toolbox, then we need to set each of the parameters on the command line. This will enable us to just source this file to set the environment variables and then execute the open stack client commands.",
+      "parentUuid": "5f2577a7_2fcc5d33",
+      "range": {
+        "startLine": 9,
+        "startChar": 41,
+        "endLine": 9,
+        "endChar": 54
+      },
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_ef83f5c9",
         "filename": "ansible/roles/common/templates/admin-openrc.sh.j2",
         "patchSetId": 17
@@ -197,6 +365,24 @@
     },
     {
       "key": {
+        "uuid": "5f2577a7_6c194020",
+        "filename": "ansible/roles/common/templates/admin-openrc.sh.j2",
+        "patchSetId": 17
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "Apparently it is required to expose some IRONIC related apis.",
+      "parentUuid": "5f2577a7_ef83f5c9",
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "5f2577a7_af696d25",
         "filename": "ansible/roles/neutron/tasks/ironic-check.yml",
         "patchSetId": 17
@@ -208,6 +394,24 @@
       "writtenOn": "2018-06-25T13:52:22Z",
       "side": 1,
       "message": "strange change. I think it should use both plugins",
+      "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "5f2577a7_ece410e2",
+        "filename": "ansible/roles/neutron/tasks/ironic-check.yml",
+        "patchSetId": 17
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-07-03T15:23:59Z",
+      "side": 1,
+      "message": "Will change.",
+      "parentUuid": "5f2577a7_af696d25",
       "revId": "200247993a755745eda9ab0fad3d2f9142ad5270",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
