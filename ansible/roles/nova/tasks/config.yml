@@ -10,26 +10,6 @@
     - set_sysctl | bool
     - inventory_hostname in groups['compute']
 
-- name: Ensuring directories exist to hold certs
-  file:
-    path: "{{ item }}"
-    state: "directory"
-    recurse: yes
-  with_items:
-    - "/etc/nova/ssl/certs"
-    - "/etc/nova/ssl/private"
-  when: metadata_ssl_enable | bool
-
-- name: Copy ssl certs for metadata if required
-  copy:
-    dest: "{{ item.dst }}"
-    src: "{{ item.src }}"
-  with_items:
-    - { dst: "/etc/nova/ssl/certs/nova.pem", src: "{{ local_ssl_directory }}/{{ ansible_hostname }}.pem" }
-    - { dst: "/etc/nova/ssl/certs/ca.pem", src: "{{ local_ssl_directory }}/ca-cert.pem" }
-    - { dst: "/etc/nova/ssl/private/novakey.pem", src: "{{ local_ssl_directory  + '/' + ansible_hostname + '-privkey.pem' }}" }
-  when: metadata_ssl_enable | bool
-
 - name: Ensuring config directories exist
   file:
     path: "{{ node_config_directory }}/{{ item.key }}"
