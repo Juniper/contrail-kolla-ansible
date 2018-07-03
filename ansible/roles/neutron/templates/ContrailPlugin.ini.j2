@@ -1,6 +1,6 @@
 {% if neutron_plugin_agent == 'opencontrail' %}
 [APISERVER]
-api_server_ip = {{ opencontrail_api_server_ip }}
+api_server_ip = {{ opencontrail_api_server_ip.split(',') | join(' ') }}
 api_server_port = {{ opencontrail_api_server_port }}
 multi_tenancy = True
 contrail_extensions = ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None,service-interface:None,vf-binding:None
