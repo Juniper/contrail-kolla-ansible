@@ -24,8 +24,8 @@
   kolla_toolbox:
     module_name: "os_user_role"
     module_args:
-      domain: "{{ openstack_keystone_auth.domain_name }}"
-      user: "{{ openstack_keystone_auth.username }}"
+      domain: "{{ openstack_auth.domain_name }}"
+      user: "{{ openstack_auth.username }}"
       role: "admin"
       auth: "{{ '{{ openstack_keystone_auth }}' }}"
     module_extra_vars:

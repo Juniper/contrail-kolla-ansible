@@ -101,7 +101,6 @@ neutron_plugin_agent: "openvswitch"
 ####################
 # Arbitrary unique number from 0..255
 #keepalived_virtual_router_id: "151"
-contrail_api_interface_address: "192.168.1.21"
 
 
 
