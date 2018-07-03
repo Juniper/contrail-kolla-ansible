@@ -6,7 +6,7 @@ multi_tenancy = True
 contrail_extensions = ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None,service-interface:None,vf-binding:None
 
 [COLLECTOR]
-analytics_api_ip = {{ opencontrail_collector_ip }}
+analytics_api_ip = {{ opencontrail_collector_ip.split(' ')[0] }}
 analytics_api_port = {{ opencontrail_collector_port }}
 
 [keystone_authtoken]

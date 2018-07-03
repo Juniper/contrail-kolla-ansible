@@ -43,6 +43,7 @@ auth_env:
 ironic_env:
   CLOUD_ORCHESTRATOR: "openstack"
   AUTH_MODE: "keystone"
-  CONTROLLER_NODES: "{{ opencontrail_collector_ip }}"
+  CONTROLLER_NODES: "{{ opencontrail_api_server_ip.split(' ') | join(',') }}"
+  ANALYTICS_NODES: "{{ opencontrail_collector_ip.split(' ') | join(',') }}"
   IRONIC_NOTIFICATION_LEVEL: "{{ ironic_notification_level }}"
 
