@@ -55,6 +55,6 @@ driver = messagingv2
 
 {% if enable_keystone_v3 | bool %}
 [resource]
-admin_project_name = {{ keystone_admin_project_name }}
-admin_project_domain_name = {{ keystone_admin_project_domain_name }}
+admin_project_name = {{ openstack_keystone_auth.username }}
+admin_project_domain_name = {{ openstack_keystone_auth.domain_name }}
 {% endif %}
