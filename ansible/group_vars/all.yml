@@ -46,7 +46,6 @@ metadata_ssl_enable: "no"
 # contrail_additions : local_ssl_directory is set to the directory where the
 # <hostname>.pem, <hostname>-privkey.pem, ca-cert.pem files are present
 local_ssl_directory: "/etc/contrail_smgr/puppet/ssl"
-
 # contrail_additions : enable_ironic_inspector is set to "no" to control
 # ironic-inspector install and its usage.
 enable_ironic_inspector: "no"
