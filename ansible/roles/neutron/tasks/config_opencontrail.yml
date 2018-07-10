@@ -1,5 +1,6 @@
 ---
 - name: Copying over ContrailPlugin.ini
+  become: true
   vars:
     service_name: "neutron-server"
     neutron_server: "{{ neutron_services[service_name] }}"
@@ -9,6 +10,7 @@
       - "{{ node_custom_config }}/neutron/ContrailPlugin.ini"
       - "{{ node_custom_config }}/neutron/{{ inventory_hostname }}/ContrailPlugin.ini"
     dest: "{{ node_config_directory }}/{{ service_name }}/ContrailPlugin.ini"
+    mode: "0660"
   register: contrailplugin_ini
   when:
     - neutron_server.enabled | bool
@@ -18,6 +20,7 @@
     - "Restart {{ service_name }} container"
 
 - name: Copying over api-paste.ini
+  become: true
   vars:
     service_name: "neutron-server"
     neutron_server: "{{ neutron_services[service_name] }}"
@@ -27,6 +30,7 @@
       - "{{ node_custom_config }}/neutron/api-paste.ini"
       - "{{ node_custom_config }}/neutron/{{ inventory_hostname }}/api-paste.ini"
     dest: "{{ node_config_directory }}/{{ service_name }}/api-paste.ini"
+    mode: "0660"
   register: api_paste_ini
   when:
     - neutron_server.enabled | bool
