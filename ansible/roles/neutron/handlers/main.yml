@@ -31,6 +31,7 @@
       or policy_json | changed
       or contrailplugin_ini | changed
       or neutron_server_container | changed
+      or api_paste_ini | changed
 
 - name: Restart neutron-openvswitch-agent container
   vars:
