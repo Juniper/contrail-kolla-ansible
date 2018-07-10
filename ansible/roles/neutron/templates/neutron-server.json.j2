@@ -30,10 +30,16 @@
             "dest": "/etc/neutron/plugins/ml2/ml2_conf.ini",
             "owner": "neutron",
             "perm": "0600"
-        }{% if neutron_plugin_agent in ['opencontrail'] -%},
+        }{% if neutron_plugin_agent == 'opencontrail' -%},
         {
             "source": "{{ container_config_directory }}/ContrailPlugin.ini",
             "dest": "/etc/neutron/plugins/opencontrail/ContrailPlugin.ini",
+            "owner": "neutron",
+            "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/api-paste.ini",
+            "dest": "/etc/neutron/api-paste.ini",
             "owner": "neutron",
             "perm": "0600"
         }{% endif %},

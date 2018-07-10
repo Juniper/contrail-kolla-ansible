@@ -12,7 +12,7 @@ bind_host = {{ api_interface_address }}
 bind_port = {{ neutron_server_port }}
 
 {% if enable_opencontrail_rbac | bool %}
-api_paste_config = {{ container_config_directory }}/api-paste.ini
+api_paste_config = /etc/neutron/api-paste.ini
 {% else %}
 api_paste_config = /usr/share/neutron/api-paste.ini
 {% endif %}
