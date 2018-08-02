@@ -45,7 +45,7 @@
 
 - name: Copying swift rings/accounts/objects
   fetch:
-    dest: /etc/kolla/config/swift/
+    dest: "{{ node_custom_config }}/swift/"
     src: "/tmp/kolla/swift/{{ item }}"
     flat: yes
     fail_on_missing: no
