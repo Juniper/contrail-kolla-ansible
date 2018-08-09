@@ -28,6 +28,58 @@
     with_items: "{{ groups['compute'] }}"
     tags: always
 
+  ## Need to create Host Aggregates to separate Baremetal and Virtual Hosts
+  - name: Create Host Aggregates to separate types of hosts
+    command: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      aggregate create --property baremetal={{ item.0 }} --zone {{ item.1 }} {{ item.2 }}
+    with_together:
+      - ['true', 'false']
+      - ['nova-baremetal', 'nova-virtual']
+      - ['baremetal-hosts', 'virtual-hosts']
+    run_once: yes
+
+  - name: Add compute hosts to virtual-hosts Aggregate Group
+    command: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      aggregate add host virtual-hosts {{ hostvars[item].ansible_hostname }}
+    when:
+      - enable_nova_compute | bool
+      - not disable_nova_compute_service | bool
+    with_items: "{{ groups['compute'] }}"
+    run_once: yes
+
+  - name: Add controller/Ironic hosts to baremetal-hosts Aggregate Group
+    command: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      aggregate add host baremetal-hosts {{ hostvars[item].ansible_hostname }}-ironic
+    with_items: "{{ groups['control'] }}"
+    run_once: yes
+
   - name: Run simple cell setup if required
     include: roles/nova/tasks/simple_cell_setup.yml
     when: not enable_nova_compute | bool
