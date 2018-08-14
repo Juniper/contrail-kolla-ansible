@@ -266,7 +266,6 @@
       or nova_conf.changed | bool
       or policy_overwriting.changed | bool
       or vcenter_ca_file | bool
-      or policy_json.changed | bool
       or compute_rootwrap_conf | bool
       or nova_compute_container.changed | bool
 
