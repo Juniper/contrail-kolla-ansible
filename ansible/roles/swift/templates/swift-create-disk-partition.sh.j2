@@ -16,7 +16,7 @@ for ((i=0;i<=2;i++)); do
     then
         echo "loopback filesystem exist"
     else
-        truncate -s 5GB /var/cache/${disk_array[$i]}
+        truncate -s {{ swift_disk_partition_size }} /var/cache/${disk_array[$i]}
         sudo mkfs.xfs /var/cache/${disk_array[$i]}
         echo "/var/cache/${disk_array[$i]} {{ swift_devices_mount_point }}/${mnt_array[$i]} xfs loop,noatime,nodiratime,nobarrier,logbufs=8 0 0" >> /etc/fstab
         mkdir -p {{ swift_devices_mount_point }}/${mnt_array[$i]}
