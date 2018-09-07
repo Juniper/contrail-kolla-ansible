@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff5d4b2f_7b83fd05",
+        "filename": "ansible/roles/haproxy/templates/haproxy.cfg.j2",
+        "patchSetId": 4
+      },
+      "lineNbr": 843,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2018-09-07T08:25:09Z",
+      "side": 1,
+      "message": "bind.... {{ tls_bind_info }}\nhttp-request del-header X-Forwarded-Proto if { ssl_fc }\nhttp-request set-header X-Forwarded-Proto https if { ssl_fc }",
+      "revId": "8d4068c211b5a0aa7fd0b47facaaff453c027d2a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_bb897527",
+        "filename": "ansible/roles/haproxy/templates/haproxy.cfg.j2",
+        "patchSetId": 4
+      },
+      "lineNbr": 859,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2018-09-07T08:25:09Z",
+      "side": 1,
+      "message": "bind.... {{ tls_bind_info }}\nhttp-request del-header X-Forwarded-Proto if { ssl_fc }\nhttp-request set-header X-Forwarded-Proto https if { ssl_fc }",
+      "revId": "8d4068c211b5a0aa7fd0b47facaaff453c027d2a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_7baadd85",
+        "filename": "ansible/roles/haproxy/templates/haproxy.cfg.j2",
+        "patchSetId": 4
+      },
+      "lineNbr": 868,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2018-09-07T08:25:09Z",
+      "side": 1,
+      "message": "remove because it is for external vip",
+      "range": {
+        "startLine": 868,
+        "startChar": 70,
+        "endLine": 868,
+        "endChar": 89
+      },
+      "revId": "8d4068c211b5a0aa7fd0b47facaaff453c027d2a",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
