@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff5d4b2f_c7bb260c",
+        "filename": "ansible/roles/nova/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-09-08T18:44:23Z",
+      "side": 0,
+      "message": "this line allowed to find contrail\u0027s code from nova code. how it can work now?",
+      "range": {
+        "startLine": 118,
+        "startChar": 8,
+        "endLine": 118,
+        "endChar": 105
+      },
+      "revId": "78f1f1a71de4dd55a4269d7a5ba545ee438dfd51",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
