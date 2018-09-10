@@ -22,6 +22,53 @@
       "revId": "78f1f1a71de4dd55a4269d7a5ba545ee438dfd51",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_a27dbd6f",
+        "filename": "ansible/roles/nova/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 62
+      },
+      "writtenOn": "2018-09-10T19:23:19Z",
+      "side": 0,
+      "message": "PYTHONPATH was not required as we had added a .pth code. This was originally a redundant code.",
+      "parentUuid": "ff5d4b2f_c7bb260c",
+      "range": {
+        "startLine": 118,
+        "startChar": 8,
+        "endLine": 118,
+        "endChar": 105
+      },
+      "revId": "78f1f1a71de4dd55a4269d7a5ba545ee438dfd51",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_8282b94e",
+        "filename": "ansible/roles/nova/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 62
+      },
+      "writtenOn": "2018-09-10T19:23:19Z",
+      "side": 0,
+      "message": "We had added the /opt/plugin/bin path in our vif plugin, which seems to be the right place to fix. Right now to workaround this, in helm we mount the vrouter-port-control in /usr/sbin and in ansible we hardcode the PATH to /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/plugin/bin. If the PATH is changed in the kolla nova-compute in future release, we would miss it as we cant read the existing PATH variable from the ansibble code.",
+      "range": {
+        "startLine": 119,
+        "startChar": 0,
+        "endLine": 119,
+        "endChar": 150
+      },
+      "revId": "78f1f1a71de4dd55a4269d7a5ba545ee438dfd51",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
