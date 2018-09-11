@@ -257,6 +257,7 @@
     privileged: "{{ service.privileged | default(False) }}"
     ipc_mode: "{{ service.ipc_mode | default(omit) }}"
     volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    environment: "{{ service.environment }}"
   when:
     - action != "config"
     - inventory_hostname in groups[service.group]
