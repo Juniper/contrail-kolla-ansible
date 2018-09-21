@@ -69,3 +69,12 @@ ironic_dnsmasq_interface: "{{ api_interface }}"
 ironic_dnsmasq_dhcp_range:
 ironic_cleaning_network:
 ironic_console_serial_speed: "115200n8"
+
+custom_ironic_pxe_default: "custom_pxelinux.default.j2"
+ironic_image_url: "http://tarballs.openstack.org/ironic-python-agent/coreos/files"
+ironic_deploy_kernel_image: "coreos_production_pxe.vmlinuz"
+ironic_deploy_initramfs_image: "coreos_production_pxe_image-oem-master.cpio.gz"
+
+ironic_images:
+  "ironic-agent.kernel": "{{ ironic_deploy_kernel_image }}"
+  "ironic-agent.initramfs": "{{ ironic_deploy_initramfs_image }}"

@@ -36,6 +36,8 @@ enable_neutron_l3_agent: "no"
 # ironic-inspector install and its usage.
 enable_ironic_inspector: "no"
 ironic_cleaning_network: "ironic-provision"
+# contrail_additions: Separating dnsmasq container from Ironic inspector for ZTP use case
+enable_ironic_dnsmasq: "no"
 
 enable_contrail_horizon: "no"
 
