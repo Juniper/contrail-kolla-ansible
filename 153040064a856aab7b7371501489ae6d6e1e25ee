@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff5d4b2f_182055b0",
+        "filename": "ansible/roles/swift/templates/swift-create-disk-partition.sh.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-09-21T18:28:00Z",
+      "side": 1,
+      "message": "if COND ; then",
+      "revId": "153040064a856aab7b7371501489ae6d6e1e25ee",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_f82ea1a3",
+        "filename": "ansible/roles/swift/templates/swift-create-disk-partition.sh.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-09-21T18:28:00Z",
+      "side": 1,
+      "message": "if ! COND ; then \n    echo ...\nfi",
+      "revId": "153040064a856aab7b7371501489ae6d6e1e25ee",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_d8299d9b",
+        "filename": "ansible/roles/swift/templates/swift-create-disk-partition.sh.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-09-21T18:28:00Z",
+      "side": 1,
+      "message": "is it an error? should script return non-zero result? can we continue with deployment?",
+      "revId": "153040064a856aab7b7371501489ae6d6e1e25ee",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_b81a697a",
+        "filename": "ansible/roles/swift/templates/swift-create-disk-partition.sh.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2018-09-21T18:28:00Z",
+      "side": 1,
+      "message": "is it an error? should script return non-zero result? can we continue with deployment?",
+      "revId": "153040064a856aab7b7371501489ae6d6e1e25ee",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
