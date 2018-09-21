@@ -78,12 +78,14 @@
   when:
     - inventory_hostname in groups['ironic-inspector']
     - enable_ironic_inspector | bool
+    - enable_ironic_dnsmasq | bool
 
 - name: Copying pxelinux.cfg default
   template:
     src: "{{ item }}"
     dest: "{{ node_config_directory }}/ironic-pxe/default"
   with_first_found:
+    - "{{ custom_ironic_pxe_default }}"
     - "{{ node_custom_config }}/ironic/pxelinux.default"
     - "{{ node_custom_config }}/ironic/{{ inventory_hostname }}/pxelinux.default"
     - "pxelinux.default.j2"
@@ -107,14 +109,12 @@
     - enable_ironic_pxe_uefi | bool
     - enable_ironic_inspector | bool
 
-- name: Copying ironic-agent kernel and initramfs
-  copy:
-    src: "{{ node_custom_config }}/ironic/{{ item }}"
-    dest: "{{ node_config_directory }}/ironic-pxe/{{ item }}"
-  with_items:
-    - "ironic-agent.kernel"
-    - "ironic-agent.initramfs"
-  when:
+- name: Get {{ item }} Image for Deploy
+  get_url:
+    url: "{{ ironic_image_url }}/{{ item.value }}"
+    dest: "{{ node_config_directory }}/ironic-pxe/{{ item.key }}"
+  with_dict: "{{ ironic_images }}"
+  when: 
     # Only required when Ironic inspector is in use.
     - groups['ironic-inspector'] | length > 0
     - inventory_hostname in groups['ironic-pxe']
