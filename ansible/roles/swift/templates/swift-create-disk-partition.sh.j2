@@ -3,9 +3,17 @@
 # <WARNING ALL DATA ON DISK will be LOST!>
 index=0
 for d in {{ disk_list }}; do
-    parted /dev/${d} -s -- mklabel gpt mkpart KOLLA_SWIFT_DATA 1 -1
-    sudo mkfs.xfs -f -L d${index} /dev/${d}1
-    (( index++ ))
+    if cat /proc/mounts | grep /dev/${d}1; then echo "File system already mounted"
+    else
+        if parted /dev/${d} -s -- mklabel gpt mkpart KOLLA_SWIFT_DATA 1 -1
+        then
+            sudo mkfs.xfs -f -L d${index} /dev/${d}1 || ( echo "Failed to create file system on /dev/${d}1 partition"; exit 1; ) #terminate if file system creation fails.
+        else
+            echo "Disk partitioning failed on /dev/${d}"
+            exit 1 #terminate if disk partition fails.
+        fi
+        (( index++ ))
+    fi
 done
 {% else %}
 disk_array=("swift-disk1" "swift-disk2" "swift-disk3")
