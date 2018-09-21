@@ -34,6 +34,14 @@ memcached_servers = {% for host in groups['memcached'] %}{{ hostvars[host]['ansi
 policy_file = {{ ironic_policy_file }}
 {% endif %}
 
+[processing]
+add_ports = all
+keep_ports = present
+node_not_found_hook = enroll
+
+[discovery]
+enroll_node_driver = ipmi
+
 [firewall]
 dnsmasq_interface = {{ ironic_dnsmasq_interface }}
 
