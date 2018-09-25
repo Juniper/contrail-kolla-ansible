@@ -1,0 +1,47 @@
+---
+- name: Get name of the ironic container
+  command: docker ps --filter name=ironic-notification --format {%raw%}"{{.Names}}"{%endraw%}
+  register: ironic_notif
+
+- name: Get name of the contrail-compute container
+  command: docker ps --filter name=contrail-openstack-compute --format {%raw%}"{{.Names}}"{%endraw%}
+  register: contrail_ops_compute
+
+- name: Destroying all Kolla containers and volumes
+  command: docker stop -t 2 "{{ item.stdout }}"
+  with_items:
+    - "{{ ironic_notif }}"
+    - "{{ contrail_ops_compute }}"
+  when: item.stdout
+
+- command: docker rm -v -f "{{ item.stdout }}"
+  with_items:
+    - "{{ ironic_notif }}"
+    - "{{ contrail_ops_compute }}"
+  when: item.stdout
+
+- command: docker network disconnect -f "{{ item.stdout }}"
+  with_items:
+    - "{{ ironic_notif }}"
+    - "{{ contrail_ops_compute }}"
+  when: item.stdout
+
+- command: docker volume rm "{{ item.stdout }}"
+  with_items:
+    - "{{ ironic_notif }}"
+    - "{{ contrail_ops_compute }}"
+  when: item.stdout
+
+- name: Get name of the ironic container image
+  shell: docker images -a --format {%raw%}"{{.Repository}}\t{{.ID}}"{%endraw%} | grep -E contrail-openstack-ironic | awk '{print $2}'
+  register: ironic_notif_image
+
+- name: Get name of the contrail-compute image
+  shell: docker images -a --format {%raw%}"{{.Repository}}\t{{.ID}}"{%endraw%} | grep -E contrail-openstack-compute | awk '{print $2}'
+  register: contrail_ops_compute_image
+
+- command: docker rmi -f "{{ item.stdout }}"
+  with_items:
+    - "{{ ironic_notif_image }}"
+    - "{{ contrail_ops_compute_image }}"
+  when: item.stdout
