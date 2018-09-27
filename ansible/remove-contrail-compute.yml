@@ -1,0 +1,95 @@
+---
+- name: Remove nova computes from nova api
+  hosts: control
+  run_once: yes
+  tasks:
+
+  - name: Get disabled services
+    shell: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      compute service list | grep {{ hostvars[item].instance_name }} | awk '{print $2}'
+    with_items: "{{ groups['delete_compute'] }}"
+    run_once: yes
+    register: nova_services
+
+  - name: Disable the nova-compute on the openstack container
+    command: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      compute service set
+      --disable-reason "Removing compute"
+      --disable {{ hostvars[item.0].instance_name }} nova-compute
+    with_together:
+      - "{{ groups['delete_compute'] }}"
+      - "{{ nova_services.results }}"
+    when: item.1.stdout
+    run_once: yes
+
+  ## Need to create Host Aggregates to separate Baremetal and Virtual Hosts
+  - name: Remove compute hosts from virtual-hosts Aggregate Group
+    command: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      aggregate remove host virtual-hosts {{ hostvars[item.0].instance_name }}
+    when:
+      - hostvars[item.0].TSN_EVPN_MODE is defined
+      - not hostvars[item.0]['TSN_EVPN_MODE'] | bool
+      - item.1.stdout
+    with_together:
+      - "{{ groups['delete_compute'] }}"
+      - "{{ nova_services.results }}"
+    run_once: yes
+
+  - name: Get disabled services
+    shell: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      compute service list | grep {{ hostvars[item].instance_name }} | awk '{print $2}'
+    with_items: "{{ groups['delete_compute'] }}"
+    run_once: yes
+    register: disabled_nova_services
+
+  - name: Remove the disabled services
+    command: >
+      docker exec kolla_toolbox openstack
+      --os-interface internal
+      --os-auth-url {{ keystone_admin_url }}
+      --os-identity-api-version 3
+      --os-project-domain-name default
+      --os-tenant-name admin
+      --os-username admin
+      --os-password {{ keystone_admin_password }}
+      --os-user-domain-name default
+      compute service delete {{ item.stdout }}
+    with_items: "{{ disabled_nova_services.results }}"
+    run_once: yes
+    when: item.stdout
