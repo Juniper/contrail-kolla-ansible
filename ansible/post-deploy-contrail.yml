@@ -8,6 +8,17 @@
       src: "roles/common/templates/admin-openrc.sh.j2"
       dest: "{{ node_config_directory }}/kolla-toolbox/admin-openrc.sh"
 
+  - name: create openstack kolla external services directory
+    file:
+      path: "{{ node_config_directory }}/external/"
+      state: directory
+      recurse: yes
+
+  - name: Creating admin openrc file for external services
+    template:
+      src: "roles/common/templates/admin-openrc.yml.j2"
+      dest: "{{ node_config_directory }}/external/admin-openrc.yml"
+
   - name: Disable the nova-compute on the openstack container
     command: >
       docker exec kolla_toolbox openstack
