@@ -101,3 +101,17 @@
       - enable_swift_opencontrail | bool
       - enable_swift | bool
     run_once: yes
+
+- name: Post-deploy playbook for external services
+  hosts: localhost
+  tasks:
+  - name: create openstack kolla external dir
+    file:
+      path: "{{ node_config_directory }}/external/"
+      state: directory
+      recurse: yes
+
+  - name: Creating admin openrc file for external services
+    template:
+      src: "roles/common/templates/admin-openrc.sh.j2"
+      dest: "{{ node_config_directory }}/external/admin-openrc.yml"
