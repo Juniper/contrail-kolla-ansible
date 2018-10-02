@@ -43,6 +43,8 @@
       - ['true', 'false']
       - ['nova-baremetal', 'nova']
       - ['baremetal-hosts', 'virtual-hosts']
+    register: command_result
+    failed_when: "command_result.rc == 1 and 'already exists' not in command_result.stderr"
     run_once: yes
 
   - name: Add compute hosts to virtual-hosts Aggregate Group
@@ -60,6 +62,8 @@
     when:
       - hostvars[item].TSN_EVPN_MODE is defined
       - not hostvars[item]['TSN_EVPN_MODE'] | bool
+    register: command_result
+    failed_when: "command_result.rc == 1 and 'already has host' not in command_result.stderr"
     with_items: "{{ groups['compute'] }}"
     run_once: yes
 
@@ -75,7 +79,9 @@
       --os-password {{ keystone_admin_password }}
       --os-user-domain-name default
       aggregate add host baremetal-hosts {{ hostvars[item].ansible_hostname }}-ironic
+    register: command_result
     with_items: "{{ groups['control'] }}"
+    failed_when: "command_result.rc == 1 and 'already has host' not in command_result.stderr"
     when:
       - enable_ironic | bool
     run_once: yes
