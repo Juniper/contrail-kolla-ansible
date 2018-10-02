@@ -46,6 +46,7 @@
       - ['nova-baremetal', 'nova']
       - ['baremetal-hosts', 'virtual-hosts']
     run_once: yes
+    ignore_errors: yes
 
   - name: Add compute hosts to virtual-hosts Aggregate Group
     command: >
@@ -101,3 +102,17 @@
       - enable_swift_opencontrail | bool
       - enable_swift | bool
     run_once: yes
+
+- name: Post-deploy playbook for contrail
+  hosts: localhost
+  tasks:
+  - name: create openstack kolla dir
+    file:
+      path: "{{ node_config_directory }}/kolla-toolbox/"
+      state: directory
+      recurse: yes
+
+  - name: Creating admin openrc file for kolla-toolbox
+    template:
+      src: "roles/common/templates/admin-openrc.sh.j2"
+      dest: "{{ node_config_directory }}/kolla-toolbox/admin-openrc.yml"
