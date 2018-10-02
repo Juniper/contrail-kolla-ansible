@@ -19,6 +19,24 @@
     },
     {
       "key": {
+        "uuid": "ff5d4b2f_7855eac5",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-02T20:15:18Z",
+      "side": 1,
+      "message": "No.",
+      "parentUuid": "ff5d4b2f_b8c6c299",
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff5d4b2f_58bb460d",
         "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
         "patchSetId": 1
@@ -30,6 +48,24 @@
       "writtenOn": "2018-10-02T19:39:53Z",
       "side": 1,
       "message": "why it\u0027s in yaml format?",
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_98f41ed1",
+        "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-02T20:15:18Z",
+      "side": 1,
+      "message": "Ansible digestable.",
+      "parentUuid": "ff5d4b2f_58bb460d",
       "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
@@ -59,6 +95,30 @@
     },
     {
       "key": {
+        "uuid": "ff5d4b2f_58fea6ae",
+        "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-02T20:15:18Z",
+      "side": 1,
+      "message": "Keeping it same as admin-openrc.sh.j2",
+      "parentUuid": "ff5d4b2f_78c04a7c",
+      "range": {
+        "startLine": 7,
+        "startChar": 39,
+        "endLine": 7,
+        "endChar": 58
+      },
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff5d4b2f_3838929e",
         "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
         "patchSetId": 1
@@ -70,6 +130,30 @@
       "writtenOn": "2018-10-02T19:39:53Z",
       "side": 1,
       "message": "why this is absent in admin-openrc.sh?",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 24
+      },
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_3861b2aa",
+        "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-02T20:15:18Z",
+      "side": 1,
+      "message": "My test setup had openstack/ocata and this was there. I dont need it specifically. Will take it off and keep it same as admin-openrc.sh on master.",
+      "parentUuid": "ff5d4b2f_3838929e",
       "range": {
         "startLine": 10,
         "startChar": 0,
