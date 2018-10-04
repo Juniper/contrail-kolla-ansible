@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "ff5d4b2f_ffd53944",
+        "filename": "ansible/roles/ironic/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2018-10-04T18:52:06Z",
+      "side": 1,
+      "message": "could you avoid giving multi-level variables? This will cause problems when translating kolla_globals if user wants to override these. Maybe just have ironic_deploy_kernel_image and ironic_deploy_initramfs_image here and then build the ironic_images dictionary as a set_fact. Also, avoid \"hyphen\" in keys. Is it required?",
+      "revId": "00d348da034f9a66b60aeb9a40deb6d86d8e9737",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
