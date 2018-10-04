@@ -55,6 +55,24 @@
     },
     {
       "key": {
+        "uuid": "ff5d4b2f_bf1101af",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-04T23:09:33Z",
+      "side": 1,
+      "message": "ok, will do",
+      "parentUuid": "ff5d4b2f_1fa24daf",
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff5d4b2f_5f9fa55e",
         "filename": "ansible/post-deploy-contrail.yml",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "writtenOn": "2018-10-04T20:04:53Z",
       "side": 1,
       "message": "if this is not being used for kolla-toolbox container, please change the name from \u0027kolla-toolbox\u0027",
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_1f7a4df0",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-04T23:09:33Z",
+      "side": 1,
+      "message": "Ok, will make it\n/etc/kolla/external/admin-openrc.yml",
+      "parentUuid": "ff5d4b2f_5f9fa55e",
       "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
@@ -250,6 +286,30 @@
     },
     {
       "key": {
+        "uuid": "ff5d4b2f_5f220502",
+        "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-04T23:09:33Z",
+      "side": 1,
+      "message": "Ok, I shall make it external fqdn.",
+      "parentUuid": "ff5d4b2f_3f9ab16d",
+      "range": {
+        "startLine": 7,
+        "startChar": 39,
+        "endLine": 7,
+        "endChar": 58
+      },
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
         "uuid": "ff5d4b2f_3838929e",
         "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
         "patchSetId": 1
@@ -309,6 +369,30 @@
       "side": 1,
       "message": "this is present in the contrail branches. do not remove it even though it might not be relevant for appformix.",
       "parentUuid": "ff5d4b2f_3861b2aa",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 24
+      },
+      "revId": "4c83a4c57bd740181a1d63a61709da79734f9b6c",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_3f1d11bd",
+        "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 257
+      },
+      "writtenOn": "2018-10-04T23:09:33Z",
+      "side": 1,
+      "message": "I wont remove anything existing. I will keep it same as what is present on that branch. \n\nWe have 7 branches fo and we need it from 5.1 onwards. Which branches should I merge my changes to?",
+      "parentUuid": "ff5d4b2f_1f8b6d1f",
       "range": {
         "startLine": 10,
         "startChar": 0,
