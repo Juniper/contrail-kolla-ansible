@@ -16,6 +16,24 @@
       "revId": "00d348da034f9a66b60aeb9a40deb6d86d8e9737",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "ff5d4b2f_7fd6e9c5",
+        "filename": "ansible/roles/ironic/defaults/main.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 105
+      },
+      "writtenOn": "2018-10-04T22:49:03Z",
+      "side": 1,
+      "message": "Yes I need the hyphen as it is what the final image name is expected as inside ironic PXE",
+      "parentUuid": "ff5d4b2f_ffd53944",
+      "revId": "00d348da034f9a66b60aeb9a40deb6d86d8e9737",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
