@@ -45,7 +45,7 @@ allow_overlapping_ips = true
 {% if neutron_plugin_agent == 'opencontrail' %}
 core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
 service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
-api_extensions_path = /opt/plugin/site-packages/neutron_plugin_contrail/extensions:/opt/plugin/site-packages/neutron_lbaas/extensions
+api_extensions_path = /opt/plugin/site-packages/neutron_plugin_contrail/extensions
 {% endif %}
 
 {% if enable_neutron_agent_ha | bool %}
