@@ -17,7 +17,7 @@
       compute service set
       --disable-reason "Removing compute"
       --disable {{ item }} nova-compute
-    with_items: "{{ deleted_nodes_name_list }}"
+    with_items: "{{ deleted_nodes_dict.keys() }}"
     run_once: yes
 
   ## Need to create Host Aggregates to separate Baremetal and Virtual Hosts
@@ -32,11 +32,12 @@
       --os-username admin
       --os-password {{ keystone_admin_password }}
       --os-user-domain-name default
-      aggregate remove host virtual-hosts {{ item }}
+      aggregate remove host virtual-hosts {{ item.key }}
     when:
-      - hostvars[item].TSN_EVPN_MODE is defined
-      - not hostvars[item]['TSN_EVPN_MODE'] | bool
-    with_items: "{{ deleted_nodes_name_list }}"
+      - item.value in hostvars
+      - hostvars[item.value].TSN_EVPN_MODE is defined
+      - not hostvars[item.value]['TSN_EVPN_MODE'] | bool
+    with_dict: "{{ deleted_nodes_dict }}"
     run_once: yes
     ignore_errors: yes
 
@@ -52,7 +53,7 @@
       --os-password {{ keystone_admin_password }}
       --os-user-domain-name default
       compute service list | grep {{ item }} | awk '{print $2}'
-    with_items: "{{ deleted_nodes_name_list }}"
+    with_items: "{{ deleted_nodes_dict.keys() }}"
     run_once: yes
     register: disabled_nova_services
 
