@@ -1,5 +1,5 @@
 ---
 - name: Apply role certificates
-  hosts: all
+  hosts: localhost
   roles:
-    - certificates
+    - { role: certificates, when: [generate_self_signed_certs is defined and generate_self_signed_certs|bool] }
