@@ -42,6 +42,12 @@
             "dest": "/etc/neutron/api-paste.ini",
             "owner": "neutron",
             "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/haproxy-ca.crt",
+            "dest": "/etc/neutron/haproxy-ca.crt",
+            "owner": "neutron",
+            "perm": "0600"
         }{% endif %},
         {
             "source": "{{ container_config_directory }}/policy.json",
