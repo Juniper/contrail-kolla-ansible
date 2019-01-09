@@ -42,7 +42,13 @@
             "dest": "/etc/neutron/api-paste.ini",
             "owner": "neutron",
             "perm": "0600"
-        }{% endif %},
+        }{% if enable_haproxy|bool and kolla_enable_tls_external|bool %},
+        {
+            "source": "{{ container_config_directory }}/haproxy-ca.crt",
+            "dest": "/etc/neutron/haproxy-ca.crt",
+            "owner": "neutron",
+            "perm": "0600"
+        }{% endif %}{% endif %},
         {
             "source": "{{ container_config_directory }}/policy.json",
             "dest": "/etc/neutron/policy.json",
