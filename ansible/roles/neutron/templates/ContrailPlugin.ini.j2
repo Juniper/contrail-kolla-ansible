@@ -2,6 +2,14 @@
 [APISERVER]
 api_server_ip = {{ opencontrail_api_server_ip }}
 api_server_port = {{ opencontrail_api_server_port }}
+{% if (enable_haproxy|bool and kolla_enable_tls_external|bool) or opencontrail_api_use_ssl|bool %}
+use_ssl = True
+protocol = https
+cafile = /etc/neutron/haproxy-ca.crt
+{% if opencontrail_api_insecure|bool %}
+insecure = True
+{% endif %}
+{% endif %}
 multi_tenancy = True
 contrail_extensions = ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None,service-interface:None,vf-binding:None
 
