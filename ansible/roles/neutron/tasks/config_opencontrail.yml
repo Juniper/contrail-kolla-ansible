@@ -38,3 +38,24 @@
     - neutron_plugin_agent == 'opencontrail'
   notify:
     - "Restart {{ service_name }} container"
+
+- name: Copying over required certificates
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+  copy:
+    src: "{{ kolla_external_fqdn_cacert }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/{{ item }}"
+    mode: "0660"
+  become: true
+  register: haproxy_pem
+  when:
+    - kolla_enable_tls_external | bool
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+    - neutron_plugin_agent == 'opencontrail'
+  with_items:
+    - "haproxy-ca.crt"
+  notify:
+    - "Restart {{ service_name }} container"
+
