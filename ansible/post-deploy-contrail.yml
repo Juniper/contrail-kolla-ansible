@@ -8,6 +8,11 @@
       src: "roles/common/templates/admin-openrc.sh.j2"
       dest: "{{ node_config_directory }}/kolla-toolbox/admin-openrc.sh"
 
+  - name: Copy cacert into the kolla-toolbox nodes
+    copy:
+      src: "{{ kolla_external_fqdn_cacert }}"
+      dest: "{{ node_config_directory }}/kolla-toolbox/haproxy-ca.crt"
+
   - name: create openstack kolla external services directory
     file:
       path: "{{ node_config_directory }}/external/"
