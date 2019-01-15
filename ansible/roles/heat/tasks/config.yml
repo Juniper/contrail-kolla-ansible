@@ -78,6 +78,8 @@
     - Restart heat-api-cfn container
     - Restart heat-engine container
 
+- include: config_opencontrail.yml
+
 - name: Copying over existing policy file
   become: true
   template:
