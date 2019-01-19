@@ -9,5 +9,5 @@ export OS_INTERFACE=internal
 export OS_IDENTITY_API_VERSION=3
 export OS_BAREMETAL_API_VERSION=1.29
 {% if kolla_enable_tls_external | bool and kolla_external_fqdn_cacert %}
-export OS_CACERT={{ kolla_external_fqdn_cacert }}
+export OS_CACERT={{ container_config_directory }}/haproxy-ca.crt
 {% endif %}
