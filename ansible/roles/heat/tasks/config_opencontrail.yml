@@ -1,0 +1,21 @@
+---
+
+- name: Copying over required certificates
+  vars:
+    service_name: "heat-engine"
+    heat_engine: "{{ heat_services[service_name] }}"
+  copy:
+    src: "{{ kolla_external_fqdn_cacert }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/{{ item }}"
+    mode: "0660"
+  become: true
+  when:
+    - kolla_enable_tls_external | bool
+    - heat_engine.enabled | bool
+    - inventory_hostname in groups[heat_engine.group]
+    - enable_heat_opencontrail | bool
+  with_items:
+    - "haproxy-ca.crt"
+  notify:
+    - "Restart {{ service_name }} container"
+
