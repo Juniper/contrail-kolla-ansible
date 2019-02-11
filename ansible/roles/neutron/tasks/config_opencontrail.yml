@@ -39,7 +39,7 @@
   notify:
     - "Restart {{ service_name }} container"
 
-- name: Copying over required certificates
+- name: Copying over kolla certificates
   vars:
     service_name: "neutron-server"
     neutron_server: "{{ neutron_services[service_name] }}"
@@ -56,6 +56,24 @@
     - neutron_plugin_agent == 'opencontrail'
   with_items:
     - "haproxy-ca.crt"
+  notify:
+    - "Restart {{ service_name }} container"
+
+- name: Copying over contrail certificates
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+  copy:
+    src: "{{ contrail_ca_file }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/contrail-ca-cert.pem"
+    mode: "0660"
+  become: true
+  when:
+    - config_api_ssl_enable is defined
+    - config_api_ssl_enable | bool
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+    - neutron_plugin_agent == 'opencontrail'
   notify:
     - "Restart {{ service_name }} container"
 

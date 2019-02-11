@@ -36,7 +36,13 @@
             "dest": "/etc/neutron/plugins/opencontrail/ContrailPlugin.ini",
             "owner": "neutron",
             "perm": "0600"
-        },
+        }{% if config_api_ssl_enable|bool %},
+        {
+            "source": "{{ container_config_directory }}/contrail-ca-cert.pem",
+            "dest": "/etc/neutron/contrail-ca-cert.pem",
+            "owner": "neutron",
+            "perm": "0600"
+        }{% endif %},
         {
             "source": "{{ container_config_directory }}/api-paste.ini",
             "dest": "/etc/neutron/api-paste.ini",
