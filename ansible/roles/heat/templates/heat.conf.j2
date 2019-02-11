@@ -108,6 +108,10 @@ insecure = True
 protocol = https
 cafile = /etc/heat/haproxy-ca.crt
 {% else %}
+{% if config_api_ssl_enable|bool %}
+cafile = /etc/heat/contrail-ca-cert.pem
+use_ssl = True
+{% endif %}
 api_server = {{ opencontrail_api_server_ip }}
 {% endif %}
 api_base_url = /
