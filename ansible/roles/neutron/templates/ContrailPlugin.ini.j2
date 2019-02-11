@@ -10,6 +10,9 @@ cafile = /etc/neutron/haproxy-ca.crt
 insecure = True
 {% endif %}
 {% else %}
+{% if config_api_ssl_enable|bool %}
+cafile = /etc/neutron/contrail-ca-cert.pem
+{% endif %}
 api_server_ip = {{ opencontrail_api_server_ip }}
 {% endif %}
 multi_tenancy = True
