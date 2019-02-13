@@ -9,6 +9,8 @@
     image: "{{ heat_opencontrail_init_image_full }}"
     labels:
       BOOTSTRAP:
+    environment:
+      OPENSTACK_VERSION: "{{ openstack_release }}"
     name: "bootstrap_heat_opencontrail_plugin"
     restart_policy: "never"
     volumes: "opt_plugin:/opt/plugin/"
