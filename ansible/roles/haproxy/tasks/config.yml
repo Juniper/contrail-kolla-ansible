@@ -48,3 +48,6 @@
   with_items:
     - "haproxy.pem"
   when: kolla_enable_tls_external | bool
+
+- include: config_opencontrail.yml
+

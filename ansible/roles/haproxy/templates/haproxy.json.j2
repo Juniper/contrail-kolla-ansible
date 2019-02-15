@@ -7,6 +7,13 @@
             "owner": "root",
             "perm": "0644"
         },
+        }{% if config_api_ssl_enable is defined and config_api_ssl_enable|bool %},
+        {
+            "source": "{{ container_config_directory }}/contrail-ca-cert.pem",
+            "dest": "/etc/haproxy/contrail-ca-cert.pem",
+            "owner": "root",
+            "perm": "0600"
+        }{% endif %},
         {
             "source": "{{ container_config_directory }}/haproxy.pem",
             "dest": "/etc/haproxy/haproxy.pem",
