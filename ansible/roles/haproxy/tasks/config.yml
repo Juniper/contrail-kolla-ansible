@@ -93,6 +93,8 @@
     - Restart haproxy container
     - Ensuring latest haproxy config is used
 
+- include: config_opencontrail.yml
+
 - name: Check haproxy containers
   become: true
   kolla_docker:
