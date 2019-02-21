@@ -22,6 +22,30 @@
       "revId": "33a853ce56c1d101e04f40f79753af9635dcbd62",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df6247ed_ad7f8564",
+        "filename": "ansible/roles/neutron/templates/neutron.conf.j2",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2019-02-21T20:24:03Z",
+      "side": 1,
+      "message": "the required code comes with contrail plugin with neutron-init container. We support this only on rocky and upwards.",
+      "parentUuid": "df6247ed_19c37b59",
+      "range": {
+        "startLine": 56,
+        "startChar": 107,
+        "endLine": 56,
+        "endChar": 118
+      },
+      "revId": "33a853ce56c1d101e04f40f79753af9635dcbd62",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
