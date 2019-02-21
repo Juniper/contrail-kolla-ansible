@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df6247ed_19c37b59",
+        "filename": "ansible/roles/neutron/templates/neutron.conf.j2",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2019-02-21T07:40:16Z",
+      "side": 1,
+      "message": "as I know - code of this plugin must be present in container with neutron-server. Same case we have for lbaas.\nlbaas extension is enabled by contrail-neutron-plugin itself.\n\nBut not all set of containers have such libraries inside neutron-server. I know that both sets of containers for helm do not contain lbaas library there. Therefore we need to workaround it by bringing lbaas code with our neutron-init container.\n\nDoes it work at least for all kolla containers sets/versions?",
+      "range": {
+        "startLine": 56,
+        "startChar": 107,
+        "endLine": 56,
+        "endChar": 118
+      },
+      "revId": "33a853ce56c1d101e04f40f79753af9635dcbd62",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
