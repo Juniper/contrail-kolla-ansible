@@ -70,6 +70,30 @@
       "revId": "33a853ce56c1d101e04f40f79753af9635dcbd62",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": false
+    },
+    {
+      "key": {
+        "uuid": "df6247ed_8d7e0117",
+        "filename": "ansible/roles/neutron/templates/neutron.conf.j2",
+        "patchSetId": 2
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 330
+      },
+      "writtenOn": "2019-02-21T22:03:16Z",
+      "side": 1,
+      "message": "From here : https://github.com/Juniper/contrail-neutron-plugin/tree/master/neutron_plugin_contrail/plugins/opencontrail/neutron_fwaas",
+      "parentUuid": "df6247ed_4de36935",
+      "range": {
+        "startLine": 56,
+        "startChar": 107,
+        "endLine": 56,
+        "endChar": 118
+      },
+      "revId": "33a853ce56c1d101e04f40f79753af9635dcbd62",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
     }
   ]
 }
