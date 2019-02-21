@@ -13,6 +13,10 @@ driver = iptables_v2
 {% endif %}
 
 [service_providers]
+{% if neutron_plugin_agent == 'opencontrail' %}
+service_provider = FIREWALL_V2:contrail:neutron_plugin_contrail.plugins.opencontrail.neutron_fwaas.contrail.ContrailFirewallv2Driver:default
+{% else %}
 service_provider = FIREWALL:Iptables:neutron.agent.linux.iptables_firewall.OVSHybridIptablesFirewallDriver:default
+{% endif %}
 {% endif %}
 {% endif %}
