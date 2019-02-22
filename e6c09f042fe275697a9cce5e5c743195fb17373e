@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "df6247ed_a20e6f38",
+        "filename": "ansible/roles/common/templates/admin-openrc.yml.j2",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2019-02-22T18:44:50Z",
+      "side": 1,
+      "message": "i suppose that this line should same indent as above",
+      "revId": "e6c09f042fe275697a9cce5e5c743195fb17373e",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": false
+    }
+  ]
+}
