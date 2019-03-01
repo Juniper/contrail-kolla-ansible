@@ -225,6 +225,7 @@ class DockerWorker(object):
         }
 
         self.dc = get_docker_client()(**options)
+        self.dc.timeout = 600
 
     def generate_tls(self):
         tls = {'verify': self.params.get('tls_verify')}
