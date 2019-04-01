@@ -10,5 +10,5 @@ openstack_envvars:
   OS_IDENTITY_API_VERSION: 3
   OS_BAREMETAL_API_VERSION: 1.29
   {% if kolla_enable_tls_external | bool and kolla_external_fqdn_cacert %}
-  OS_CACERT: {{ kolla_external_fqdn_cacert }}
+  OS_CACERT={{ container_config_directory }}/haproxy-ca.crt
   {% endif %}
