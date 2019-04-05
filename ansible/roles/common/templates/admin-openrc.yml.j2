@@ -5,7 +5,7 @@ openstack_envvars:
   OS_TENANT_NAME: {{ keystone_admin_project }}
   OS_USERNAME: {{ keystone_admin_user }}
   OS_PASSWORD: {{ keystone_admin_password }}
-  OS_AUTH_URL: {{ admin_protocol }}://{{ kolla_external_fqdn }}:{{ keystone_admin_port }}/v3
+  OS_AUTH_URL: {{ admin_protocol }}://{{ kolla_internal_fqdn }}:{{ keystone_admin_port }}/v3
   OS_INTERFACE: internal
   OS_IDENTITY_API_VERSION: 3
   OS_REGION_NAME: {{ openstack_region_name }}
