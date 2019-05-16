@@ -3,6 +3,7 @@
 
 - include: bootstrap_cluster.yml
   when:
+    - delegate_host is defined
     - delegate_host == 'None'
     - inventory_hostname == groups['mariadb'][0]
 
