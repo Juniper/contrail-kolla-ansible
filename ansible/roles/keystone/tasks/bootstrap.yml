@@ -29,4 +29,6 @@
   delegate_to: "{{ groups['keystone'][0] }}"
 
 - include: bootstrap_service.yml
-  when: database.changed
+  when:
+    - database is defined
+    - database.changed
