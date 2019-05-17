@@ -6,6 +6,7 @@
 
 - include: bootstrap_cluster.yml
   when:
+    - has_cluster is defined
     - not has_cluster | bool
     - inventory_hostname == groups['mariadb'][0]
 

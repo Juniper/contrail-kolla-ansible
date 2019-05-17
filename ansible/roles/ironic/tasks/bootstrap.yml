@@ -49,7 +49,7 @@
     - inventory_hostname in groups[item.group]
 
 - include: bootstrap_service.yml
-  when: database.changed
+  when: database is defined and database.changed
 
 - name: Running Ironic-PXE bootstrap container
   kolla_docker:

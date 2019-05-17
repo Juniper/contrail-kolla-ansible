@@ -1,7 +1,9 @@
 ---
 - fail:
     msg: "MariaDB cluster was not found. Is your inventory correct?"
-  when: not has_cluster | bool
+  when:
+    - has_cluster is defined
+    - not has_cluster | bool
 
 - name: Cleaning up temp file on mariadb hosts
   file: path=/tmp/kolla_mariadb_grastate.dat state=absent
