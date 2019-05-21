@@ -1,6 +1,6 @@
 ---
-- include: config.yml
+- include_tasks: config.yml
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
 
 - include: start.yml
