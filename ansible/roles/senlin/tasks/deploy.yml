@@ -1,12 +1,12 @@
 ---
-- include: register.yml
+- include_tasks: register.yml
   when: inventory_hostname in groups['senlin-api']
 
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['senlin-api'] or
         inventory_hostname in groups['senlin-engine']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['senlin-api']
 
 - name: Flush handlers

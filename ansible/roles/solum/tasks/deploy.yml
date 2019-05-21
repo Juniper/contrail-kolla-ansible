@@ -1,14 +1,14 @@
 ---
-- include: register.yml
+- include_tasks: register.yml
   when: inventory_hostname in groups['solum-api']
 
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['solum-api'] or
         inventory_hostname in groups['solum-deploy'] or
         inventory_hostname in groups['solum-worker'] or
         inventory_hostname in groups['solum-conductor']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['solum-api']
 
 - name: Flush handlers

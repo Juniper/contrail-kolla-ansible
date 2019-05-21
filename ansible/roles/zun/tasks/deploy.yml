@@ -1,12 +1,12 @@
 ---
-- include: register.yml
+- include_tasks: register.yml
   when: inventory_hostname in groups['zun-api']
 
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['zun-api'] or
         inventory_hostname in groups['zun-compute']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['zun-api']
 
 - name: Flush handlers

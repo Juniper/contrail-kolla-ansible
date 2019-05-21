@@ -1,7 +1,7 @@
 ---
-- include: config.yml
+- include_tasks: config.yml
 
-- include: bootstrap_service.yml
+- include_tasks: bootstrap_service.yml
 
 # TODO(jeffrey4l): ceilometer-api and ceilometer-collector are marked as
 # deprecated and will be removed already. Upgrade to Pike should remove
