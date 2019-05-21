@@ -1,6 +1,7 @@
 #jinja2: trim_blocks: False
 {% set tls_bind_info = 'ssl crt /etc/haproxy/haproxy.pem' if kolla_enable_tls_external | bool else '' %}
 {% set contrail_ssl_info = 'ssl verify required ca-file /etc/haproxy/contrail-ca-cert.pem' if config_api_ssl_enable is defined and config_api_ssl_enable | bool else '' %}
+{% set contrail_analytics_ssl_info = 'ssl verify required ca-file /etc/haproxy/contrail-ca-cert.pem' if analytics_api_ssl_enable is defined and analytics_api_ssl_enable | bool else '' %}
 global
   chroot /var/lib/haproxy
   user haproxy
@@ -1453,7 +1454,7 @@ listen contrail_config_api_external
 listen contrail_analytics_api_internal
   bind {{ kolla_internal_vip_address }}:{{ opencontrail_collector_port }}
 {% for host in opencontrail_collector_ip.split(' ') %}
-  server {{ host }} {{ host }}:{{ opencontrail_collector_port }} check inter 2000 rise 2 fall 5
+  server {{ host }} {{ host }}:{{ opencontrail_collector_port }} check inter 2000 rise 2 fall 5 {{ contrail_analytics_ssl_info }}
 {% endfor %}
 
 {% if haproxy_enable_external_vip | bool %}
@@ -1462,7 +1463,7 @@ listen contrail_analytics_api_external
   http-request del-header X-Forwarded-Proto if { ssl_fc }
   http-request set-header X-Forwarded-Proto https if { ssl_fc }
 {% for host in opencontrail_collector_ip.split(' ') %}
-  server {{ host }} {{ host }}:{{ opencontrail_collector_port }} check inter 2000 rise 2 fall 5
+  server {{ host }} {{ host }}:{{ opencontrail_collector_port }} check inter 2000 rise 2 fall 5 {{ contrail_analytics_ssl_info }}
 {% endfor %}
 {% endif %}
 {% endif %}
