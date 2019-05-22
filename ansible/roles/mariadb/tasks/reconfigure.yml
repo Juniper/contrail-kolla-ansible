@@ -9,7 +9,7 @@
   with_items:
     - { name: mariadb, group: mariadb }
 
-- include: config.yml
+- include_tasks: config.yml
 
 - name: Check the configs
   command: docker exec {{ item.name }} /usr/local/bin/kolla_set_configs --check
@@ -46,7 +46,7 @@
     - "{{ container_envs.results }}"
     - "{{ check_results.results }}"
 
-- include: start.yml
+- include_tasks: start.yml
   when: remove_containers.changed
 
 - name: Restart containers
@@ -63,4 +63,4 @@
     - "{{ container_envs.results }}"
     - "{{ check_results.results }}"
 
-- include: check.yml
+- include_tasks: check.yml

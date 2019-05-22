@@ -62,7 +62,7 @@
 
 # TODO(Jeffrey4l): fix idempotent when ceilometer_database_type == "gnocchi"
 # NOTE(vbel): bootstrapping of mysql db for ceilometer is idempotent
-- include: bootstrap_service.yml
+- include_tasks: bootstrap_service.yml
   when: ((ceilometer_database_type == "mongodb" and mongodb_ceilometer_database.changed)
          or (ceilometer_database_type == "mysql" and mysql_ceilometer_database.changed )
          or ceilometer_database_type == "gnocchi")

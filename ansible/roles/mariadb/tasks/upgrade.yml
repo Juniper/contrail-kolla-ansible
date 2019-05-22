@@ -1,8 +1,8 @@
 ---
-- include: config.yml
+- include_tasks: config.yml
 
-- include: lookup_cluster.yml
+- include_tasks: lookup_cluster.yml
 
-- include: start.yml
+- include_tasks: start.yml
 
-- include: check.yml
+- include_tasks: check.yml

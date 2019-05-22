@@ -28,10 +28,10 @@
   run_once: True
   delegate_to: "{{ groups['heat-api'][0] }}"
 
-- include: bootstrap_service.yml
+- include_tasks: bootstrap_service.yml
   when: database.changed
 
-- include: init_opencontrail_heat.yml
+- include_tasks: init_opencontrail_heat.yml
   when:
     - inventory_hostname in groups['heat-engine']
     - enable_heat_opencontrail | bool

@@ -1,19 +1,19 @@
 ---
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['keystone']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['keystone']
 
 - name: Flush handlers
   meta: flush_handlers
 
-- include: init_fernet.yml
+- include_tasks: init_fernet.yml
   when:
     - inventory_hostname in groups['keystone']
     - keystone_token_provider == 'fernet'
 
-- include: register.yml
+- include_tasks: register.yml
   when: inventory_hostname in groups['keystone']
 
-- include: check.yml
+- include_tasks: check.yml

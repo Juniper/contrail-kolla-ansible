@@ -1,8 +1,8 @@
 ---
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['grafana']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['grafana']
 
 - name: Flush handlers

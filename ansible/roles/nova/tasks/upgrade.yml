@@ -28,9 +28,9 @@
   delegate_to: "{{ groups['nova-api'][0] }}"
 
 # Create new set of configs on nodes
-- include: config.yml
+- include_tasks: config.yml
 
-- include: bootstrap_service.yml
+- include_tasks: bootstrap_service.yml
 
 - include: register.yml
 
@@ -56,4 +56,4 @@
 - name: Flush handlers
   meta: flush_handlers
 
-- include: reload.yml
+- include_tasks: reload.yml

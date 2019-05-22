@@ -28,8 +28,8 @@
   run_once: True
   delegate_to: "{{ groups['neutron-server'][0] }}"
 
-- include: bootstrap_service.yml
+- include_tasks: bootstrap_service.yml
   when: database.changed
 
-- include: init_opencontrail.yml
+- include_tasks: init_opencontrail.yml
   when: inventory_hostname in groups['neutron-server']

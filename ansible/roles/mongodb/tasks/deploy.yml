@@ -1,9 +1,9 @@
 ---
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['mongodb']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['mongodb']
 
-- include: start.yml
+- include_tasks: start.yml
   when: inventory_hostname in groups['mongodb']

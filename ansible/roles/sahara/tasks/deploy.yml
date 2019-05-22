@@ -1,12 +1,12 @@
 ---
-- include: register.yml
+- include_tasks: register.yml
   when: inventory_hostname in groups['sahara-api']
 
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['sahara-api'] or
         inventory_hostname in groups['sahara-engine']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['sahara-api']
 
 - name: Flush handlers

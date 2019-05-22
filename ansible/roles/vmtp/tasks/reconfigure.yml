@@ -7,7 +7,7 @@
   failed_when: container_state.Running == false
   when: inventory_hostname in groups['vmtp']
 
-- include: config.yml
+- include_tasks: config.yml
 
 - name: Check configuration
   command: docker exec {{ item.name }} /usr/local/bin/kolla_set_configs --check
@@ -41,7 +41,7 @@
     - "{{ container_envs.results }}"
     - "{{ check_results.results }}"
 
-- include: start.yml
+- include_tasks: start.yml
   when: remove_containers.changed
 
 - name: Restart containers

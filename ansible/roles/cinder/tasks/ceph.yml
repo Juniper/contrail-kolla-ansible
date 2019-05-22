@@ -22,13 +22,13 @@
     - "cinder-backup"
   when: inventory_hostname in groups['cinder-volume']
 
-- include: ../../ceph_pools.yml
+- include_tasks: ../../ceph_pools.yml
   vars:
     pool_name: "{{ cinder_pool_name }}"
     pool_type: "{{ cinder_pool_type }}"
     cache_mode: "{{ cinder_cache_mode }}"
 
-- include: ../../ceph_pools.yml
+- include_tasks: ../../ceph_pools.yml
   vars:
     pool_name: "{{ cinder_backup_pool_name }}"
     pool_type: "{{ cinder_backup_pool_type }}"

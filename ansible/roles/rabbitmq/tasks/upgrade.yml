@@ -8,7 +8,7 @@
   when: inventory_hostname in groups['rabbitmq']
   register: rabbitmq_differs
 
-- include: config.yml
+- include_tasks: config.yml
 
 - name: Find gospel node
   command: docker exec -t rabbitmq /usr/local/bin/rabbitmq_get_gospel_node

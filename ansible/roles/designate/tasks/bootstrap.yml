@@ -36,5 +36,5 @@
     - database_name: "{{ designate_pool_manager_database_name }}"
       database_password: "{{ designate_pool_manager_database_password }}"
 
-- include: bootstrap_service.yml
+- include_tasks: bootstrap_service.yml
   when: database.changed

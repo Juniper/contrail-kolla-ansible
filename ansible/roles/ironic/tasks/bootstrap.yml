@@ -40,7 +40,7 @@
       database_password: "{{ ironic_inspector_database_password }}"
       delegate_to: "{{ groups['ironic-inspector'][0] }}"
 
-- include: bootstrap_service.yml
+- include_tasks: bootstrap_service.yml
   when: database.changed
 
 - name: Running Ironic-PXE bootstrap container

@@ -1,4 +1,4 @@
 ---
-- include: pre-install.yml
-- include: install.yml
-- include: post-install.yml
+- include_tasks: pre-install.yml
+- include_tasks: install.yml
+- include_tasks: post-install.yml

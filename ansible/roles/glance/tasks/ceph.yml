@@ -14,7 +14,7 @@
     dest: "{{ node_config_directory }}/glance-api/ceph.conf"
   when: inventory_hostname in groups['glance-api']
 
-- include: ../../ceph_pools.yml
+- include_tasks: ../../ceph_pools.yml
   vars:
     pool_name: "{{ glance_pool_name }}"
     pool_type: "{{ glance_pool_type }}"

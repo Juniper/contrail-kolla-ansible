@@ -6,7 +6,7 @@
   register: container_state
   failed_when: container_state.Running == false
 
-- include: config.yml
+- include_tasks: config.yml
 
 - name: Checking the fluentd config
   command: docker exec fluentd /usr/local/bin/kolla_set_configs --check
@@ -29,7 +29,7 @@
     - config_strategy == "COPY_ONCE" or container_env["KOLLA_CONFIG_STRATEGY"] == "COPY_ONCE"
     - check_result.rc == 1
 
-- include: start.yml
+- include_tasks: start.yml
   when: remove_container.changed
 
 - name: Restarting the fluentd container

@@ -1,11 +1,11 @@
 ---
-- include: register.yml
+- include_tasks: register.yml
   when: inventory_hostname in groups['searchlight']
 
-- include: config.yml
+- include_tasks: config.yml
   when: inventory_hostname in groups['searchlight']
 
-- include: bootstrap.yml
+- include_tasks: bootstrap.yml
   when: inventory_hostname in groups['searchlight']
 
 - name: Flush handlers
