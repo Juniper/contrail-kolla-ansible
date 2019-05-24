@@ -6,6 +6,8 @@
     mode: "0660"
   become: true
   when:
-    - config_api_ssl_enable is defined
-    - config_api_ssl_enable | bool
+    - (( config_api_ssl_enable is defined ) and
+      ( config_api_ssl_enable | bool )) or
+      (( analytics_api_ssl_enable is defined ) and
+      ( analytics_api_ssl_enable | bool ))
 
