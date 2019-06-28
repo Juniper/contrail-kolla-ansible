@@ -75,6 +75,8 @@
       or policy_json.changed | bool
       or ironic_inspector_container.changed | bool
 
+# Note: Added variable defined check for "ironic_kernel" as the variable registration is disabled at
+# ansible/roles/ironic/tasks/config.yml#L161
 - name: Restart ironic-pxe container
   vars:
     service_name: "ironic-pxe"
@@ -96,7 +98,7 @@
     - config_json.changed | bool
       or ironic_pxe_confs.changed | bool
       or ironic_pxe_uefi_confs.changed | bool
-      or ironic_kernel.changed | bool
+      or (ironic_kernel is defined and ironic_kernel.changed | bool)
       or ironic_pxe_container.changed | bool
 
 - name: Restart ironic-ipxe container
