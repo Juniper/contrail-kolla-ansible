@@ -42,10 +42,25 @@ host = {{ ansible_hostname }}_{{ item }}
 {% endif %}
 
 allow_overlapping_ips = true
+<<<<<<< HEAD   (df09f9 Make haproxy support only TLSv1.2 externally)
 {% if neutron_plugin_agent == 'opencontrail' %}
 core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
 service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
 api_extensions_path = /opt/plugin/site-packages/neutron_plugin_contrail/extensions:/opt/plugin/site-packages/neutron_lbaas/extensions
+=======
+
+{% if neutron_plugin_agent == 'vmware_nsxv' %}
+core_plugin = vmware_nsx.plugin.NsxVPlugin
+{% elif neutron_plugin_agent == 'vmware_dvs' %}
+core_plugin = vmware_nsx.plugin.NsxDvsPlugin
+{% elif neutron_plugin_agent == 'opencontrail' %}
+core_plugin = contrail
+service_plugins = contrail-timestamp,contrail-lbaasv2
+api_extensions_path = /opt/plugin/site-packages/neutron_lbaas/extensions
+{% else %}
+core_plugin = ml2
+service_plugins = {{ neutron_service_plugins|map(attribute='name')|join(',') }}
+>>>>>>> CHANGE (8d1e7f Rename the python package from neutron_plugin_contrail to ne)
 {% endif %}
 
 {% if enable_neutron_agent_ha | bool %}
@@ -155,5 +170,5 @@ ipv6_ptr_zone_prefix_size = 116
 quota_network=-1
 quota_subnet=-1
 quota_port=-1
-quota_driver=neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDriver
+quota_driver=networking_contrail.quota.driver.QuotaDriver
 {% endif %}
