@@ -17,6 +17,10 @@
       when: openstack_release == "auto"
   tags: always
 
+  - name: Evaluate contrail version from image tag
+  set_fact:
+    contrail_version: "{{ neutron_opencontrail_init_image_full | get_contrail_version }}"
+
 - name: Apply role prechecks
   gather_facts: false
   hosts:
