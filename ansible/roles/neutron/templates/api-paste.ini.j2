@@ -22,7 +22,7 @@ keystone = user_token cors http_proxy_to_wsgi neutronversions
 paste.filter_factory = oslo_middleware:RequestId.factory
 
 [filter:user_token]
-paste.filter_factory = neutron_plugin_contrail.plugins.opencontrail.neutron_middleware:token_factory
+paste.filter_factory = neutron_plugin_contrail.plugin.middlewares.user_token:token_factory
 
 [filter:catch_errors]
 paste.filter_factory = oslo_middleware:CatchErrors.factory
