@@ -51,13 +51,13 @@ dhcp_agent_notification = False
 {% elif neutron_plugin_agent == 'vmware_dvs' %}
 core_plugin = vmware_nsx.plugin.NsxDvsPlugin
 {% elif neutron_plugin_agent == 'opencontrail' %}
-core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
+core_plugin = contrail
 {% if enable_neutron_fwaas | bool %}
-service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2,firewall_v2
+service_plugins = contrail-timestamp,contrail-lbaasv2,firewall_v2
 {% else %}
-service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
+service_plugins = contrail-timestamp,contrail-lbaasv2
 {% endif %}
-api_extensions_path = /opt/plugin/site-packages/neutron_plugin_contrail/extensions:/opt/plugin/site-packages/neutron_lbaas/extensions
+api_extensions_path = /opt/plugin/site-packages/networking_contrail/extensions:/opt/plugin/site-packages/neutron_lbaas/extensions
 {% else %}
 core_plugin = ml2
 service_plugins = {{ neutron_service_plugins|map(attribute='name')|join(',') }}
@@ -184,7 +184,7 @@ notification_drivers = {{ neutron_notification_drivers|map(attribute='name')|joi
 quota_network=-1
 quota_subnet=-1
 quota_port=-1
-quota_driver=neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDriver
+quota_driver=networking_contrail.quota.driver.QuotaDriver
 {% endif %}
 
 [placement]
