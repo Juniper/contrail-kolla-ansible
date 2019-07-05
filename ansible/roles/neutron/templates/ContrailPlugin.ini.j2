@@ -17,11 +17,14 @@ use_ssl = True
 api_server_ip = {{ opencontrail_api_server_ip }}
 {% endif %}
 multi_tenancy = True
+{% if contrail_version | int >= 2005 %}
+contrail_extensions = contrail:None
+{% else %}
 contrail_extensions = ipam:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_ipam.NeutronPluginContrailIpam,policy:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_policy.NeutronPluginContrailPolicy,route-table:neutron_plugin_contrail.plugins.opencontrail.contrail_plugin_vpc.NeutronPluginContrailVpc,contrail:None,service-interface:None,vf-binding:None
-
 [COLLECTOR]
 analytics_api_ip = {{ opencontrail_collector_ip.split(' ')[0] }}
 analytics_api_port = {{ opencontrail_collector_port }}
+{% endif %}
 
 [keystone_authtoken]
 auth_host = {{ kolla_internal_fqdn }}
