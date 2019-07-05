@@ -43,13 +43,13 @@ host = {{ ansible_hostname }}_{{ item }}
 
 allow_overlapping_ips = true
 {% if neutron_plugin_agent == 'opencontrail' %}
-core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
+core_plugin = contrail
 {% if enable_opencontrail_trunk | bool %}
-service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2,contrail-trunk
+service_plugins = contrail-timestamp,contrail-lbaasv2,contrail-trunk
 {% else %}
-service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
+service_plugins = contrail-timestamp,contrail-lbaasv2
 {% endif %}
-api_extensions_path = /opt/plugin/site-packages/neutron_plugin_contrail/extensions:/opt/plugin/site-packages/neutron_lbaas/extensions
+api_extensions_path = /opt/plugin/site-packages/networking_contrail/extensions:/opt/plugin/site-packages/neutron_lbaas/extensions
 {% endif %}
 
 {% if enable_neutron_agent_ha | bool %}
@@ -159,5 +159,5 @@ ipv6_ptr_zone_prefix_size = 116
 quota_network=-1
 quota_subnet=-1
 quota_port=-1
-quota_driver=neutron_plugin_contrail.plugins.opencontrail.quota.driver.QuotaDriver
+quota_driver=networking_contrail.quota.driver.QuotaDriver
 {% endif %}
