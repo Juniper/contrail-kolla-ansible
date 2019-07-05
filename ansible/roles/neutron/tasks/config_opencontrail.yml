@@ -1,4 +1,8 @@
 ---
+- name: Evaluate contrail version from image tag
+  set_fact:
+    contrail_version: "{{ neutron_opencontrail_init_image_full | get_contrail_version }}"
+
 - name: Copying over ContrailPlugin.ini
   vars:
     service_name: "neutron-server"
