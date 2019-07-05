@@ -9,6 +9,10 @@
         - passwords.yml.original
         - globals.yml.original
 
+- name: Evaluate contrail version from image tag
+  set_fact:
+    contrail_version: "{{ neutron_opencontrail_init_image_full | get_contrail_version }}"
+
 - include: kolla-host.yml
   vars:
     action: bootstrap-servers
