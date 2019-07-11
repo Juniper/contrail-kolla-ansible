@@ -10,8 +10,10 @@
   when:
     - inventory_hostname in groups[service.group]
     - service.enabled | bool
-    - config_api_ssl_enable is defined
-    - config_api_ssl_enable | bool
+    - (( config_api_ssl_enable is defined ) and
+      ( config_api_ssl_enable | bool )) or
+      (( analytics_api_ssl_enable is defined ) and
+      ( analytics_api_ssl_enable | bool ))
   notify:
     - Restart haproxy container
     - Ensuring latest haproxy config is used
