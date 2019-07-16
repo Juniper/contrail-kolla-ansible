@@ -12,9 +12,14 @@
     - service.enabled | bool
     - (( config_api_ssl_enable is defined ) and
       ( config_api_ssl_enable | bool )) or
+<<<<<<< HEAD   (06961f Merge "Configure haproxy container with ssl for analytics-ap)
       (( analytics_api_ssl_enable is defined ) and
       ( analytics_api_ssl_enable | bool ))
   notify:
     - Restart haproxy container
     - Ensuring latest haproxy config is used
+=======
+      (( redis_ssl_enable is defined ) and
+      ( redis_ssl_enable | bool ))
+>>>>>>> CHANGE (6f51fb change from analytics_api_ssl_enable to redis_ssl_enable, si)
 

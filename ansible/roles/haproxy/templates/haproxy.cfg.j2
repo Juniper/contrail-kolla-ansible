@@ -1,7 +1,7 @@
 #jinja2: trim_blocks: False
 {% set tls_bind_info = 'ssl crt /etc/haproxy/haproxy.pem' if kolla_enable_tls_external | bool else '' %}
 {% set contrail_ssl_info = 'ssl verify required ca-file /etc/haproxy/contrail-ca-cert.pem' if config_api_ssl_enable is defined and config_api_ssl_enable | bool else '' %}
-{% set contrail_analytics_ssl_info = 'ssl verify required ca-file /etc/haproxy/contrail-ca-cert.pem' if analytics_api_ssl_enable is defined and analytics_api_ssl_enable | bool else '' %}
+{% set contrail_analytics_ssl_info = 'ssl verify required ca-file /etc/haproxy/contrail-ca-cert.pem' if redis_ssl_enable is defined and redis_ssl_enable | bool else '' %}
 global
   chroot /var/lib/haproxy
   user haproxy
