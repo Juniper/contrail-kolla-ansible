@@ -49,7 +49,11 @@ core_plugin = vmware_nsx.plugin.NsxVPlugin
 core_plugin = vmware_nsx.plugin.NsxDvsPlugin
 {% elif neutron_plugin_agent == 'opencontrail' %}
 core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
+{% if enable_opencontrail_trunk | bool %}
 service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2,contrail-trunk
+{% else %}
+service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2
+{% endif %}
 api_extensions_path = /opt/plugin/site-packages/neutron_plugin_contrail/extensions:/opt/plugin/site-packages/neutron_lbaas/extensions
 {% else %}
 core_plugin = ml2
