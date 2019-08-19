@@ -22,6 +22,8 @@ enable_swift_opencontrail: "yes"
 
 enable_opencontrail_rbac: no
 
+enable_opencontrail_trunk: no
+
 # When neutron_plugin_agent is opencontrail, then these next variables are
 # required. By default these are being set to known working container images.
 # These should be overridden in globals.yml
