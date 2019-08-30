@@ -56,7 +56,7 @@ opencontrail_api_server_port: "8082"
 opencontrail_collector_ip: "{{ contrail_api_interface_address }}"
 opencontrail_collector_port: "8081"
 opencontrail_collector_listen_port: "8086"
-swift_disk_partition_size: 5GB
+swift_disk_partition_size: 15GB
 # here can be a space separated list of webui IP-s
 opencontrail_webui_ip: "{{ contrail_api_interface_address }}"
 opencontrail_webui_port: "8143"
