@@ -8,6 +8,6 @@
   when:
     - (( config_api_ssl_enable is defined ) and
       ( config_api_ssl_enable | bool )) or
-      (( redis_ssl_enable is defined ) and
-      ( redis_ssl_enable | bool ))
+      (( analytics_api_ssl_enable is defined ) and
+      ( analytics_api_ssl_enable | bool ))
 
