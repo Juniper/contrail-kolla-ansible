@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "6a45ff1b_85e80f4a",
+        "filename": "ansible/roles/haproxy/tasks/config_opencontrail.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 437
+      },
+      "writtenOn": "2019-09-07T07:32:50Z",
+      "side": 0,
+      "message": "is it still needed? I mean - should it be remove from ansible-deployer?",
+      "range": {
+        "startLine": 12,
+        "startChar": 8,
+        "endLine": 12,
+        "endChar": 24
+      },
+      "revId": "e1383208e0b8090f1f50b71c93728ec971682a25",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
