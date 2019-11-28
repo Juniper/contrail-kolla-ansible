@@ -20,7 +20,7 @@
   local_action: stat path="{{ node_custom_config }}/keystone/domains"
   run_once: True
   register: keystone_domain_directory
-
+  become: True
 - name: Ensuring config directories exist
   file:
     path: "{{ node_config_directory }}/{{ item.key }}"
