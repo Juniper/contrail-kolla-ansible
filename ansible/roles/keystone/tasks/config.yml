@@ -8,6 +8,7 @@
   local_action: stat path="{{ node_custom_config }}/keystone/domains"
   run_once: True
   register: keystone_domain_directory
+  become: true
 
 - name: Ensuring config directories exist
   file:
