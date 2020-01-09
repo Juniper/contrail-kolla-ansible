@@ -16,8 +16,8 @@
       --os-user-domain-name default
       compute service set
       --disable-reason "Removing compute"
-      --disable {{ item }} nova-compute
-    with_items: "{{ deleted_nodes_dict.keys() }}"
+      --disable {{ item.key }} nova-compute
+    with_dict: "{{ deleted_nodes_dict }}"
     run_once: yes
 
   ## Need to create Host Aggregates to separate Baremetal and Virtual Hosts
@@ -52,8 +52,8 @@
       --os-username admin
       --os-password {{ keystone_admin_password }}
       --os-user-domain-name default
-      compute service list | grep {{ item }} | awk '{print $2}'
-    with_items: "{{ deleted_nodes_dict.keys() }}"
+      compute service list | grep {{ item.key }} | awk '{print $2}'
+    with_dict: "{{ deleted_nodes_dict }}"
     run_once: yes
     register: disabled_nova_services
 
