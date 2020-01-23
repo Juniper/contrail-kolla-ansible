@@ -70,6 +70,7 @@ opencontrail_collector_ip: "{{ contrail_api_interface_address }}"
 opencontrail_collector_port: "8081"
 opencontrail_collector_listen_port: "8086"
 swift_disk_partition_size: 15GB
+swift_proxy_node_timeout: 90
 # here can be a space separated list of webui IP-s
 opencontrail_webui_ip: "{{ contrail_api_interface_address }}"
 opencontrail_webui_port: "8143"

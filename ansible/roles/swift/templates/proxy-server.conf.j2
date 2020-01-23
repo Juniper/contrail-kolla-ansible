@@ -16,7 +16,7 @@ pipeline = catch_errors gatekeeper healthcheck cache tempurl container_sync bulk
 use = egg:swift#proxy
 allow_account_management = true
 account_autocreate = true
-node_timeout = 60
+node_timeout = {{swift_proxy_node_timeout}}
 
 [filter:cache]
 use = egg:swift#memcache
