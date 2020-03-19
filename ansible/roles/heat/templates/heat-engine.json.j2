@@ -6,6 +6,12 @@
             "dest": "/etc/heat/heat.conf",
             "owner": "heat",
             "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/contrail-plugin.pth",
+            "dest": "/usr/lib/python{{ distro_python_version }}/site-packages/contrail-plugin.pth",
+            "owner": "root",
+            "perm": "0644"
         }{% if heat_policy_file is defined %},
         {
             "source": "{{ container_config_directory }}/{{ heat_policy_file }}",

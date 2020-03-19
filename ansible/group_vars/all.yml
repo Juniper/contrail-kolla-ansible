@@ -1,6 +1,72 @@
 ---
 # The options in this file can be overridden in 'globals.yml'
 
+####################### CONTRAIL ADDITIONS - BEGIN ###########################
+
+enable_swift_opencontrail: "yes"
+
+enable_opencontrail_rbac: no
+
+enable_opencontrail_trunk: no
+
+# When enable_neutron_opencontrail is set to "yes", then these two variables are
+# required. By default these are being set to known working container images.
+# These should be overridden in globals.yml
+neutron_opencontrail_init_image_full: "opencontrailnightly/contrail-openstack-neutron-init:queens-master-131"
+nova_compute_opencontrail_init_image_full: "opencontrailnightly/contrail-openstack-compute-init:queens-master-131"
+ironic_notification_manager_image_full: "opencontrailnightly/contrail-openstack-ironic-notification-manager:queens-master-131"
+heat_opencontrail_init_image_full: "opencontrailnightly/contrail-openstack-heat-init:queens-master-131"
+
+# contrail_additions : Ideally leave this to yes if you want the opencontrail
+# heat plugin. "no" means pure openstack heat - without contrail heat plugin
+enable_heat_opencontrail: "yes"
+
+# contrail_additions: When enable_ironic is set to "yes", the ironic notification
+# manager service container is deployed. By default this will be set to known
+# upstream working containers. These should be overridden in globals.yml
+# ironic_notification_manager_image_full: "opencontrailnightly/contrail-openstack-ironic-notification-manager:queens-master-131"
+ironic_notification_manager_log_file: "/var/log/ironic/ironic-notification-manager.log"
+ironic_notification_manager_log_level: "SYS_INFO"
+ironic_notification_manager_introspect_port: "8110"
+ironic_dev_mode: "no"
+
+
+# contrail_additions : We don't use neutron_l3_agent. Set this to "yes" if it is
+# needed for any reason
+enable_neutron_l3_agent: "no"
+
+# contrail_additions : enable_ironic_inspector is set to "no" to control
+# ironic-inspector install and its usage.
+enable_ironic_inspector: "no"
+ironic_cleaning_network: "ironic-provision"
+# contrail_additions: Separating dnsmasq container from Ironic inspector for ZTP use case
+enable_ironic_dnsmasq: "no"
+
+enable_contrail_horizon: "no"
+
+# contrail_additions : IP address where contrail-api is listening on - on an
+# all-in-one, it will be same as kolla_internal_vip_address
+# here can be a space separated list of IP-s
+contrail_api_interface_address: "{{ kolla_internal_vip_address }}"
+
+# here can be a space separated list of config-api IP-s
+opencontrail_api_server_ip: "{{ contrail_api_interface_address }}"
+opencontrail_api_server_port: "8082"
+# here can be a space separated list of collector IP-s
+opencontrail_collector_ip: "{{ contrail_api_interface_address }}"
+opencontrail_collector_port: "8081"
+opencontrail_collector_listen_port: "8086"
+swift_disk_partition_size: 15GB
+swift_proxy_node_timeout: 90
+# here can be a space separated list of webui IP-s
+opencontrail_webui_ip: "{{ contrail_api_interface_address }}"
+opencontrail_webui_port: "8143"
+
+# These option controls the "insecure" option under the 
+# [APISERVER] section of ContrailPlugin.ini
+opencontrail_api_insecure: "no"
+####################### CONTRAIL ADDITIONS - END ###########################
+
 # The "temp" files that are created before merge need to stay persistent due
 # to the fact that ansible will register a "change" if it has to create them
 # again. Persistent files allow for idempotency
@@ -597,7 +663,8 @@ enable_horizon_designate: "{{ enable_designate | bool }}"
 enable_horizon_fwaas: "{{ enable_neutron_fwaas | bool }}"
 enable_horizon_freezer: "{{ enable_freezer | bool }}"
 enable_horizon_heat: "{{ enable_heat | bool }}"
-enable_horizon_ironic: "{{ enable_ironic | bool }}"
+#disabling ironic-ui as 4.0.0 container fails to come up
+enable_horizon_ironic: "no"
 enable_horizon_karbor: "{{ enable_karbor | bool }}"
 enable_horizon_magnum: "{{ enable_magnum | bool }}"
 enable_horizon_manila: "{{ enable_manila | bool }}"
@@ -622,7 +689,9 @@ enable_ironic: "no"
 enable_ironic_ipxe: "no"
 enable_ironic_neutron_agent: "{{ enable_neutron | bool and enable_ironic | bool }}"
 enable_ironic_pxe_uefi: "no"
-enable_iscsid: "{{ (enable_cinder | bool and enable_cinder_backend_iscsi | bool) or enable_ironic | bool }}"
+enable_ironic: "yes"
+enable_ironic_notifications: "yes"
+enable_iscsid: "{{ enable_cinder_backend_iscsi | bool or enable_cinder_backend_lvm | bool or enable_ironic | bool }}"
 enable_karbor: "no"
 enable_kafka: "{{ enable_monasca | bool }}"
 enable_kuryr: "no"

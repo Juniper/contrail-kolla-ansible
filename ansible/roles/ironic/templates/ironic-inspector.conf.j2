@@ -53,6 +53,12 @@ connection = mysql+pymysql://{{ ironic_inspector_database_user }}:{{ ironic_insp
 
 [processing]
 ramdisk_logs_dir = /var/log/kolla/ironic-inspector
+add_ports = all
+keep_ports = present
+node_not_found_hook = enroll
+
+[discovery]
+enroll_node_driver = ipmi
 
 [pxe_filter]
 driver = {{ ironic_inspector_pxe_filter }}

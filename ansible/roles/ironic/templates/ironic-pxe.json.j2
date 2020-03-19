@@ -6,6 +6,7 @@
     "config_files": [
 {% if not enable_ironic_ipxe | bool and groups['ironic-inspector'] | length > 0 %}
 {% if not enable_ironic_pxe_uefi | bool %}
+{% if enable_ironic_notifications | bool %}
         {
             "source": "{{ container_config_directory }}/ironic-agent.kernel",
             "dest": "/tftpboot/ironic-agent.kernel",
@@ -18,13 +19,14 @@
             "owner": "root",
             "perm": "0644"
         },
-{% endif %}
         {
             "source": "{{ container_config_directory }}/default",
             "dest": "{{ pxe_dir }}/{{ pxe_cfg }}",
             "owner": "root",
             "perm": "0644"
         }
+{% endif %}
+{% endif %}
 {% endif %}
     ],
     "permissions": [

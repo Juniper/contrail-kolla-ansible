@@ -12,7 +12,19 @@
             "dest": "/etc/nova/{{ nova_policy_file }}",
             "owner": "nova",
             "perm": "0600"
-        }{% endif %}{% if nova_backend == "rbd" %},
+        }{% endif %},
+        {
+            "source": "{{ container_config_directory }}/rootwrap.conf",
+            "dest": "/etc/nova/rootwrap.conf",
+            "owner": "root",
+            "perm": "0640"
+        },
+        {
+            "source": "{{ container_config_directory }}/contrail-plugin.pth",
+            "dest": "/usr/lib/python{{ distro_python_version }}/site-packages/contrail-plugin.pth",
+            "owner": "root",
+            "perm": "0644"
+        }{% if nova_backend == "rbd" %},
         {
             "source": "{{ container_config_directory }}/ceph.*",
             "dest": "/etc/ceph/",
