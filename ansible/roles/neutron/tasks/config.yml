@@ -26,6 +26,10 @@
     - set_sysctl | bool
     - (neutron_l3_agent.enabled | bool and neutron_l3_agent.host_in_groups | bool)
 
+- name: Evaluate contrail version from image tag
+  set_fact:
+    contrail_version: "{{ neutron_opencontrail_init_image_full | get_contrail_version }}"
+
 - name: Ensuring config directories exist
   become: true
   file:
@@ -348,6 +352,8 @@
     - neutron_plugin_agent in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs']
   notify:
     - "Restart {{ service_name }} container"
+
+- include: config_opencontrail.yml
 
 - name: Copying over existing policy.json
   become: true
