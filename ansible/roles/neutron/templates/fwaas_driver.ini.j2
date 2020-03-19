@@ -8,6 +8,14 @@ agent_version = v2
 driver = iptables_v2
 
 [service_providers]
+{% if neutron_plugin_agent == 'opencontrail' %}
+{% if contrail_version | int >= 2005 %}
+service_provider = FIREWALL_V2:contrail:neutron_plugin_contrail.services.neutron_fwaas.contrail.ContrailFirewallv2Driver:default
+{% else %}
+service_provider = FIREWALL_V2:contrail:neutron_plugin_contrail.plugins.opencontrail.neutron_fwaas.contrail.ContrailFirewallv2Driver:default
+{% endif %}
+{% else %}
 service_provider = FIREWALL_V2:fwaas_db:neutron_fwaas.services.firewall.service_drivers.agents.agents.FirewallAgentDriver:default
+{% endif %}
 {% endif %}
 {% endif %}

@@ -1,0 +1,17 @@
+---
+
+- name: Copying opencontrail files for heat
+  become: true
+  vars:
+    service: "{{ heat_services['heat-engine'] }}"
+  copy:
+    src: "{{ role_path }}/templates/{{ item }}"
+    dest: "{{ node_config_directory }}/heat-engine/{{ item }}"
+    mode: "0644"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_items:
+    - "contrail-plugin.pth"
+  notify:
+    - "Restart heat-engine container"

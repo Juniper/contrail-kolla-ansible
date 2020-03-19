@@ -1,0 +1,59 @@
+---
+- name: convert disk_partition to disk_list
+  set_fact:
+    disk_list: "{{ disk_partition.replace(',',' ') }}"
+  when: disk_partition is defined
+
+- name: create template for disk partitioning script
+  template:
+    src: swift-create-disk-partition.sh.j2
+    dest: /bin/swift_create_disk_partition.sh
+    mode: 0755
+
+- name: Creating block devices for swift storage
+  command: /bin/swift_create_disk_partition.sh
+
+- name: convert openstack_list to node_list
+  set_fact:
+    swift_node_list: "{{ groups['control']|join(' ') }}"
+  when: storage_nodes is not defined
+
+- name: convert storage_nodes to node_list
+  set_fact:
+    swift_node_list: "{{ storage_nodes.replace(',',' ') }}"
+  when: storage_nodes is defined
+
+- name: create template for ring builder script
+  template:
+    src: swift-ring-builder.sh.j2
+    dest: /bin/swift_ring_builder.sh
+    mode: 0755
+  run_once: true
+  delegate_to: "{{ groups['storage'][0] }}"
+
+- name: Creating swift rings
+  command: /bin/swift_ring_builder.sh
+  run_once: true
+  delegate_to: "{{ groups['storage'][0] }}"
+
+- name: Creating local config directory
+  file:
+    path: /etc/kolla/config/swift
+    state: directory
+  delegate_to: localhost
+  run_once: true
+
+- name: Copying swift rings/accounts/objects
+  fetch:
+    dest: "{{ node_custom_config }}/swift/"
+    src: "/tmp/kolla/swift/{{ item }}"
+    flat: yes
+    fail_on_missing: no
+  with_items:
+    - "account.builder"
+    - "account.ring.gz"
+    - "container.builder"
+    - "container.ring.gz"
+    - "object.builder"
+    - "object.ring.gz"
+  run_once: true
