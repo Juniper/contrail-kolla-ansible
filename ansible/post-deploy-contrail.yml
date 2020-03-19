@@ -98,7 +98,7 @@
     run_once: yes
 
   - name: Contrail default swift container and Temp-URL-Key creation
-    shell: docker exec -u root kolla_toolbox bash -c 'source /var/lib/kolla/config_files/admin-openrc.sh; openstack container create contrail_container; openstack container set --property Temp-URL-Key=mykey --property read_acl=.r:* contrail_container'
+    shell: docker exec -u root kolla_toolbox bash -c 'pip install python-swiftclient; source /var/lib/kolla/config_files/admin-openrc.sh; swift post -r '.r:*' contrail_container; swift post -m "Temp-URL-Key:mykey"'
     when:
       - enable_swift_opencontrail | bool
       - enable_swift | bool
