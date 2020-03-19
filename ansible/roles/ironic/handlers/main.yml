@@ -62,6 +62,8 @@
   when:
     - kolla_action != "config"
 
+# Note: Added variable defined check for "ironic_kernel" as the variable registration is disabled at
+# ansible/roles/ironic/tasks/config.yml#L161
 - name: Restart ironic-pxe container
   vars:
     service_name: "ironic-pxe"
@@ -76,6 +78,7 @@
     dimensions: "{{ service.dimensions }}"
   when:
     - kolla_action != "config"
+    - ironic_kernel is defined and ironic_kernel.changed | bool
 
 - name: Restart ironic-ipxe container
   vars:
