@@ -47,6 +47,8 @@ heat_services:
     group: heat-engine
     enabled: true
     image: "{{ heat_engine_image_full }}"
+    environment:
+        PYTHONPATH: "{% if enable_heat_opencontrail | bool %}/opt/plugin/site-packages{% endif %}"
     volumes: "{{ heat_engine_default_volumes + heat_engine_extra_volumes }}"
     dimensions: "{{ heat_engine_dimensions }}"
 
@@ -91,6 +93,7 @@ heat_api_cfn_default_volumes:
   - "{{ kolla_dev_repos_directory ~ '/heat/heat:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/heat' if heat_dev_mode | bool else '' }}"
   - "kolla_logs:/var/log/kolla/"
 heat_engine_default_volumes:
+  - "opt_plugin:/opt/plugin"
   - "{{ node_config_directory }}/heat-engine/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ kolla_dev_repos_directory ~ '/heat/heat:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/heat' if heat_dev_mode | bool else '' }}"
