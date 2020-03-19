@@ -1,6 +1,8 @@
 ---
 - include_tasks: register.yml
 
+- include_tasks: disk_and_ring.yml
+
 - include_tasks: config.yml
 
 - include_tasks: start.yml

@@ -52,6 +52,7 @@ nova_cell_services:
     image: "{{ nova_compute_image_full }}"
     environment:
       LIBGUESTFS_BACKEND: "direct"
+      PATH: "{% if neutron_plugin_agent == 'opencontrail' %}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/plugin/bin{% endif %}"
     privileged: True
     enabled: "{{ not enable_nova_fake | bool }}"
     ipc_mode: "host"
@@ -293,6 +294,7 @@ nova_conductor_default_volumes:
   - "kolla_logs:/var/log/kolla/"
   - "{{ kolla_dev_repos_directory ~ '/nova/nova:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/nova' if nova_dev_mode | bool else '' }}"
 nova_compute_default_volumes:
+  - "opt_plugin_nova:/opt/plugin/"
   - "{{ node_config_directory }}/nova-compute/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
   - "/lib/modules:/lib/modules:ro"

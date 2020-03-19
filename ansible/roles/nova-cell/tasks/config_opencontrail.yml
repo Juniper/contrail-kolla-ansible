@@ -1,0 +1,18 @@
+---
+
+- name: Copying opencontrail files for nova-compute
+  become: true
+  vars:
+    service: "{{ nova_cell_services['nova-compute'] }}"
+  copy:
+    src: "{{ role_path }}/templates/{{ item.src }}"
+    dest: "{{ node_config_directory }}/nova-compute/{{ item.src }}"
+    mode: "{{ item.mode }}"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_items:
+    - { src: "contrail-plugin.pth", mode: "0644" }
+    - { src: "rootwrap.conf", mode: "0640" }
+  notify:
+    - Restart nova-compute container

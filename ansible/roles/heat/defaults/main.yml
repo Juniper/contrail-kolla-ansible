@@ -91,6 +91,7 @@ heat_api_cfn_default_volumes:
   - "{{ kolla_dev_repos_directory ~ '/heat/heat:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/heat' if heat_dev_mode | bool else '' }}"
   - "kolla_logs:/var/log/kolla/"
 heat_engine_default_volumes:
+  - "opt_plugin_heat:/opt/plugin/"
   - "{{ node_config_directory }}/heat-engine/:{{ container_config_directory }}/:ro"
   - "/etc/localtime:/etc/localtime:ro"
   - "{{ kolla_dev_repos_directory ~ '/heat/heat:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/heat' if heat_dev_mode | bool else '' }}"
