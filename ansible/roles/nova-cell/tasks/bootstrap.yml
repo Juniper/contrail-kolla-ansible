@@ -39,3 +39,6 @@
 - import_tasks: bootstrap_service.yml
 
 - import_tasks: create_cells.yml
+
+- include: init_opencontrail.yml
+  when: inventory_hostname == groups[nova_cell_conductor_group][0]

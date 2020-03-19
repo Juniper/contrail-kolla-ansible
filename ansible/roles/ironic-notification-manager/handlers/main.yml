@@ -1,0 +1,2 @@
+---
+- include: ironic_notification_manager.yml
