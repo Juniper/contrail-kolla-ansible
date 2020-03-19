@@ -8,6 +8,8 @@ neutron_services:
     enabled: true
     group: "neutron-server"
     host_in_groups: "{{ inventory_hostname in groups['neutron-server'] }}"
+    environment:
+        PYTHONPATH: "{% if neutron_plugin_agent == 'opencontrail' %}/opt/plugin/site-packages{% endif %}"
     volumes: "{{ neutron_server_default_volumes + neutron_server_extra_volumes }}"
     dimensions: "{{ neutron_server_dimensions }}"
     haproxy:
@@ -84,7 +86,7 @@ neutron_services:
     container_name: "neutron_dhcp_agent"
     image: "{{ neutron_dhcp_agent_image_full }}"
     privileged: True
-    enabled: "{{ neutron_plugin_agent not in [ 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
+    enabled: "{{ neutron_plugin_agent not in ['opencontrail', 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
     group: "neutron-dhcp-agent"
     host_in_groups: "{{ inventory_hostname in groups['neutron-dhcp-agent'] }}"
     volumes: "{{ neutron_dhcp_agent_default_volumes + neutron_dhcp_agent_extra_volumes }}"
@@ -93,7 +95,7 @@ neutron_services:
     container_name: "neutron_l3_agent"
     image: "{{ neutron_l3_agent_image_full }}"
     privileged: True
-    enabled: "{{ neutron_plugin_agent not in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] and not enable_opendaylight_l3 | bool and not enable_onos | bool }}"
+    enabled: "{{ neutron_plugin_agent not in ['opencontrail', 'vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] and not enable_opendaylight_l3 | bool and not enable_onos | bool }}"
     environment:
       KOLLA_LEGACY_IPTABLES: "{{ neutron_legacy_iptables | bool | lower }}"
     host_in_groups: >-
@@ -115,7 +117,7 @@ neutron_services:
     container_name: "neutron_metadata_agent"
     image: "{{ neutron_metadata_agent_image_full }}"
     privileged: True
-    enabled: "{{ neutron_plugin_agent not in [ 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
+    enabled: "{{ neutron_plugin_agent not in ['opencontrail', 'vmware_nsxv', 'vmware_nsxv3' ] and not enable_onos | bool }}"
     host_in_groups: >-
       {{
       inventory_hostname in groups['neutron-metadata-agent']

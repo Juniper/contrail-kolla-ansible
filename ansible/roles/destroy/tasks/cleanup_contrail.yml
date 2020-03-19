@@ -1,0 +1,22 @@
+---
+- name: Remove all contrail openstack containers
+  docker_container:
+    state: "absent"
+    name: "{{ item }}"
+  with_items:
+    - ironic_notification_manager
+    - bootstrap_heat_opencontrail_plugin
+    - bootstrap_nova_compute_opencontrail_plugin
+    - bootstrap_neutron_opencontrail_plugin
+
+- name: Remove all contrail openstack images
+  docker_image:
+    state: "absent"
+    name: "{{ item }}"
+  with_items:
+    - "{{ ironic_notification_manager_image_full }}"
+    - "{{ heat_opencontrail_init_image_full }}"
+    - "{{ nova_compute_opencontrail_init_image_full }}"
+    - "{{ neutron_opencontrail_init_image_full }}"
+  when:
+    - destroy_include_images | bool
