@@ -349,6 +349,8 @@
   notify:
     - "Restart {{ service_name }} container"
 
+- include: config_opencontrail.yml
+
 - name: Copying over existing policy.json
   become: true
   vars:
