@@ -76,5 +76,7 @@
   notify:
     - Restart {{ item.key }} container
 
+- include: config_opencontrail.yml
+
 - include_tasks: check-containers.yml
   when: kolla_action != "config"

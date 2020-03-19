@@ -1,0 +1,80 @@
+---
+
+- name: Copying opencontrail files for neutron
+  become: true
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+  copy:
+    src: "{{ role_path }}/templates/{{ item }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/{{ item }}"
+    mode: "0644"
+  when:
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+    - neutron_plugin_agent == 'opencontrail'
+  with_items:
+    - "contrail-plugin.pth"
+  notify:
+    - "Restart {{ service_name }} container"
+
+- name: Copying over ContrailPlugin.ini
+  become: true
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+  merge_configs:
+    sources:
+      - "{{ role_path }}/templates/ContrailPlugin.ini.j2"
+      - "{{ node_custom_config }}/neutron/ContrailPlugin.ini"
+      - "{{ node_custom_config }}/neutron/{{ inventory_hostname }}/ContrailPlugin.ini"
+    dest: "{{ node_config_directory }}/{{ service_name }}/ContrailPlugin.ini"
+    mode: "0660"
+  register: contrailplugin_ini
+  when:
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+    - neutron_plugin_agent == 'opencontrail'
+  notify:
+    - "Restart {{ service_name }} container"
+
+- name: Copying over api-paste.ini
+  become: true
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+  merge_configs:
+    sources:
+      - "{{ role_path }}/templates/api-paste.ini.j2"
+      - "{{ node_custom_config }}/neutron/api-paste.ini"
+      - "{{ node_custom_config }}/neutron/{{ inventory_hostname }}/api-paste.ini"
+    dest: "{{ node_config_directory }}/{{ service_name }}/api-paste.ini"
+    mode: "0660"
+  register: api_paste_ini
+  when:
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+    - neutron_plugin_agent == 'opencontrail'
+  notify:
+    - "Restart {{ service_name }} container"
+
+- name: Copying over required certificates
+  vars:
+    service_name: "neutron-server"
+    neutron_server: "{{ neutron_services[service_name] }}"
+  copy:
+    src: "{{ kolla_external_fqdn_cacert }}"
+    dest: "{{ node_config_directory }}/{{ service_name }}/{{ item }}"
+    mode: "0660"
+  become: true
+  register: haproxy_pem
+  when:
+    - kolla_enable_tls_external | bool
+    - neutron_server.enabled | bool
+    - neutron_server.host_in_groups | bool
+    - neutron_plugin_agent == 'opencontrail'
+  with_items:
+    - "haproxy-ca.crt"
+  notify:
+    - "Restart {{ service_name }} container"
+
