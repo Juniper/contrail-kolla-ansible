@@ -34,3 +34,6 @@
     - not use_preconfigured_databases | bool
 
 - include_tasks: bootstrap_service.yml
+
+- include: init_opencontrail.yml
+  when: inventory_hostname in groups['neutron-server']
