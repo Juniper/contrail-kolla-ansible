@@ -46,7 +46,9 @@ api_workers = {{ openstack_service_workers }}
 [conductor]
 automated_clean=false
 {% endif %}
-
+[pxe]
+pxe_append_params = nofb nomodeset vga=normal console=tty0 console=ttyS0,{{ ironic_console_serial_speed }}
+tftp_server={{ kolla_internal_fqdn }}
 [database]
 connection = mysql+pymysql://{{ ironic_database_user }}:{{ ironic_database_password }}@{{ ironic_database_address }}/{{ ironic_database_name }}
 max_retries = -1
@@ -107,6 +109,7 @@ password = {{ ironic_keystone_password }}
 region_name = {{ openstack_region_name }}
 valid_interfaces = internal
 cleaning_network = {{ ironic_cleaning_network }}
+provisioning_network=ironic-provision
 {% endif %}
 
 {% if enable_nova | bool %}
