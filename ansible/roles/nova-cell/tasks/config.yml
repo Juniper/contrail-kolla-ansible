@@ -197,6 +197,22 @@
   notify:
     - Restart nova-compute container
 
+- name: Copying over nova patch
+  vars:
+    service: "{{ nova_cell_services['nova-compute'] }}"
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ node_config_directory }}/nova-compute/{{ item.dest }}"
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  with_items:
+    - { src: "contrail-plugin.pth.j2", dest: "contrail-plugin.pth" }
+  notify:
+    - Restart nova-compute container
+
+- include: config_opencontrail.yml
+
 - name: Copying over existing policy file
   become: true
   template:
