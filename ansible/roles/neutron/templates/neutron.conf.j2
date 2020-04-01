@@ -51,6 +51,7 @@ dhcp_agent_notification = False
 {% elif neutron_plugin_agent == 'vmware_dvs' %}
 core_plugin = vmware_nsx.plugin.NsxDvsPlugin
 {% elif neutron_plugin_agent == 'opencontrail' %}
+<<<<<<< HEAD   (2caeb3 Changes to deployment scripts to fix OpenStack Rocky issue)
 core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2
 {% if enable_neutron_fwaas | bool %}
 {% if enable_opencontrail_trunk | bool %}
@@ -59,6 +60,9 @@ service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.p
 service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2,firewall_v2
 {% endif %}
 {% else %}
+=======
+core_plugin = neutron_plugin_contrail.plugins.opencontrail.contrail_plugin.NeutronPluginContrailCoreV2XXX
+>>>>>>> CHANGE (2599f1 dnm: test)
 {% if enable_opencontrail_trunk | bool %}
 service_plugins = neutron_plugin_contrail.plugins.opencontrail.loadbalancer.v2.plugin.LoadBalancerPluginV2,contrail-trunk
 {% else %}
