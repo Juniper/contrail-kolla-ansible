@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Add support for configuring Neutron to use an ONOS SDN controller via
+    the ``networking-onos`` project.  Networking-onos is Neutron's sub-project
+    to provide connectivity between Neutron and ONOS.

@@ -1,0 +1,16 @@
+---
+sources:
+    - name: event_source
+      events:
+          - "*"
+      sinks:
+          - event_sink
+sinks:
+    - name: event_sink
+      publishers:
+{% if enable_gnocchi | bool %}
+          - gnocchi://
+{% endif %}
+{% if enable_panko | bool %}
+          - panko://
+{% endif %}

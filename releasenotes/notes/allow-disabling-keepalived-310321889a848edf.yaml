@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds a configuration option ``enable_keepalived`` to allow disabling the
+    ``keepalived`` service. This is useful when using an external load balancer
+    in front of HAProxy.

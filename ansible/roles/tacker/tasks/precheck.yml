@@ -1,0 +1,18 @@
+---
+- name: Get container facts
+  become: true
+  kolla_container_facts:
+    name:
+      - tacker_server
+  register: container_facts
+
+- name: Checking free port for Tacker Server
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ tacker_server_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - container_facts['tacker_server'] is not defined
+    - inventory_hostname in groups['tacker-server']

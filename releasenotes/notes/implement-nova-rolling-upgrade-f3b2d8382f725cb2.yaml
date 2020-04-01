@@ -1,0 +1,4 @@
+---
+features:
+  - |
+    Implements Nova rolling upgrade logic.

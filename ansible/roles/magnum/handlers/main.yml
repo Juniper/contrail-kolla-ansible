@@ -1,0 +1,32 @@
+---
+- name: Restart magnum-api container
+  vars:
+    service_name: "magnum-api"
+    service: "{{ magnum_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    environment: "{{ service.environment }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"
+
+- name: Restart magnum-conductor container
+  vars:
+    service_name: "magnum-conductor"
+    service: "{{ magnum_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    environment: "{{ service.environment }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"

@@ -1,0 +1,12 @@
+---
+- include_tasks: config.yml
+
+- include_tasks: bootstrap.yml
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- include_tasks: register.yml
+
+# Test haproxy user through VIP
+- include_tasks: check.yml

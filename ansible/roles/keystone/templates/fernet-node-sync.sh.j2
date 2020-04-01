@@ -1,0 +1,19 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+
+# Get data on the fernet tokens
+TOKEN_CHECK=$(/usr/bin/python{{ distro_python_version }} /usr/bin/fetch_fernet_tokens.py -t {{ fernet_token_expiry }} -n {{ (groups['keystone'] | length) + 1 }})
+
+# Ensure the primary token exists and is not stale
+if $(echo "$TOKEN_CHECK" | grep -q '"update_required":"false"'); then
+    exit 0;
+fi
+
+# For each host node sync tokens
+{% for host in groups['keystone'] %}
+{% if inventory_hostname != host %}
+/usr/bin/rsync -azu --delete -e 'ssh -i /var/lib/keystone/.ssh/id_rsa -p {{ hostvars[host]['keystone_ssh_port'] }} -F /var/lib/keystone/.ssh/config' keystone@{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:/etc/keystone/fernet-keys/ /etc/keystone/fernet-keys
+{% endif %}
+{% endfor %}

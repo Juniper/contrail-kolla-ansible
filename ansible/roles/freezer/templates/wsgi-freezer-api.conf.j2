@@ -1,0 +1,31 @@
+{% set freezer_log_dir = '/var/log/kolla/freezer' %}
+{% set python_path = '/usr/lib/python' ~ distro_python_version ~ '/site-packages' if freezer_install_type == 'binary' else '/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages' %}
+Listen {{ api_interface_address | put_address_in_context('url') }}:{{ freezer_api_port }}
+
+ServerSignature Off
+ServerTokens Prod
+TraceEnable off
+
+{% if freezer_logging_debug | bool %}
+LogLevel info
+{% endif %}
+
+<VirtualHost *:{{ freezer_api_port }}>
+    WSGIDaemonProcess freezer-api processes={{ openstack_service_workers }} threads=1 user=freezer display-name=%{GROUP}
+    WSGIProcessGroup freezer-api
+    WSGIApplicationGroup %{GLOBAL}
+    WSGIScriptAlias / {{ python_path }}/freezer_api/cmd/wsgi.py
+
+    ErrorLog {{ freezer_log_dir }}/freezer-api.log
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"" logformat
+    CustomLog {{ freezer_log_dir }}/freezer-api_access.log logformat
+
+    <Directory {{ python_path }}/freezer_api>
+      Options Indexes FollowSymLinks MultiViews
+      Require all granted
+      AllowOverride None
+      Order allow,deny
+      allow from all
+      LimitRequestBody 102400
+    </Directory>
+</VirtualHost>

@@ -1,0 +1,27 @@
+---
+project_name: "qdrouterd"
+
+qdrouterd_services:
+  qdrouterd:
+    container_name: qdrouterd
+    group: qdrouterd
+    enabled: true
+    image: "{{ qdrouterd_image_full }}"
+    volumes: "{{ qdrouterd_default_volumes + qdrouterd_extra_volumes }}"
+    dimensions: "{{ qdrouterd_dimensions }}"
+
+####################
+# Docker
+####################
+qdrouterd_install_type: "{{ kolla_install_type }}"
+qdrouterd_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ qdrouterd_install_type }}-qdrouterd"
+qdrouterd_tag: "{{ openstack_tag }}"
+qdrouterd_image_full: "{{ qdrouterd_image }}:{{ qdrouterd_tag }}"
+qdrouterd_dimensions: "{{ default_container_dimensions }}"
+
+qdrouterd_default_volumes:
+  - "{{ node_config_directory }}/qdrouterd/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "qdrouterd:/var/lib/qdrouterd/"
+  - "kolla_logs:/var/log/kolla/"
+qdrouterd_extra_volumes: "{{ default_extra_volumes }}"

@@ -1,0 +1,29 @@
+{
+    "command": "magnum-conductor --config-file /etc/magnum/magnum.conf",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/magnum.conf",
+            "dest": "/etc/magnum/magnum.conf",
+            "owner": "magnum",
+            "perm": "0600"
+        }{% if magnum_policy_file is defined %},
+        {
+            "source": "{{ container_config_directory }}/{{ magnum_policy_file }}",
+            "dest": "/etc/magnum/{{ magnum_policy_file }}",
+            "owner": "magnum",
+            "perm": "0600"
+        }{% endif %}
+    ],
+    "permissions": [
+        {
+            "path": "/var/lib/magnum",
+            "owner": "magnum:magnum",
+            "recurse": true
+        },
+        {
+            "path": "/var/log/kolla/magnum",
+            "owner": "magnum:magnum",
+            "recurse": true
+        }
+    ]
+}

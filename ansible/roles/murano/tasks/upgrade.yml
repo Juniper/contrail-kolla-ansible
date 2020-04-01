@@ -1,0 +1,9 @@
+---
+- include_tasks: config.yml
+
+- include_tasks: bootstrap_service.yml
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- include_tasks: import_library_packages.yml

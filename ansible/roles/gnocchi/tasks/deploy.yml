@@ -1,0 +1,14 @@
+---
+- include_tasks: register.yml
+  when: inventory_hostname in groups['gnocchi-api']
+
+- include_tasks: config.yml
+  when: inventory_hostname in groups['gnocchi-statsd'] or
+        inventory_hostname in groups['gnocchi-api'] or
+        inventory_hostname in groups['gnocchi-metricd']
+
+- include_tasks: bootstrap.yml
+  when: inventory_hostname in groups['gnocchi-api']
+
+- name: Flush handlers
+  meta: flush_handlers

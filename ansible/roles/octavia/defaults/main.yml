@@ -1,0 +1,140 @@
+---
+project_name: "octavia"
+
+octavia_services:
+  octavia-api:
+    container_name: octavia_api
+    group: octavia-api
+    enabled: true
+    image: "{{ octavia_api_image_full }}"
+    volumes: "{{ octavia_api_default_volumes + octavia_api_extra_volumes }}"
+    dimensions: "{{ octavia_api_dimensions }}"
+    haproxy:
+      octavia_api:
+        enabled: "{{ enable_octavia }}"
+        mode: "http"
+        external: false
+        port: "{{ octavia_api_port }}"
+      octavia_api_external:
+        enabled: "{{ enable_octavia }}"
+        mode: "http"
+        external: true
+        port: "{{ octavia_api_port }}"
+  octavia-health-manager:
+    container_name: octavia_health_manager
+    group: octavia-health-manager
+    enabled: true
+    image: "{{ octavia_health_manager_image_full }}"
+    volumes: "{{ octavia_health_manager_default_volumes + octavia_health_manager_extra_volumes }}"
+    dimensions: "{{ octavia_health_manager_dimensions }}"
+  octavia-housekeeping:
+    container_name: octavia_housekeeping
+    group: octavia-housekeeping
+    enabled: true
+    image: "{{ octavia_housekeeping_image_full }}"
+    volumes: "{{ octavia_housekeeping_default_volumes + octavia_housekeeping_extra_volumes }}"
+    dimensions: "{{ octavia_housekeeping_dimensions }}"
+  octavia-worker:
+    container_name: octavia_worker
+    group: octavia-worker
+    enabled: true
+    image: "{{ octavia_worker_image_full }}"
+    volumes: "{{ octavia_worker_default_volumes + octavia_worker_extra_volumes }}"
+    dimensions: "{{ octavia_worker_dimensions }}"
+
+octavia_required_roles:
+  - load-balancer_observer
+  - load-balancer_global_observer
+  - load-balancer_member
+  - load-balancer_admin
+  - load-balancer_quota_admin
+
+
+####################
+# Database
+####################
+octavia_database_name: "octavia"
+octavia_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}octavia{% endif %}"
+octavia_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+octavia_install_type: "{{ kolla_install_type }}"
+octavia_tag: "{{ openstack_tag }}"
+
+octavia_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ octavia_install_type }}-octavia-api"
+octavia_api_tag: "{{ octavia_tag }}"
+octavia_api_image_full: "{{ octavia_api_image }}:{{ octavia_api_tag }}"
+
+octavia_health_manager_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ octavia_install_type }}-octavia-health-manager"
+octavia_health_manager_tag: "{{ octavia_tag }}"
+octavia_health_manager_image_full: "{{ octavia_health_manager_image }}:{{ octavia_health_manager_tag }}"
+
+octavia_housekeeping_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ octavia_install_type }}-octavia-housekeeping"
+octavia_housekeeping_tag: "{{ octavia_tag }}"
+octavia_housekeeping_image_full: "{{ octavia_housekeeping_image }}:{{ octavia_housekeeping_tag }}"
+
+octavia_worker_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ octavia_install_type }}-octavia-worker"
+octavia_worker_tag: "{{ octavia_tag }}"
+octavia_worker_image_full: "{{ octavia_worker_image }}:{{ octavia_worker_tag }}"
+
+octavia_api_dimensions: "{{ default_container_dimensions }}"
+octavia_health_manager_dimensions: "{{ default_container_dimensions }}"
+octavia_housekeeping_dimensions: "{{ default_container_dimensions }}"
+octavia_worker_dimensions: "{{ default_container_dimensions }}"
+
+octavia_api_default_volumes:
+  - "{{ node_config_directory }}/octavia-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+octavia_health_manager_default_volumes:
+  - "{{ node_config_directory }}/octavia-health-manager/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+octavia_housekeeping_default_volumes:
+  - "{{ node_config_directory }}/octavia-housekeeping/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+octavia_worker_default_volumes:
+  - "{{ node_config_directory }}/octavia-worker/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+
+octavia_extra_volumes: "{{ default_extra_volumes }}"
+octavia_api_extra_volumes: "{{ octavia_extra_volumes }}"
+octavia_health_manager_extra_volumes: "{{ octavia_extra_volumes }}"
+octavia_housekeeping_extra_volumes: "{{ octavia_extra_volumes }}"
+octavia_worker_extra_volumes: "{{ octavia_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+octavia_admin_endpoint: "{{ admin_protocol }}://{{ octavia_internal_fqdn | put_address_in_context('url') }}:{{ octavia_api_port }}"
+octavia_internal_endpoint: "{{ internal_protocol }}://{{ octavia_internal_fqdn | put_address_in_context('url') }}:{{ octavia_api_port }}"
+octavia_public_endpoint: "{{ public_protocol }}://{{ octavia_external_fqdn | put_address_in_context('url') }}:{{ octavia_api_port }}"
+
+octavia_logging_debug: "{{ openstack_logging_debug }}"
+
+octavia_keystone_user: "octavia"
+
+openstack_octavia_auth: "{{ openstack_auth }}"
+
+####################
+# Keystone
+####################
+octavia_ks_services:
+  - name: "octavia"
+    type: "load-balancer"
+    description: "Octavia Load Balancing Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ octavia_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ octavia_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ octavia_public_endpoint }}'}
+
+octavia_ks_users:
+  - project: "service"
+    user: "{{ octavia_keystone_user }}"
+    password: "{{ octavia_keystone_password }}"
+    role: "admin"

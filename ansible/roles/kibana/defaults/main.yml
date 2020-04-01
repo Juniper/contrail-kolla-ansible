@@ -1,0 +1,61 @@
+---
+project_name: "kibana"
+
+kibana_services:
+  kibana:
+    container_name: "kibana"
+    image: "{{ kibana_image_full }}"
+    enabled: true
+    group: "kibana"
+    volumes: "{{ kibana_default_volumes + kibana_extra_volumes }}"
+    dimensions: "{{ kibana_dimensions }}"
+    haproxy:
+      kibana:
+        enabled: "{{ enable_kibana }}"
+        mode: "http"
+        external: false
+        port: "{{ kibana_server_port }}"
+        auth_user: "{{ kibana_user }}"
+        auth_pass: "{{ kibana_password }}"
+      kibana_external:
+        enabled: "{{ enable_kibana }}"
+        mode: "http"
+        external: true
+        port: "{{ kibana_server_port }}"
+        auth_user: "{{ kibana_user }}"
+        auth_pass: "{{ kibana_password }}"
+
+
+####################
+# Kibana
+####################
+kibana_default_app_id: "discover"
+kibana_elasticsearch_request_timeout: 300000
+kibana_elasticsearch_shard_timeout: 0
+kibana_elasticsearch_ssl_verify: false
+
+
+####################
+# Default index
+####################
+kibana_default_index_pattern: "{{ kibana_log_prefix }}-*"
+kibana_default_index:
+  title: "{{ kibana_default_index_pattern }}"
+  timeFieldName: "@timestamp"
+kibana_default_index_options:
+  index.mapper.dynamic: true
+
+####################
+# Docker
+####################
+kibana_install_type: "{{ kolla_install_type }}"
+kibana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ kibana_install_type }}-kibana"
+kibana_tag: "{{ openstack_tag }}"
+kibana_image_full: "{{ kibana_image }}:{{ kibana_tag }}"
+kibana_dimensions: "{{ default_container_dimensions }}"
+
+kibana_default_volumes:
+  - "{{ node_config_directory }}/kibana/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+kibana_extra_volumes: "{{ default_extra_volumes }}"

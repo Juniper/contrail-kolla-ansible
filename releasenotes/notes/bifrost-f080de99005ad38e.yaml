@@ -1,0 +1,17 @@
+---
+prelude: >
+    During the Newton cycle support for baremetal
+    provisioning with bifrost was added to kolla.
+    Bifrost is a collection of ansible roles and
+    playbooks to deploy a standalone instance of
+    ironic.
+features:
+  - A new deploy-bifrost command was added to
+    kolla-ansible. The deploy-bifrost command
+    will deploy and bootstrap a standalone
+    instance of ironic in a single container.
+  - A new deploy-server command was added to
+    kolla-ansible. The deploy-server command
+    uses a locally deployed instance of bifrost
+    to enrole servers with ironic and provision
+    their os.

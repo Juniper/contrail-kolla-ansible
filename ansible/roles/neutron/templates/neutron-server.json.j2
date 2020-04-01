@@ -1,0 +1,58 @@
+{
+    "command": "neutron-server --config-file /etc/neutron/neutron.conf {% if neutron_plugin_agent in ['openvswitch', 'linuxbridge', 'opendaylight'] %} --config-file /etc/neutron/plugins/ml2/ml2_conf.ini --config-file /etc/neutron/neutron_vpnaas.conf {% elif neutron_plugin_agent in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] %} --config-file /etc/neutron/plugins/vmware/nsx.ini {% endif %} --config-file /etc/neutron/fwaas_driver.ini",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/neutron.conf",
+            "dest": "/etc/neutron/neutron.conf",
+            "owner": "neutron",
+            "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/fwaas_driver.ini",
+            "dest": "/etc/neutron/fwaas_driver.ini",
+            "owner": "neutron",
+            "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/neutron_vpnaas.conf",
+            "dest": "/etc/neutron/neutron_vpnaas.conf",
+            "owner": "neutron",
+            "perm": "0600"
+        },
+        {
+            "source": "{{ container_config_directory }}/ml2_conf.ini",
+            "dest": "/etc/neutron/plugins/ml2/ml2_conf.ini",
+            "owner": "neutron",
+            "perm": "0600"
+        },
+{% if check_extra_ml2_plugins is defined and check_extra_ml2_plugins.matched > 0 %}{% for plugin in check_extra_ml2_plugins.files %}
+        {
+            "source": "{{ container_config_directory }}/{{ plugin.path | basename }}",
+            "dest": "/etc/neutron/plugins/ml2/{{ plugin.path | basename }}",
+            "owner": "neutron",
+            "perm": "0600"
+        },
+{% endfor %}{% endif %}
+        {
+            "source": "{{ container_config_directory }}/policy.json",
+            "dest": "/etc/neutron/policy.json",
+            "owner": "neutron",
+            "perm": "0600",
+            "optional": true
+        }{% if neutron_plugin_agent in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs'] -%},
+        {
+            "source": "{{ container_config_directory }}/nsx.ini",
+            "dest": "/etc/neutron/plugins/vmware/nsx.ini",
+            "owner": "neutron",
+            "optional": {{ (neutron_plugin_agent not in ['vmware_nsxv', 'vmware_nsxv3', 'vmware_dvs']) | string | lower }},
+            "perm": "0600"
+        }{% endif %}
+    ],
+    "permissions": [
+        {
+            "path": "/var/log/kolla/neutron",
+            "owner": "neutron:neutron",
+            "recurse": true
+        }
+    ]
+}

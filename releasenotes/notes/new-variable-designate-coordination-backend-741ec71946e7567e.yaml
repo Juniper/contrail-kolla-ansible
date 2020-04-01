@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Adds support for configuring a coordination backend for Designate via the
+    ``designate_coordination_backend`` variable. Coordination is mandatory
+    when multiple workers are deployed as in a multinode environment.
+    Possible values are ``redis`` or ``etcd``.

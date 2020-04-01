@@ -1,0 +1,5 @@
+---
+- name: Removing Kolla images
+  script: ../tools/cleanup-images --all
+  when:
+    - destroy_include_images | bool

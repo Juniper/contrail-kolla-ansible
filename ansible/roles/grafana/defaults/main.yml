@@ -1,0 +1,73 @@
+---
+project_name: "grafana"
+
+grafana_services:
+  grafana:
+    container_name: grafana
+    group: grafana
+    enabled: true
+    image: "{{ grafana_image_full }}"
+    volumes: "{{ grafana_default_volumes + grafana_extra_volumes }}"
+    dimensions: "{{ grafana_dimensions }}"
+    haproxy:
+      grafana_server:
+        enabled: "{{ enable_grafana }}"
+        mode: "http"
+        external: false
+        port: "{{ grafana_server_port }}"
+      grafana_server_external:
+        enabled: "{{ enable_grafana }}"
+        mode: "http"
+        external: true
+        port: "{{ grafana_server_port }}"
+
+####################
+# Database
+####################
+grafana_database_name: "grafana"
+grafana_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}grafana{% endif %}"
+grafana_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+####################
+# Datasource
+####################
+grafana_data_sources:
+  influxdb:
+    enabled: "{{ enable_influxdb | bool }}"
+    data:
+      isDefault: yes
+      database: "telegraf"
+      name: "telegraf"
+      type: "influxdb"
+      url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ influxdb_http_port }}"
+      access: "proxy"
+      basicAuth: false
+  elasticsearch:
+    enabled: "{{ enable_elasticsearch | bool }}"
+    data:
+      name: "elasticsearch"
+      type: "elasticsearch"
+      access: "proxy"
+      url: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ elasticsearch_port }}"
+      database: "flog-*"
+      jsonData:
+        esVersion: 5
+        timeField: "@timestamp"
+
+##########
+# Grafana
+##########
+grafana_install_type: "{{ kolla_install_type }}"
+grafana_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ grafana_install_type }}-grafana"
+grafana_tag: "{{ openstack_tag }}"
+grafana_image_full: "{{ grafana_image }}:{{ grafana_tag }}"
+grafana_admin_username: "admin"
+
+grafana_dimensions: "{{ default_container_dimensions }}"
+
+grafana_default_volumes:
+  - "{{ node_config_directory }}/grafana/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "grafana:/var/lib/grafana/"
+  - "kolla_logs:/var/log/kolla/"
+grafana_extra_volumes: "{{ default_extra_volumes }}"

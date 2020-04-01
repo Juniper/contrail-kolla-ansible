@@ -1,0 +1,76 @@
+[DEFAULT]
+debug = {{ barbican_logging_debug }}
+log_dir = /var/log/kolla/barbican
+
+bind_port = {{ barbican_api_listen_port }}
+bind_host = {{ api_interface_address }}
+host_href = {{ public_protocol }}://{{ barbican_external_fqdn | put_address_in_context('url') }}:{{ barbican_api_port }}
+backlog = 4096
+max_allowed_secret_in_bytes = 10000
+max_allowed_request_size_in_bytes = 1000000
+
+db_auto_create = False
+sql_connection = mysql+pymysql://{{ barbican_database_user }}:{{ barbican_database_password }}@{{ barbican_database_address }}/{{ barbican_database_name }}
+
+transport_url = {{ rpc_transport_url }}
+
+# ================= Secret Store Plugin ===================
+[secretstore]
+namespace = barbican.secretstore.plugin
+enabled_secretstore_plugins = store_crypto
+
+# ================= Crypto plugin ===================
+[crypto]
+namespace = barbican.crypto.plugin
+enabled_crypto_plugins = {{ barbican_crypto_plugin }}
+
+{% if barbican_crypto_plugin == 'p11_crypto' %}
+[p11_crypto_plugin]
+# Path to vendor PKCS11 library
+library_path = {{ barbican_library_path }}
+# Password to login to PKCS11 session
+login = '{{ barbican_p11_password }}'
+# Label to identify master KEK in the HSM (must not be the same as HMAC label)
+mkek_label = 'kolla_master_kek'
+# Length in bytes of master KEK
+mkek_length = 32
+# Label to identify HMAC key in the HSM (must not be the same as MKEK label)
+hmac_label = 'kolla_hmac'
+{% endif %}
+{% if barbican_crypto_plugin == 'simple_crypto' %}
+[simple_crypto_plugin]
+# the kek should be a 32-byte value which is base64 encoded
+kek = '{{ barbican_crypto_key }}'
+{% endif %}
+
+
+[keystone_notifications]
+enable = True
+{% if enable_keystone | bool %}
+topic = barbican_notifications
+{% endif %}
+
+[keystone_authtoken]
+www_authenticate_uri = {{ keystone_internal_url }}
+project_domain_id = {{ default_project_domain_id }}
+project_name = service
+user_domain_id = {{ default_user_domain_id }}
+username = {{ barbican_keystone_user }}
+password = {{ barbican_keystone_password }}
+auth_url = {{ keystone_admin_url }}
+auth_type = password
+
+memcache_security_strategy = ENCRYPT
+memcache_secret_key = {{ memcache_secret_key }}
+memcached_servers = {% for host in groups['memcached'] %}{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
+
+[oslo_messaging_notifications]
+transport_url = {{ notify_transport_url }}
+
+[oslo_middleware]
+enable_proxy_headers_parsing = True
+
+{% if barbican_policy_file is defined %}
+[oslo_policy]
+policy_file = {{ barbican_policy_file }}
+{% endif %}

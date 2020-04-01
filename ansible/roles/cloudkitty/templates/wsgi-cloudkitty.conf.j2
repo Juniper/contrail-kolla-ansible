@@ -1,0 +1,29 @@
+{% set python_path = '/usr/lib/python' ~ distro_python_version ~ '/site-packages' if cloudkitty_install_type == 'binary' else '/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages' %}
+{% set binary_path = '/usr/bin' if cloudkitty_install_type == 'binary' else '/var/lib/kolla/venv/bin' %}
+Listen {{ api_interface_address | put_address_in_context('url') }}:{{ cloudkitty_api_port }}
+
+ServerSignature Off
+ServerTokens Prod
+TraceEnable off
+
+{% if cloudkitty_logging_debug | bool %}
+LogLevel info
+{% endif %}
+
+<VirtualHost *:{{ cloudkitty_api_port }}>
+
+  ErrorLog "/var/log/kolla/cloudkitty/cloudkitty-api-error.log"
+  LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"" logformat
+  CustomLog "/var/log/kolla/cloudkitty/cloudkitty-api-access.log" logformat
+  WSGIApplicationGroup %{GLOBAL}
+  WSGIDaemonProcess cloudkitty group=cloudkitty processes={{ openstack_service_workers }} threads=1 user=cloudkitty python-path={{ python_path }}
+  WSGIProcessGroup cloudkitty
+  WSGIScriptAlias / "{{ binary_path }}/cloudkitty-api"
+
+  <Directory "{{ binary_path }}">
+       <FilesMatch "^cloudkitty-api$">
+            Require all granted
+       </FilesMatch>
+  </Directory>
+
+</VirtualHost>

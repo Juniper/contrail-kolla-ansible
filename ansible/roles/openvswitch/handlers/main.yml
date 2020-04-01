@@ -1,0 +1,42 @@
+---
+- name: Restart openvswitch-db-server container
+  vars:
+    service_name: "openvswitch-db-server"
+    service: "{{ openvswitch_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"
+  notify:
+    - Waiting for openvswitch_db service to be ready
+
+- name: Waiting for openvswitch_db service to be ready
+  become: true
+  command: docker exec openvswitch_db ovs-vsctl --no-wait show
+  register: check_result
+  until: check_result is success
+  changed_when: False
+  retries: 30
+  delay: 2
+
+- name: Restart openvswitch-vswitchd container
+  vars:
+    service_name: "openvswitch-vswitchd"
+    service: "{{ openvswitch_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes }}"
+    privileged: "{{ service.privileged | default(False) }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"

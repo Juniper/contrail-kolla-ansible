@@ -1,0 +1,151 @@
+---
+project_name: "gnocchi"
+
+gnocchi_services:
+  gnocchi-api:
+    container_name: gnocchi_api
+    group: gnocchi-api
+    enabled: true
+    image: "{{ gnocchi_api_image_full }}"
+    volumes: "{{ gnocchi_api_default_volumes + gnocchi_api_extra_volumes }}"
+    dimensions: "{{ gnocchi_api_dimensions }}"
+    haproxy:
+      gnocchi_api:
+        enabled: "{{ enable_gnocchi }}"
+        mode: "http"
+        external: false
+        port: "{{ gnocchi_api_listen_port }}"
+      gnocchi_api_external:
+        enabled: "{{ enable_gnocchi }}"
+        mode: "http"
+        external: true
+        port: "{{ gnocchi_api_listen_port }}"
+  gnocchi-metricd:
+    container_name: gnocchi_metricd
+    group: gnocchi-metricd
+    enabled: true
+    image: "{{ gnocchi_metricd_image_full }}"
+    volumes: "{{ gnocchi_metricd_default_volumes + gnocchi_metricd_extra_volumes }}"
+    dimensions: "{{ gnocchi_metricd_dimensions }}"
+  gnocchi-statsd:
+    container_name: gnocchi_statsd
+    group: gnocchi-statsd
+    enabled: true
+    image: "{{ gnocchi_statsd_image_full }}"
+    volumes: "{{ gnocchi_statsd_default_volumes + gnocchi_statsd_extra_volumes }}"
+    dimensions: "{{ gnocchi_statsd_dimensions }}"
+
+
+####################
+# Ceph
+####################
+ceph_gnocchi_pool_type: "{{ ceph_pool_type }}"
+ceph_gnocchi_cache_mode: "{{ ceph_cache_mode }}"
+
+# Due to Ansible issues on include, you cannot override these variables. Please
+# override the variables they reference instead.
+gnocchi_pool_name: "{{ ceph_gnocchi_pool_name }}"
+gnocchi_pool_type: "{{ ceph_gnocchi_pool_type }}"
+gnocchi_cache_mode: "{{ ceph_gnocchi_cache_mode }}"
+gnocchi_pool_pg_num: "{{ ceph_pool_pg_num }}"
+gnocchi_pool_pgp_num: "{{ ceph_pool_pgp_num }}"
+
+ceph_client_gnocchi_keyring_caps:
+  mon: 'profile rbd'
+  osd: >-
+    profile rbd pool={{ ceph_gnocchi_pool_name }},
+    profile rbd pool={{ ceph_gnocchi_pool_name }}-cache
+
+
+####################
+# Swift
+####################
+swift_keystone_user: "swift"
+swift_admin_tenant_name: "admin"
+
+
+####################
+# Database
+####################
+gnocchi_database_name: "gnocchi"
+gnocchi_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}gnocchi{% endif %}"
+gnocchi_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+gnocchi_install_type: "{{ kolla_install_type }}"
+gnocchi_tag: "{{ openstack_tag }}"
+
+gnocchi_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ gnocchi_install_type }}-gnocchi-api"
+gnocchi_api_tag: "{{ gnocchi_tag }}"
+gnocchi_api_image_full: "{{ gnocchi_api_image }}:{{ gnocchi_api_tag }}"
+
+gnocchi_statsd_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ gnocchi_install_type }}-gnocchi-statsd"
+gnocchi_statsd_tag: "{{ gnocchi_tag }}"
+gnocchi_statsd_image_full: "{{ gnocchi_statsd_image }}:{{ gnocchi_statsd_tag }}"
+
+gnocchi_metricd_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ gnocchi_install_type }}-gnocchi-metricd"
+gnocchi_metricd_tag: "{{ gnocchi_tag }}"
+gnocchi_metricd_image_full: "{{ gnocchi_metricd_image }}:{{ gnocchi_metricd_tag }}"
+
+gnocchi_api_dimensions: "{{ default_container_dimensions }}"
+gnocchi_metricd_dimensions: "{{ default_container_dimensions }}"
+gnocchi_statsd_dimensions: "{{ default_container_dimensions }}"
+
+gnocchi_api_default_volumes:
+  - "{{ node_config_directory }}/gnocchi-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ gnocchi_metric_datadir_volume }}:/var/lib/gnocchi/"
+  - "kolla_logs:/var/log/kolla/"
+
+gnocchi_metricd_default_volumes:
+  - "{{ node_config_directory }}/gnocchi-metricd/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ gnocchi_metric_datadir_volume }}:/var/lib/gnocchi/"
+  - "kolla_logs:/var/log/kolla/"
+
+gnocchi_statsd_default_volumes:
+  - "{{ node_config_directory }}/gnocchi-statsd/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ gnocchi_metric_datadir_volume }}:/var/lib/gnocchi/"
+  - "kolla_logs:/var/log/kolla/"
+
+gnocchi_extra_volumes: "{{ default_extra_volumes }}"
+gnocchi_api_extra_volumes: "{{ gnocchi_extra_volumes }}"
+gnocchi_metricd_extra_volumes: "{{ gnocchi_extra_volumes }}"
+gnocchi_statsd_extra_volumes: "{{ gnocchi_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+gnocchi_admin_endpoint: "{{ admin_protocol }}://{{ gnocchi_internal_fqdn | put_address_in_context('url') }}:{{ gnocchi_api_port }}"
+gnocchi_internal_endpoint: "{{ internal_protocol }}://{{ gnocchi_internal_fqdn | put_address_in_context('url') }}:{{ gnocchi_api_port }}"
+gnocchi_public_endpoint: "{{ public_protocol }}://{{ gnocchi_external_fqdn | put_address_in_context('url') }}:{{ gnocchi_api_port }}"
+
+gnocchi_logging_debug: "{{ openstack_logging_debug }}"
+
+gnocchi_metricd_workers: "{{ openstack_service_workers }}"
+
+gnocchi_keystone_user: "gnocchi"
+
+openstack_gnocchi_auth: "{{ openstack_auth }}"
+
+####################
+# Keystone
+####################
+gnocchi_ks_services:
+  - name: "gnocchi"
+    type: "metric"
+    description: "OpenStack Metric Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ gnocchi_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ gnocchi_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ gnocchi_public_endpoint }}'}
+
+gnocchi_ks_users:
+  - project: "service"
+    user: "{{ gnocchi_keystone_user }}"
+    password: "{{ gnocchi_keystone_password }}"
+    role: "admin"

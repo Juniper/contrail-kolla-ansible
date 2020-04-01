@@ -1,0 +1,38 @@
+---
+- name: Get container facts
+  become: true
+  kolla_container_facts:
+    name:
+      - zun_api
+      - zun_wsproxy
+  register: container_facts
+
+- name: Checking free port for Zun API
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ zun_api_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - container_facts['zun_api'] is not defined
+    - inventory_hostname in groups['zun-api']
+
+- name: Checking free port for Zun WSproxy
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ zun_wsproxy_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - container_facts['zun_wsproxy'] is not defined
+    - inventory_hostname in groups['zun-wsproxy']
+
+- name: Ensure kuryr enabled for zun
+  run_once: True
+  local_action: fail msg="kuryr is required but not enabled"
+  changed_when: false
+  when:
+    - enable_zun | bool
+    - not enable_kuryr | bool

@@ -1,0 +1,47 @@
+{
+    "command": "glance-api",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/glance-api.conf",
+            "dest": "/etc/glance/glance-api.conf",
+            "owner": "glance",
+            "perm": "0600"
+        }{% if glance_policy_file is defined %},
+        {
+            "source": "{{ container_config_directory }}/{{ glance_policy_file }}",
+            "dest": "/etc/glance/{{ glance_policy_file }}",
+            "owner": "glance",
+            "perm": "0600"
+        }{% endif %}{% if glance_backend_ceph | bool %},
+        {
+            "source": "{{ container_config_directory }}/ceph.*",
+            "dest": "/etc/ceph/",
+            "owner": "glance",
+            "perm": "0700"
+        }{% endif %}{% if glance_backend_swift | bool %},
+        {
+            "source": "{{ container_config_directory }}/glance-swift.conf",
+            "dest": "/etc/glance/glance-swift.conf",
+            "owner": "glance",
+            "perm": "0600"
+        }{% endif %}{% if enable_glance_image_cache | bool %},
+        {
+            "source": "{{ container_config_directory }}/glance-cache.conf",
+            "dest": "/etc/glance/glance-cache.conf",
+            "owner": "glance",
+            "perm": "0600"
+        }{% endif %}
+    ],
+    "permissions": [
+        {
+            "path": "/var/lib/glance",
+            "owner": "glance:glance",
+            "recurse": true
+        },
+        {
+            "path": "/var/log/kolla/glance",
+            "owner": "glance:glance",
+            "recurse": true
+        }
+    ]
+}

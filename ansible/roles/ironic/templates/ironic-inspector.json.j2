@@ -1,0 +1,17 @@
+{
+    "command": "ironic-inspector --config-file /etc/ironic-inspector/inspector.conf",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/inspector.conf",
+            "dest": "/etc/ironic-inspector/inspector.conf",
+            "owner": "ironic-inspector",
+            "perm": "0600"
+        }{% if ironic_policy_file is defined %},
+        {
+            "source": "{{ container_config_directory }}/{{ ironic_policy_file }}",
+            "dest": "/etc/ironic/{{ ironic_policy_file }}",
+            "owner": "ironic",
+            "perm": "0600"
+        }{% endif %}
+    ]
+}

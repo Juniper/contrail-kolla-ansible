@@ -1,0 +1,80 @@
+---
+- name: Ensuring config directories exist
+  file:
+    path: "{{ node_config_directory }}/{{ item.key }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ blazar_services }}"
+
+- name: Check if policies shall be overwritten
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: blazar_policy
+  with_first_found:
+    - files: "{{ supported_policy_format_list }}"
+      paths:
+        - "{{ node_custom_config }}/blazar/"
+      skip: true
+
+- name: Set blazar policy file
+  set_fact:
+    blazar_policy_file: "{{ blazar_policy.results.0.stat.path | basename }}"
+    blazar_policy_file_path: "{{ blazar_policy.results.0.stat.path }}"
+  when:
+    - blazar_policy.results
+
+- name: Copying over config.json files for services
+  template:
+    src: "{{ item.key }}.json.j2"
+    dest: "{{ node_config_directory }}/{{ item.key }}/config.json"
+    mode: "0660"
+  become: true
+  when:
+    - item.value.enabled | bool
+    - inventory_hostname in groups[item.value.group]
+  with_dict: "{{ blazar_services }}"
+  notify:
+    - Restart {{ item.key }} container
+
+- name: Copying over blazar.conf
+  vars:
+    service_name: "{{ item.key }}"
+  merge_configs:
+    sources:
+      - "{{ role_path }}/templates/blazar.conf.j2"
+      - "{{ node_custom_config }}/global.conf"
+      - "{{ node_custom_config }}/blazar.conf"
+      - "{{ node_custom_config }}/blazar/{{ item.key }}.conf"
+      - "{{ node_custom_config }}/blazar/{{ inventory_hostname }}/blazar.conf"
+    dest: "{{ node_config_directory }}/{{ item.key }}/blazar.conf"
+    mode: "0660"
+  become: true
+  when:
+    - item.value.enabled | bool
+    - inventory_hostname in groups[item.value.group]
+  with_dict: "{{ blazar_services }}"
+  notify:
+    - Restart {{ item.key }} container
+
+- name: Copying over existing policy file
+  template:
+    src: "{{ blazar_policy_file_path }}"
+    dest: "{{ node_config_directory }}/{{ item.key }}/{{ blazar_policy_file }}"
+    mode: "0660"
+  become: true
+  when:
+    - blazar_policy_file is defined
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ blazar_services }}"
+  notify:
+    - Restart {{ item.key }} container
+
+- include_tasks: check-containers.yml
+  when: kolla_action != "config"

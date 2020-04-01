@@ -1,0 +1,124 @@
+---
+project_name: "horizon"
+
+horizon_services:
+  horizon:
+    container_name: horizon
+    group: horizon
+    enabled: true
+    image: "{{ horizon_image_full }}"
+    environment:
+      ENABLE_BLAZAR: "{{ 'yes' if enable_horizon_blazar | bool else 'no' }}"
+      ENABLE_CLOUDKITTY: "{{ 'yes' if enable_horizon_cloudkitty | bool else 'no' }}"
+      ENABLE_CONGRESS: "{{ 'yes' if enable_horizon_congress | bool else 'no' }}"
+      ENABLE_DESIGNATE: "{{ 'yes' if enable_horizon_designate | bool else 'no' }}"
+      ENABLE_FWAAS: "{{ 'yes' if enable_horizon_fwaas | bool else 'no' }}"
+      ENABLE_FREEZER: "{{ 'yes' if enable_horizon_freezer | bool else 'no' }}"
+      ENABLE_HEAT: "{{ 'yes' if enable_horizon_heat | bool else 'no' }}"
+      ENABLE_IRONIC: "{{ 'yes' if enable_horizon_ironic | bool else 'no' }}"
+      ENABLE_KARBOR: "{{ 'yes' if enable_horizon_karbor | bool else 'no' }}"
+      ENABLE_MAGNUM: "{{ 'yes' if enable_horizon_magnum | bool else 'no' }}"
+      ENABLE_MANILA: "{{ 'yes' if enable_horizon_manila | bool else 'no' }}"
+      ENABLE_MASAKARI: "{{ 'yes' if enable_horizon_masakari | bool else 'no' }}"
+      ENABLE_MISTRAL: "{{ 'yes' if enable_horizon_mistral | bool else 'no' }}"
+      ENABLE_MURANO: "{{ 'yes' if  enable_horizon_murano | bool else 'no' }}"
+      ENABLE_NEUTRON_VPNAAS: "{{ 'yes' if enable_horizon_neutron_vpnaas | bool else 'no' }}"
+      ENABLE_OCTAVIA: "{{ 'yes' if enable_horizon_octavia | bool else 'no' }}"
+      ENABLE_QINLING: "{{ 'yes' if enable_horizon_qinling | bool else 'no' }}"
+      ENABLE_SAHARA: "{{ 'yes' if enable_horizon_sahara | bool else 'no' }}"
+      ENABLE_SEARCHLIGHT: "{{ 'yes' if enable_horizon_searchlight | bool else 'no' }}"
+      ENABLE_SENLIN: "{{ 'yes' if enable_horizon_senlin | bool else 'no' }}"
+      ENABLE_SOLUM: "{{ 'yes' if enable_horizon_solum | bool else 'no' }}"
+      ENABLE_TACKER: "{{ 'yes' if enable_horizon_tacker | bool else 'no' }}"
+      ENABLE_TROVE: "{{ 'yes' if enable_horizon_trove | bool else 'no' }}"
+      ENABLE_VITRAGE: "{{ 'yes' if enable_horizon_vitrage | bool else 'no' }}"
+      ENABLE_WATCHER: "{{ 'yes' if enable_horizon_watcher | bool else 'no' }}"
+      ENABLE_ZUN: "{{ 'yes' if enable_horizon_zun | bool else 'no' }}"
+      FORCE_GENERATE: "{{ 'yes' if horizon_dev_mode | bool else 'no' }}"
+    volumes: "{{ horizon_default_volumes + horizon_extra_volumes }}"
+    dimensions: "{{ horizon_dimensions }}"
+    haproxy:
+      horizon:
+        enabled: "{{ enable_horizon }}"
+        mode: "http"
+        external: false
+        port: "{% if kolla_enable_tls_internal|bool %}443{% else %}{{ horizon_port }}{% endif %}"
+        listen_port: "{{ horizon_listen_port }}"
+        frontend_http_extra:
+          - "balance source"
+      horizon_redirect:
+        enabled: "{{ enable_horizon|bool and kolla_enable_tls_internal|bool }}"
+        mode: "redirect"
+        external: false
+        port: "{{ horizon_port }}"
+        listen_port: "{{ horizon_listen_port }}"
+      horizon_external:
+        enabled: "{{ enable_horizon }}"
+        mode: "http"
+        external: true
+        port: "{% if kolla_enable_tls_external|bool %}443{% else %}{{ horizon_port }}{% endif %}"
+        listen_port: "{{ horizon_listen_port }}"
+        frontend_http_extra:
+          - "balance source"
+      horizon_external_redirect:
+        enabled: "{{ enable_horizon|bool and kolla_enable_tls_external|bool }}"
+        mode: "redirect"
+        external: true
+        port: "{{ horizon_port }}"
+        listen_port: "{{ horizon_listen_port }}"
+horizon_keystone_domain_choices:
+  Default: default
+
+####################
+# Database
+####################
+horizon_database_name: "horizon"
+horizon_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}horizon{% endif %}"
+horizon_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+####################
+# Docker
+####################
+horizon_install_type: "{{ kolla_install_type }}"
+horizon_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ horizon_install_type }}-horizon"
+horizon_tag: "{{ openstack_tag }}"
+horizon_image_full: "{{ horizon_image }}:{{ horizon_tag }}"
+
+horizon_dimensions: "{{ default_container_dimensions }}"
+
+horizon_default_volumes:
+  - "{{ node_config_directory }}/horizon/:{{ container_config_directory }}/:ro"
+  - "{{ kolla_dev_repos_directory ~ '/horizon/horizon:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/horizon' if horizon_dev_mode | bool else '' }}"
+  - "{{ kolla_dev_repos_directory ~ '/horizon/openstack_dashboard:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/openstack_dashboard' if horizon_dev_mode | bool else '' }}"
+  - "{{ kolla_dev_repos_directory ~ '/murano-dashboard/muranodashboard:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/muranodashboard' if horizon_murano_dev_mode | bool else '' }}"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "/tmp:/tmp"
+
+horizon_extra_volumes: "{{ default_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+horizon_logging_debug: "{{ openstack_logging_debug }}"
+horizon_keystone_url: "{{ keystone_internal_url }}/v3"
+
+
+####################
+# Apache
+####################
+horizon_wsgi_processes: "{{ openstack_service_workers }}"
+horizon_wsgi_threads: 1
+
+
+####################
+# Kolla
+####################
+horizon_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+murano_dashboard_git_repository: "{{ kolla_dev_repos_git }}/murano-dashboard"
+
+horizon_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+horizon_dev_mode: "{{ kolla_dev_mode }}"
+horizon_murano_dev_mode: "{{ kolla_dev_mode }}"
+horizon_source_version: "{{ kolla_source_version }}"
+horizon_murano_source_version: "{{ kolla_source_version }}"

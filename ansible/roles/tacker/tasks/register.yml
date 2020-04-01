@@ -1,0 +1,8 @@
+---
+- import_role:
+    name: service-ks-register
+  vars:
+    service_ks_register_auth: "{{ openstack_tacker_auth }}"
+    service_ks_register_services: "{{ tacker_ks_services }}"
+    service_ks_register_users: "{{ tacker_ks_users }}"
+  tags: always

@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Implements Neutron rolling upgrade logic, applied for Neutron server,
+    VPNaaS and FWaaS because only these projects have support for rolling
+    upgrade database migration.

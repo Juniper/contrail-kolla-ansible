@@ -1,0 +1,67 @@
+---
+- name: Get container facts
+  become: true
+  kolla_container_facts:
+    name:
+      - ironic_api
+      - ironic_inspector
+      - ironic_ipxe
+  register: container_facts
+
+- name: Checking free port for Ironic API
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ ironic_api_listen_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - container_facts['ironic_api'] is not defined
+    - inventory_hostname in groups['ironic-api']
+
+- name: Checking free port for Ironic Inspector
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ ironic_inspector_listen_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - container_facts['ironic_inspector'] is not defined
+    - inventory_hostname in groups['ironic-inspector']
+
+- name: Checking free port for Ironic iPXE
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ ironic_ipxe_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - enable_ironic_ipxe | bool
+    - container_facts['ironic_ipxe'] is not defined
+    - inventory_hostname in groups['ironic-ipxe']
+
+- name: Checking ironic-agent files exist for Ironic Inspector
+  local_action: stat path="{{ node_custom_config }}/ironic/{{ item }}"
+  run_once: True
+  register: result
+  failed_when: not result.stat.exists
+  when:
+    # Only required when Ironic inspector is in use.
+    - groups['ironic-inspector'] | length > 0
+    - (not enable_ironic_ipxe | bool and inventory_hostname in groups['ironic-pxe']) or
+        (enable_ironic_ipxe | bool and inventory_hostname in groups['ironic-ipxe'])
+    - not enable_ironic_pxe_uefi | bool
+  with_items:
+    - "ironic-agent.kernel"
+    - "ironic-agent.initramfs"
+
+- name: Ensure dnsmasq_dhcp_range configured for Ironic Dnsmasq
+  fail:
+    msg: >
+      ironic_dnsmasq_dhcp_range must be set when enable ironic
+  connection: local
+  run_once: True
+  when:
+    - ironic_dnsmasq_dhcp_range is none

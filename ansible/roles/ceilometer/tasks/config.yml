@@ -1,0 +1,333 @@
+---
+- name: Ensuring config directories exist
+  file:
+    path: "{{ node_config_directory }}/{{ item.key }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ ceilometer_services }}"
+
+- name: Check if the folder for custom meter definitions exist
+  local_action: stat path="{{ node_custom_config }}/ceilometer/{{ ceilometer_custom_meters_local_folder }}"
+  register: ceilometer_custom_meters_folder
+
+- name: Set variable that indicates if we have a folder for custom meter YAML files
+  set_fact:
+    custom_meter_folder_exist: "{{ ceilometer_custom_meters_folder.stat.exists and ceilometer_custom_meters_folder.stat.isdir }}"
+
+- name: Find all *.yaml files in custom meter definitions folder (if the folder exist)
+  local_action: find paths="{{ node_custom_config }}/ceilometer/{{ ceilometer_custom_meters_local_folder }}" patterns="*.yaml"
+  register: ceilometer_custom_meters_folder_found_files
+  when: custom_meter_folder_exist
+
+- name: Set the variable that control the copy of custom meter definitions
+  set_fact:
+    should_copy_custom_meter_definitions: "{{ custom_meter_folder_exist and ceilometer_custom_meters_folder_found_files.matched > 0 }}"
+
+- name: Create default folder for custom meter definitions
+  file:
+    path: "{{ node_config_directory }}/{{ item.key }}/meters.d"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  become: true
+  with_dict: "{{ ceilometer_services }}"
+  when:
+    - should_copy_custom_meter_definitions
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+
+- name: Copying custom meter definitions to Ceilometer
+  copy:
+    src: "{{ node_custom_config }}/ceilometer/{{ ceilometer_custom_meters_local_folder }}/"
+    dest: "{{ node_config_directory }}/{{ item.key }}/meters.d"
+    force: True
+    mode: "0660"
+  become: true
+  when:
+    - should_copy_custom_meter_definitions
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Check if custom polling.yaml exists
+  local_action: stat path="{{ node_custom_config }}/ceilometer/polling.yaml"
+  register: ceilometer_polling_file
+
+- name: Copying over polling.yaml
+  copy:
+    src: "{{ node_custom_config }}/ceilometer/polling.yaml"
+    dest: "{{ node_config_directory }}/{{ item.key }}/polling.yaml"
+    force: True
+    mode: "0660"
+  become: true
+  when:
+    - ceilometer_polling_file.stat.exists
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Set ceilometer polling file's path
+  set_fact:
+    ceilometer_polling_file_path: "{{ ceilometer_polling_file.stat.path }}"
+  when:
+    - ceilometer_polling_file.stat.exists
+
+- name: Check custom gnocchi_resources.yaml exists
+  local_action: stat path="{{ node_custom_config }}/ceilometer/gnocchi_resources.yaml"
+  register: ceilometer_gnocchi_resources_file
+
+- name: Copying over gnocchi_resources.yaml
+  copy:
+    src: "{{ node_custom_config }}/ceilometer/gnocchi_resources.yaml"
+    dest: "{{ node_config_directory }}/{{ item.key }}/gnocchi_resources.yaml"
+    force: True
+    mode: "0660"
+  become: true
+  when:
+    - ceilometer_gnocchi_resources_file.stat.exists
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Set ceilometer gnocchi_resources file's path
+  set_fact:
+    ceilometer_gnocchi_resources_file_path: "{{ ceilometer_gnocchi_resources_file.stat.path }}"
+  when:
+    - ceilometer_gnocchi_resources_file.stat.exists
+
+- name: Check if policies shall be overwritten
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: ceilometer_policy
+  with_first_found:
+    - files: "{{ supported_policy_format_list }}"
+      paths:
+        - "{{ node_custom_config }}/ceilometer/"
+      skip: true
+
+- name: Set ceilometer policy file
+  set_fact:
+    ceilometer_policy_file: "{{ ceilometer_policy.results.0.stat.path | basename }}"
+    ceilometer_policy_file_path: "{{ ceilometer_policy.results.0.stat.path }}"
+  when:
+    - ceilometer_policy.results
+
+- name: Copying over config.json files for services
+  template:
+    src: "{{ item.key }}.json.j2"
+    dest: "{{ node_config_directory }}/{{ item.key }}/config.json"
+    mode: "0660"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Copying over ceilometer.conf
+  vars:
+    service_name: "{{ item.key }}"
+  merge_configs:
+    sources:
+      - "{{ role_path }}/templates/ceilometer.conf.j2"
+      - "{{ node_custom_config }}/global.conf"
+      - "{{ node_custom_config }}/ceilometer.conf"
+      - "{{ node_custom_config }}/ceilometer/{{ item.key }}.conf"
+      - "{{ node_custom_config }}/ceilometer/{{ inventory_hostname }}/ceilometer.conf"
+    dest: "{{ node_config_directory }}/{{ item.key }}/ceilometer.conf"
+    mode: "0660"
+  become: true
+  when:
+    - item.value.enabled | bool
+    - inventory_hostname in groups[item.value.group]
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Check custom event_definitions.yaml exists
+  local_action: stat path="{{ node_custom_config }}/ceilometer/event_definitions.yaml"
+  register: ceilometer_event_definitions_file
+
+- name: Copying over event_definitions.yaml
+  vars:
+    service: "{{ ceilometer_services['ceilometer-notification'] }}"
+  copy:
+    src: "{{ node_custom_config }}/ceilometer/event_definitions.yaml"
+    dest: "{{ node_config_directory }}/ceilometer-notification/event_definitions.yaml"
+    force: True
+    mode: "0660"
+  become: true
+  register: ceilometer_event_definitions_overwriting
+  when:
+    - ceilometer_event_definitions_file.stat.exists
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  notify:
+    - Restart ceilometer-notification container
+
+- name: Copying over event_definitions.yaml for notification service
+  vars:
+    service: "{{ ceilometer_services['ceilometer-notification'] }}"
+  template:
+    src: "event_definitions.yaml.j2"
+    dest: "{{ node_config_directory }}/ceilometer-notification/event_definitions.yaml"
+    mode: "0660"
+  become: true
+  register: ceilometer_event_definitions
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - not ceilometer_event_definitions_file.stat.exists
+  notify:
+    - Restart ceilometer-notification container
+
+- name: Check custom event_pipeline.yaml exists
+  local_action: stat path="{{ node_custom_config }}/ceilometer/event_pipeline.yaml"
+  register: ceilometer_event_pipeline_file
+
+- name: Copying over event_pipeline.yaml
+  vars:
+    service: "{{ ceilometer_services['ceilometer-notification'] }}"
+  copy:
+    src: "{{ node_custom_config }}/ceilometer/event_pipeline.yaml"
+    dest: "{{ node_config_directory }}/ceilometer-notification/event_pipeline.yaml"
+    force: True
+    mode: "0660"
+  become: true
+  register: ceilometer_event_pipeline_overwriting
+  when:
+    - ceilometer_event_pipeline_file.stat.exists
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  notify:
+    - Restart ceilometer-notification container
+
+- name: Copying over event_pipeline.yaml for notification service
+  vars:
+    service: "{{ ceilometer_services['ceilometer-notification'] }}"
+  template:
+    src: "event_pipeline.yaml.j2"
+    dest: "{{ node_config_directory }}/ceilometer-notification/event_pipeline.yaml"
+    mode: "0660"
+  become: true
+  when:
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+    - not ceilometer_event_pipeline_file.stat.exists
+  notify:
+    - Restart ceilometer-notification container
+
+- name: Check custom pipeline.yaml exists
+  local_action: stat path="{{ node_custom_config }}/ceilometer/pipeline.yaml"
+  register: ceilometer_pipeline_file
+
+- name: Copying over pipeline.yaml
+  vars:
+    services_require_pipeline:
+      - ceilometer-compute
+      - ceilometer-central
+      - ceilometer-notification
+  copy:
+    src: "{{ node_custom_config }}/ceilometer/pipeline.yaml"
+    dest: "{{ node_config_directory }}/{{ item.key }}/pipeline.yaml"
+    force: True
+    mode: "0660"
+  become: true
+  register: ceilometer_pipeline_overwriting
+  when:
+    - ceilometer_pipeline_file.stat.exists
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - item.key in services_require_pipeline
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Copying over pipeline.yaml file
+  vars:
+    services_require_pipeline:
+      - ceilometer-compute
+      - ceilometer-central
+      - ceilometer-notification
+  template:
+    src: "pipeline.yaml.j2"
+    dest: "{{ node_config_directory }}/{{ item.key }}/pipeline.yaml"
+    mode: "0660"
+  become: true
+  when:
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+    - item.key in services_require_pipeline
+    - not ceilometer_pipeline_file.stat.exists
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Copying over panko.conf
+  vars:
+    service_require_panko_conf:
+      - ceilometer-notification
+  merge_configs:
+    sources:
+      - "{{ role_path }}/../panko/templates/panko.conf.j2"
+      - "{{ node_custom_config }}/global.conf"
+      - "{{ node_custom_config }}/panko.conf"
+      - "{{ node_custom_config }}/panko/panko.conf"
+      - "{{ node_custom_config }}/panko/{{ inventory_hostname }}/panko.conf"
+    dest: "{{ node_config_directory }}/{{ item.key }}/panko.conf"
+    mode: "0660"
+  become: true
+  when:
+    - enable_panko | bool
+    - item.value.enabled | bool
+    - inventory_hostname in groups[item.value.group]
+    - item.key in service_require_panko_conf
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- name: Copying VMware vCenter CA file
+  vars:
+    service: "{{ ceilometer_services['ceilometer-compute'] }}"
+  copy:
+    src: "{{ node_custom_config }}/vmware_ca"
+    dest: "{{ node_config_directory }}/ceilometer-compute/vmware_ca"
+    mode: "0660"
+  when:
+    - nova_compute_virt_type == "vmware"
+    - not vmware_vcenter_insecure | bool
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  notify:
+    - Restart ceilometer-compute container
+
+- name: Copying over existing policy file
+  template:
+    src: "{{ ceilometer_policy_file_path }}"
+    dest: "{{ node_config_directory }}/{{ item.key }}/{{ ceilometer_policy_file }}"
+    mode: "0660"
+  become: true
+  when:
+    - ceilometer_policy_file is defined
+    - inventory_hostname in groups[item.value.group]
+    - item.value.enabled | bool
+  with_dict: "{{ ceilometer_services }}"
+  notify:
+    - "Restart {{ item.key }} container"
+
+- include_tasks: check-containers.yml
+  when: kolla_action != "config"

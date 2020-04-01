@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Adds support for configuring additional Docker volumes for Kolla
+    containers.  These are configured via ``<service_name>_extra_volumes``.

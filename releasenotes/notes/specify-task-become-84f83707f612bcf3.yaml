@@ -1,0 +1,6 @@
+---
+prelude: >
+    Specify Ansible "become" for only necessary tasks.
+features:
+  - Increase security by add "become" to only
+    necessary Ansible tasks.

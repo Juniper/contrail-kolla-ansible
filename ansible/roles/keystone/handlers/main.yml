@@ -1,0 +1,96 @@
+---
+# NOTE: Handler order matter, init database upgrade must be before other handlers
+# finish database upgrade must be the last handler.
+
+- name: Init keystone database upgrade
+  vars:
+    service_name: "keystone"
+    service: "{{ keystone_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    environment:
+      KOLLA_UPGRADE:
+      KOLLA_CONFIG_STRATEGY: "{{ config_strategy }}"
+    image: "{{ service.image }}"
+    labels:
+      KOLLA_UPGRADE:
+    name: "init_upgrade_database"
+    restart_policy: no
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    dimensions: "{{ service.dimensions }}"
+  run_once: True
+  when:
+    - kolla_action == "upgrade"
+    - inventory_hostname == groups[service.group][0]
+
+- name: Restart keystone container
+  vars:
+    service_name: "keystone"
+    service: "{{ keystone_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"
+
+- name: Restart keystone-ssh container
+  vars:
+    service_name: "keystone-ssh"
+    service: "{{ keystone_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"
+
+- name: Restart keystone-fernet container
+  vars:
+    service_name: "keystone-fernet"
+    service: "{{ keystone_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"
+
+- name: Finish keystone database upgrade
+  vars:
+    service_name: "keystone"
+    service: "{{ keystone_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    environment:
+      KOLLA_FINISH_UPGRADE:
+      KOLLA_CONFIG_STRATEGY: "{{ config_strategy }}"
+    image: "{{ service.image }}"
+    labels:
+      KOLLA_UPGRADE:
+    name: "finish_upgrade_database"
+    restart_policy: no
+    volumes: "{{ service.volumes|reject('equalto', '')|list }}"
+    dimensions: "{{ service.dimensions }}"
+  run_once: True
+  when:
+    - kolla_action == "upgrade"
+    - inventory_hostname == groups[service.group][-1]

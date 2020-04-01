@@ -1,0 +1,15 @@
+---
+- include_tasks: "register.yml"
+  when: inventory_hostname in groups['octavia-api']
+
+- include_tasks: "config.yml"
+  when: inventory_hostname in groups['octavia-api'] or
+        inventory_hostname in groups['octavia-health-manager'] or
+        inventory_hostname in groups['octavia-housekeeping'] or
+        inventory_hostname in groups['octavia-worker']
+
+- include_tasks: "bootstrap.yml"
+  when: inventory_hostname in groups['octavia-api']
+
+- name: Flush handlers
+  meta: flush_handlers

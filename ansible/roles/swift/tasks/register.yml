@@ -1,0 +1,20 @@
+---
+- import_role:
+    name: service-ks-register
+  vars:
+    service_ks_register_auth: "{{ openstack_swift_auth }}"
+    service_ks_register_services: "{{ swift_ks_services }}"
+    service_ks_register_users: "{{ swift_ks_users }}"
+  tags: always
+
+- name: Creating the ResellerAdmin role
+  become: true
+  kolla_toolbox:
+    module_name: "os_keystone_role"
+    module_args:
+      name: "ResellerAdmin"
+      region_name: "{{ openstack_region_name }}"
+      auth: "{{ openstack_swift_auth }}"
+      endpoint_type: "{{ openstack_interface }}"
+      cacert: "{{ openstack_cacert }}"
+  run_once: True

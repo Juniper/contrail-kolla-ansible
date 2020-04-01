@@ -1,0 +1,36 @@
+{% set python_path = '/usr/lib/python' ~ distro_python_version ~ '/site-packages' if vitrage_install_type == 'binary' else '/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages' %}
+Listen {{ 'api' | kolla_address | put_address_in_context('url') }}:{{ vitrage_api_port }}
+
+ServerSignature Off
+ServerTokens Prod
+TraceEnable off
+
+{% if vitrage_logging_debug | bool %}
+LogLevel info
+{% endif %}
+
+<VirtualHost *:{{ vitrage_api_port }}>
+
+  ## Vhost docroot
+  DocumentRoot "/var/www/cgi-bin/vitrage"
+
+  ## Directories, there should at least be a declaration for /var/www/cgi-bin/vitrage
+
+  <Directory "/var/www/cgi-bin/vitrage">
+    Options Indexes FollowSymLinks MultiViews
+    AllowOverride None
+    Require all granted
+  </Directory>
+
+  ## Logging
+  ErrorLog "/var/log/kolla/vitrage/vitrage_wsgi_error.log"
+  ServerSignature Off
+  CustomLog "/var/log/kolla/vitrage/vitrage_wsgi_access.log" combined
+  WSGIApplicationGroup %{GLOBAL}
+  WSGIDaemonProcess vitrage group=vitrage processes={{ openstack_service_workers }} threads=1 user=vitrage python-path={{ python_path }}
+  WSGIProcessGroup vitrage
+  WSGIScriptAlias / "/var/www/cgi-bin/vitrage/app.wsgi"
+{% if enable_vitrage_prometheus_datasource | bool %}
+  WSGIPassAuthorization On
+{% endif %}
+</VirtualHost>

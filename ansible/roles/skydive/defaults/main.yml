@@ -1,0 +1,59 @@
+---
+project_name: "skydive"
+
+skydive_services:
+  skydive-analyzer:
+    container_name: skydive_analyzer
+    group: skydive-analyzer
+    enabled: true
+    image: "{{ skydive_analyzer_image_full }}"
+    volumes: "{{ skydive_analyzer_default_volumes + skydive_analyzer_extra_volumes }}"
+    dimensions: "{{ skydive_analyzer_dimensions }}"
+    haproxy:
+      skydive_server:
+        enabled: "{{ enable_skydive }}"
+        mode: "http"
+        external: false
+        port: "{{ skydive_analyzer_port }}"
+      skydive_server_external:
+        enabled: "{{ enable_skydive }}"
+        mode: "http"
+        external: true
+        port: "{{ skydive_analyzer_port }}"
+  skydive-agent:
+    container_name: skydive_agent
+    group: skydive-agent
+    enabled: true
+    image: "{{ skydive_agent_image_full }}"
+    privileged: True
+    volumes: "{{ skydive_agent_default_volumes + skydive_agent_extra_volumes }}"
+    dimensions: "{{ skydive_agent_dimensions }}"
+
+####################
+# Docker
+####################
+skydive_install_type: "{{ kolla_install_type }}"
+skydive_analyzer_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ skydive_install_type }}-skydive-analyzer"
+skydive_analyzer_tag: "{{ openstack_tag }}"
+skydive_analyzer_image_full: "{{ skydive_analyzer_image }}:{{ skydive_analyzer_tag }}"
+
+skydive_agent_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ skydive_install_type }}-skydive-agent"
+skydive_agent_tag: "{{ openstack_tag }}"
+skydive_agent_image_full: "{{ skydive_agent_image }}:{{ skydive_agent_tag }}"
+skydive_analyzer_dimensions: "{{ default_container_dimensions }}"
+skydive_agent_dimensions: "{{ default_container_dimensions }}"
+
+skydive_analyzer_default_volumes:
+  - "{{ node_config_directory }}/skydive-analyzer/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+skydive_agent_default_volumes:
+  - "{{ node_config_directory }}/skydive-agent/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/var/run/openvswitch:/var/run/openvswitch:ro"
+  - "/var/run/netns:/host/run:shared"
+  - "kolla_logs:/var/log/kolla/"
+
+skydive_extra_volumes: "{{ default_extra_volumes }}"
+skydive_analyzer_extra_volumes: "{{ skydive_extra_volumes }}"
+skydive_agent_extra_volumes: "{{ skydive_extra_volumes }}"

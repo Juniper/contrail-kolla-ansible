@@ -1,0 +1,8 @@
+---
+features:
+  - |
+    Adds support for configuring the maximum files and processes limits in the
+    ``nova_libvirt`` container, via the ``qemu_max_files`` and
+    ``qemu_max_processes`` variables. The default values for these are 32768
+    and 131072 respectively.  This is useful when Nova uses Ceph as a backend,
+    since the default limit of 1024 is often not enough.

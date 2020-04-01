@@ -1,0 +1,9 @@
+---
+- name: Recover mariadb
+  hosts: mariadb
+  roles:
+    - { role: mariadb,
+        tags: mariadb,
+        when: enable_mariadb | bool }
+  vars:
+    mariadb_recover: true

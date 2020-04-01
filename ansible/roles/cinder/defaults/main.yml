@@ -1,0 +1,274 @@
+---
+project_name: "cinder"
+
+cinder_services:
+  cinder-api:
+    container_name: cinder_api
+    group: cinder-api
+    enabled: true
+    image: "{{ cinder_api_image_full }}"
+    volumes: "{{ cinder_api_default_volumes + cinder_api_extra_volumes }}"
+    dimensions: "{{ cinder_api_dimensions }}"
+    haproxy:
+      cinder_api:
+        enabled: "{{ enable_cinder }}"
+        mode: "http"
+        external: false
+        port: "{{ cinder_api_port }}"
+        listen_port: "{{ cinder_api_listen_port }}"
+      cinder_api_external:
+        enabled: "{{ enable_cinder }}"
+        mode: "http"
+        external: true
+        port: "{{ cinder_api_port }}"
+        listen_port: "{{ cinder_api_listen_port }}"
+  cinder-scheduler:
+    container_name: cinder_scheduler
+    group: cinder-scheduler
+    enabled: true
+    image: "{{ cinder_scheduler_image_full }}"
+    volumes: "{{ cinder_scheduler_default_volumes + cinder_scheduler_extra_volumes }}"
+    dimensions: "{{ cinder_scheduler_dimensions }}"
+  cinder-volume:
+    container_name: cinder_volume
+    group: cinder-volume
+    enabled: true
+    image: "{{ cinder_volume_image_full }}"
+    privileged: True
+    ipc_mode: "host"
+    volumes: "{{ cinder_volume_default_volumes + cinder_volume_extra_volumes }}"
+    dimensions: "{{ cinder_volume_dimensions }}"
+  cinder-backup:
+    container_name: cinder_backup
+    group: cinder-backup
+    enabled: "{{ enable_cinder_backup | bool }}"
+    image: "{{ cinder_backup_image_full }}"
+    privileged: True
+    volumes: "{{ cinder_backup_default_volumes + cinder_backup_extra_volumes }}"
+    dimensions: "{{ cinder_backup_dimensions }}"
+
+####################
+# Ceph
+####################
+ceph_cinder_pool_type: "{{ ceph_pool_type }}"
+ceph_cinder_cache_mode: "{{ ceph_cache_mode }}"
+ceph_cinder_backup_pool_type: "{{ ceph_pool_type }}"
+ceph_cinder_backup_cache_mode: "{{ ceph_cache_mode }}"
+
+# Due to Ansible issues on include, you cannot override these variables. Please
+# override the variables they reference instead.
+cinder_pool_name: "{{ ceph_cinder_pool_name }}"
+cinder_pool_type: "{{ ceph_cinder_pool_type }}"
+cinder_cache_mode: "{{ ceph_cinder_cache_mode }}"
+cinder_pool_pg_num: "{{ ceph_pool_pg_num }}"
+cinder_pool_pgp_num: "{{ ceph_pool_pgp_num }}"
+
+cinder_backup_pool_name: "{{ ceph_cinder_backup_pool_name }}"
+cinder_backup_pool_type: "{{ ceph_cinder_backup_pool_type }}"
+cinder_backup_cache_mode: "{{ ceph_cinder_backup_cache_mode }}"
+cinder_backup_pool_pg_num: "{{ ceph_pool_pg_num }}"
+cinder_backup_pool_pgp_num: "{{ ceph_pool_pgp_num }}"
+
+ceph_client_cinder_keyring_caps:
+  mon: 'profile rbd'
+  osd: >-
+    profile rbd pool={{ ceph_cinder_pool_name }},
+    profile rbd pool={{ ceph_nova_pool_name }},
+    profile rbd pool={{ ceph_glance_pool_name }},
+    profile rbd pool={{ ceph_cinder_pool_name }}-cache,
+    profile rbd pool={{ ceph_nova_pool_name }}-cache,
+    profile rbd pool={{ ceph_glance_pool_name }}-cache
+
+ceph_client_cinder_backup_keyring_caps:
+  mon: 'profile rbd'
+  osd: >-
+    profile rbd pool={{ ceph_cinder_backup_pool_name }},
+    profile rbd pool={{ ceph_cinder_backup_pool_name }}-cache
+
+
+####################
+# Database
+####################
+cinder_database_name: "cinder"
+cinder_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}cinder{% endif %}"
+cinder_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+# Max number of object to consider
+# when run online data migration
+# cinder_max_number_osm: ""
+
+####################
+# Docker
+####################
+cinder_install_type: "{{ kolla_install_type }}"
+cinder_tag: "{{ openstack_tag }}"
+
+cinder_volume_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ cinder_install_type }}-cinder-volume"
+cinder_volume_tag: "{{ cinder_tag }}"
+cinder_volume_image_full: "{{ cinder_volume_image }}:{{ cinder_volume_tag }}"
+
+cinder_scheduler_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ cinder_install_type }}-cinder-scheduler"
+cinder_scheduler_tag: "{{ cinder_tag }}"
+cinder_scheduler_image_full: "{{ cinder_scheduler_image }}:{{ cinder_scheduler_tag }}"
+
+cinder_backup_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ cinder_install_type }}-cinder-backup"
+cinder_backup_tag: "{{ cinder_tag }}"
+cinder_backup_image_full: "{{ cinder_backup_image }}:{{ cinder_backup_tag }}"
+
+cinder_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ cinder_install_type }}-cinder-api"
+cinder_api_tag: "{{ cinder_tag }}"
+cinder_api_image_full: "{{ cinder_api_image }}:{{ cinder_api_tag }}"
+
+cinder_api_dimensions: "{{ default_container_dimensions }}"
+cinder_backup_dimensions: "{{ default_container_dimensions }}"
+cinder_scheduler_dimensions: "{{ default_container_dimensions }}"
+cinder_volume_dimensions: "{{ default_container_dimensions }}"
+
+cinder_api_default_volumes:
+  - "{{ node_config_directory }}/cinder-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cinder/cinder:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cinder' if cinder_dev_mode | bool else '' }}"
+cinder_backup_default_volumes:
+  - "{{ node_config_directory }}/cinder-backup/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/dev/:/dev/"
+  - "/lib/modules:/lib/modules:ro"
+  - "/run/:/run/:shared"
+  - "cinder:/var/lib/cinder"
+  - "{% if enable_iscsid | bool %}iscsi_info:/etc/iscsi{% endif %}"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cinder/cinder:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cinder' if cinder_dev_mode | bool else '' }}"
+cinder_scheduler_default_volumes:
+  - "{{ node_config_directory }}/cinder-scheduler/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cinder/cinder:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cinder' if cinder_dev_mode | bool else '' }}"
+cinder_volume_default_volumes:
+  - "{{ node_config_directory }}/cinder-volume/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/dev/:/dev/"
+  - "/lib/modules:/lib/modules:ro"
+  - "/run/:/run/:shared"
+  - "cinder:/var/lib/cinder"
+  - "{% if enable_iscsid | bool %}iscsi_info:/etc/iscsi{% endif %}"
+  - "{% if enable_cinder_backend_lvm | bool and cinder_target_helper == 'lioadm' %}target_config:/etc/target{% endif %}"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cinder/cinder:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cinder' if cinder_dev_mode | bool else '' }}"
+
+cinder_extra_volumes: "{{ default_extra_volumes }}"
+cinder_api_extra_volumes: "{{ cinder_extra_volumes }}"
+cinder_backup_extra_volumes: "{{ cinder_extra_volumes }}"
+cinder_scheduler_extra_volumes: "{{ cinder_extra_volumes }}"
+cinder_volume_extra_volumes: "{{ cinder_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+cinder_v2_admin_endpoint: "{{ admin_protocol }}://{{ cinder_internal_fqdn | put_address_in_context('url') }}:{{ cinder_api_port }}/v2/%(tenant_id)s"
+cinder_v2_internal_endpoint: "{{ internal_protocol }}://{{ cinder_internal_fqdn | put_address_in_context('url') }}:{{ cinder_api_port }}/v2/%(tenant_id)s"
+cinder_v2_public_endpoint: "{{ public_protocol }}://{{ cinder_external_fqdn | put_address_in_context('url') }}:{{ cinder_api_port }}/v2/%(tenant_id)s"
+cinder_v3_admin_endpoint: "{{ admin_protocol }}://{{ cinder_internal_fqdn | put_address_in_context('url') }}:{{ cinder_api_port }}/v3/%(tenant_id)s"
+cinder_v3_internal_endpoint: "{{ internal_protocol }}://{{ cinder_internal_fqdn | put_address_in_context('url') }}:{{ cinder_api_port }}/v3/%(tenant_id)s"
+cinder_v3_public_endpoint: "{{ public_protocol }}://{{ cinder_external_fqdn | put_address_in_context('url') }}:{{ cinder_api_port }}/v3/%(tenant_id)s"
+
+cinder_logging_debug: "{{ openstack_logging_debug }}"
+
+openstack_cinder_auth: "{{ openstack_auth }}"
+
+
+####################
+# Cinder
+####################
+cinder_backends:
+  - name: "rbd-1"
+    enabled: "{{ enable_ceph | bool and cinder_backend_ceph | bool }}"
+  - name: "lvm-1"
+    enabled: "{{ enable_cinder_backend_lvm | bool }}"
+  - name: "nfs-1"
+    enabled: "{{ enable_cinder_backend_nfs | bool }}"
+  - name: "hnas-nfs"
+    enabled: "{{ enable_cinder_backend_hnas_nfs | bool }}"
+  - name: "vmwarevc-vmdk"
+    enabled: "{{ cinder_backend_vmwarevc_vmdk | bool }}"
+  - name: "zfssa-iscsi"
+    enabled: "{{ enable_cinder_backend_zfssa_iscsi | bool }}"
+  - name: "QuobyteHD"
+    enabled: "{{ enable_cinder_backend_quobyte | bool }}"
+
+skip_cinder_backend_check: False
+
+cinder_enabled_backends: "{{ cinder_backends|selectattr('enabled', 'equalto', true)|list }}"
+
+####################
+# Notification
+####################
+cinder_notification_topics:
+  - name: notifications
+    enabled: "{{ enable_ceilometer | bool }}"
+  - name: vitrage_notifications
+    enabled: "{{ enable_vitrage | bool }}"
+
+cinder_enabled_notification_topics: "{{ cinder_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+##################################
+# Hitachi NAS Platform NFS drivers
+##################################
+# nfs
+hnas_nfs_backend: "hnas_nfs_backend"
+hnas_nfs_username:
+hnas_nfs_mgmt_ip0:
+hnas_nfs_svc0_volume_type:
+hnas_nfs_svc0_hdp:
+
+#############################################
+# Oracle ZFS Storage Appliance iSCSI driver
+#############################################
+zfssa_iscsi_backend: "zfssa_iscsi_backend"
+zfssa_iscsi_san_ip:
+zfssa_iscsi_login:
+zfssa_iscsi_pool:
+zfssa_iscsi_project:
+zfssa_iscsi_initiator_group:
+zfssa_iscsi_target_portal:
+zfssa_iscsi_target_interfaces:
+
+#########################
+# Quobyte Storage Driver
+#########################
+quobyte_storage_host:
+quobyte_storage_volume:
+
+
+####################
+# Kolla
+####################
+cinder_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+cinder_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+cinder_dev_mode: "{{ kolla_dev_mode }}"
+cinder_source_version: "{{ kolla_source_version }}"
+
+####################
+# Keystone
+####################
+cinder_ks_services:
+  - name: "cinderv2"
+    type: "volumev2"
+    description: "Openstack Block Storage"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ cinder_v2_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ cinder_v2_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ cinder_v2_public_endpoint }}'}
+  - name: "cinderv3"
+    type: "volumev3"
+    description: "Openstack Block Storage"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ cinder_v3_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ cinder_v3_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ cinder_v3_public_endpoint }}'}
+
+cinder_ks_users:
+  - project: "service"
+    user: "{{ cinder_keystone_user }}"
+    password: "{{ cinder_keystone_password }}"
+    role: "admin"

@@ -1,0 +1,85 @@
+{% set python_path = '/usr/share/openstack-dashboard' if horizon_install_type == 'binary' else '/var/lib/kolla/venv/lib/python' + distro_python_version + '/site-packages' %}
+
+Listen {{ api_interface_address | put_address_in_context('url') }}:{{ horizon_listen_port }}
+
+ServerSignature Off
+ServerTokens Prod
+TraceEnable off
+
+<VirtualHost *:{{ horizon_listen_port }}>
+    LogLevel warn
+    ErrorLog /var/log/kolla/horizon/horizon.log
+    LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"" logformat
+    CustomLog /var/log/kolla/horizon/horizon-access.log logformat
+
+    WSGIScriptReloading On
+    WSGIDaemonProcess horizon-http processes={{ horizon_wsgi_processes }} threads={{ horizon_wsgi_threads }} user=horizon group=horizon display-name=%{GROUP} python-path={{ python_path }}
+    WSGIProcessGroup horizon-http
+{% if kolla_base_distro in ['debian'] and horizon_install_type == 'binary' %}
+    WSGIScriptAlias / {{ python_path }}/wsgi.py
+{% else %}
+    WSGIScriptAlias / {{ python_path }}/openstack_dashboard/wsgi/django.wsgi
+{% endif %}
+    WSGIPassAuthorization On
+    WSGIApplicationGroup %{GLOBAL}
+
+    <Location "/">
+        Require all granted
+    </Location>
+
+{% if kolla_base_distro in ['debian', 'ubuntu'] and horizon_install_type == 'binary' %}
+    Alias /static /var/lib/openstack-dashboard/static
+{% else %}
+    Alias /static {{ python_path }}/static
+{% endif %}
+    <Location "/static">
+        SetHandler None
+    </Location>
+</VirtualHost>
+
+{# FIXME(yoctozepto): enabling of either tls will break the other if not enabled too #}
+{% if kolla_enable_tls_external | bool or kolla_enable_tls_internal | bool %}
+Header edit Location ^http://(.*)$ https://$1
+{% endif %}
+
+<IfModule mod_deflate.c>
+    # Compress HTML, CSS, JavaScript, Json, Text, XML and fonts
+    AddOutputFilterByType DEFLATE application/javascript
+    AddOutputFilterByType DEFLATE application/json
+    AddOutputFilterByType DEFLATE application/rss+xml
+    AddOutputFilterByType DEFLATE application/vnd.ms-fontobject
+    AddOutputFilterByType DEFLATE application/x-font
+    AddOutputFilterByType DEFLATE application/x-font-opentype
+    AddOutputFilterByType DEFLATE application/x-font-otf
+    AddOutputFilterByType DEFLATE application/x-font-truetype
+    AddOutputFilterByType DEFLATE application/x-font-ttf
+    AddOutputFilterByType DEFLATE application/x-javascript
+    AddOutputFilterByType DEFLATE application/xhtml+xml
+    AddOutputFilterByType DEFLATE application/xml
+    AddOutputFilterByType DEFLATE font/opentype
+    AddOutputFilterByType DEFLATE font/otf
+    AddOutputFilterByType DEFLATE font/ttf
+    AddOutputFilterByType DEFLATE image/svg+xml
+    AddOutputFilterByType DEFLATE image/x-icon
+    AddOutputFilterByType DEFLATE text/css
+    AddOutputFilterByType DEFLATE text/html
+    AddOutputFilterByType DEFLATE text/javascript
+    AddOutputFilterByType DEFLATE text/plain
+    AddOutputFilterByType DEFLATE text/xml
+</IfModule>
+
+<IfModule mod_expires.c>
+    <Filesmatch "\.(jpg|jpeg|png|gif|js|css|swf|ico|woff)$">
+        ExpiresActive on
+        ExpiresDefault "access plus 1 month"
+        ExpiresByType application/javascript "access plus 1 year"
+        ExpiresByType text/css "access plus 1 year"
+        ExpiresByType image/x-ico "access plus 1 year"
+        ExpiresByType image/jpg "access plus 1 year"
+        ExpiresByType image/jpeg "access plus 1 year"
+        ExpiresByType image/gif "access plus 1 year"
+        ExpiresByType image/png "access plus 1 year"
+        Header merge Cache-Control public
+        Header unset ETag
+    </Filesmatch>
+</IfModule>

@@ -1,0 +1,11 @@
+{
+    "command": "/opt/node_exporter/node_exporter --path.procfs /host/proc --path.sysfs /host/sys --web.listen-address {{ api_interface_address | put_address_in_context('url') }}:{{ prometheus_node_exporter_port }}",
+    "config_files": [],
+    "permissions": [
+        {
+            "path": "/var/log/kolla/prometheus",
+            "owner": "prometheus:kolla",
+            "recurse": true
+        }
+    ]
+}

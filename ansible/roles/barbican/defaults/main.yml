@@ -1,0 +1,141 @@
+---
+project_name: "barbican"
+
+barbican_services:
+  barbican-api:
+    container_name: barbican_api
+    group: barbican-api
+    enabled: true
+    image: "{{ barbican_api_image_full }}"
+    volumes: "{{ barbican_api_default_volumes + barbican_api_extra_volumes }}"
+    dimensions: "{{ barbican_api_dimensions }}"
+    haproxy:
+      barbican_api:
+        enabled: "{{ enable_barbican }}"
+        mode: "http"
+        external: false
+        port: "{{ barbican_api_port }}"
+        listen_port: "{{ barbican_api_listen_port }}"
+      barbican_api_external:
+        enabled: "{{ enable_barbican }}"
+        mode: "http"
+        external: true
+        port: "{{ barbican_api_port }}"
+        listen_port: "{{ barbican_api_listen_port }}"
+  barbican-keystone-listener:
+    container_name: barbican_keystone_listener
+    group: barbican-keystone-listener
+    enabled: true
+    image: "{{ barbican_keystone_listener_image_full }}"
+    volumes: "{{ barbican_keystone_listener_default_volumes + barbican_keystone_listener_extra_volumes }}"
+    dimensions: "{{ barbican_keystone_listener_dimensions }}"
+  barbican-worker:
+    container_name: barbican_worker
+    group: barbican-worker
+    enabled: true
+    image: "{{ barbican_worker_image_full }}"
+    volumes: "{{ barbican_worker_default_volumes + barbican_worker_extra_volumes }}"
+    dimensions: "{{ barbican_worker_dimensions }}"
+
+
+####################
+# Database
+####################
+barbican_database_name: "barbican"
+barbican_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}barbican{% endif %}"
+barbican_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+barbican_install_type: "{{ kolla_install_type }}"
+barbican_tag: "{{ openstack_tag }}"
+
+barbican_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ barbican_install_type }}-barbican-api"
+barbican_api_tag: "{{ barbican_tag }}"
+barbican_api_image_full: "{{ barbican_api_image }}:{{ barbican_api_tag }}"
+
+barbican_keystone_listener_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ barbican_install_type }}-barbican-keystone-listener"
+barbican_keystone_listener_tag: "{{ barbican_tag }}"
+barbican_keystone_listener_image_full: "{{ barbican_keystone_listener_image }}:{{ barbican_keystone_listener_tag }}"
+
+barbican_worker_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ barbican_install_type }}-barbican-worker"
+barbican_worker_tag: "{{ barbican_tag }}"
+barbican_worker_image_full: "{{ barbican_worker_image }}:{{ barbican_worker_tag }}"
+
+barbican_api_dimensions: "{{ default_container_dimensions }}"
+barbican_keystone_listener_dimensions: "{{ default_container_dimensions }}"
+barbican_worker_dimensions: "{{ default_container_dimensions }}"
+
+barbican_api_default_volumes:
+  - "{{ node_config_directory }}/barbican-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "barbican:/var/lib/barbican/"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/barbican/barbican:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/barbican' if barbican_dev_mode | bool else '' }}"
+barbican_keystone_listener_default_volumes:
+  - "{{ node_config_directory }}/barbican-keystone-listener/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/barbican/barbican:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/barbican' if barbican_dev_mode | bool else '' }}"
+barbican_worker_default_volumes:
+  - "{{ node_config_directory }}/barbican-worker/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/barbican/barbican:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/barbican' if barbican_dev_mode | bool else '' }}"
+
+barbican_extra_volumes: "{{ default_extra_volumes }}"
+barbican_api_extra_volumes: "{{ barbican_extra_volumes }}"
+barbican_keystone_listener_extra_volumes: "{{ barbican_extra_volumes }}"
+barbican_worker_extra_volumes: "{{ barbican_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+barbican_admin_endpoint: "{{ admin_protocol }}://{{ barbican_internal_fqdn | put_address_in_context('url') }}:{{ barbican_api_port }}"
+barbican_internal_endpoint: "{{ internal_protocol }}://{{ barbican_internal_fqdn | put_address_in_context('url') }}:{{ barbican_api_port }}"
+barbican_public_endpoint: "{{ public_protocol }}://{{ barbican_external_fqdn | put_address_in_context('url') }}:{{ barbican_api_port }}"
+
+barbican_logging_debug: "{{ openstack_logging_debug }}"
+
+barbican_keystone_user: "barbican"
+barbican_keymanager_role: "key-manager:service-admin"
+barbican_creator_role: "creator"
+barbican_observer_role: "observer"
+barbican_audit_role: "audit"
+
+openstack_barbican_auth: "{{ openstack_auth }}"
+
+
+####################
+# Kolla
+####################
+barbican_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+barbican_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+barbican_dev_mode: "{{ kolla_dev_mode }}"
+barbican_source_version: "{{ kolla_source_version }}"
+
+####################
+# Keystone
+####################
+barbican_ks_services:
+  - name: "barbican"
+    type: "key-manager"
+    description: "Barbican Key Management Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ barbican_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ barbican_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ barbican_public_endpoint }}'}
+
+barbican_ks_users:
+  - project: "service"
+    user: "{{ barbican_keystone_user }}"
+    password: "{{ barbican_keystone_password }}"
+    role: "admin"
+
+barbican_ks_roles:
+  - "{{ barbican_keymanager_role }}"
+  - "{{ barbican_creator_role }}"
+  - "{{ barbican_observer_role }}"
+  - "{{ barbican_audit_role }}"

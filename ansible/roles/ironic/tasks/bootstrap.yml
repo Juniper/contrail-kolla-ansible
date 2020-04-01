@@ -1,0 +1,73 @@
+---
+- name: Creating Ironic database
+  become: true
+  kolla_toolbox:
+    module_name: mysql_db
+    module_args:
+      login_host: "{{ database_address }}"
+      login_port: "{{ database_port }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      name: "{{ item.database_name }}"
+  run_once: True
+  delegate_to: "{{ groups[item.group][0] }}"
+  with_items:
+    - database_name: "{{ ironic_database_name }}"
+      group: "ironic-api"
+    - database_name: "{{ ironic_inspector_database_name }}"
+      group: "ironic-inspector"
+  when:
+    - not use_preconfigured_databases | bool
+    - inventory_hostname in groups[item.group]
+
+- name: Creating Ironic database user and setting permissions
+  become: true
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_port: "{{ database_port }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      name: "{{ item.database_user }}"
+      password: "{{ item.database_password }}"
+      host: "%"
+      priv: "{{ item.database_name }}.*:ALL"
+      append_privs: "yes"
+  run_once: True
+  delegate_to: "{{ groups[item.group][0] }}"
+  with_items:
+    - database_name: "{{ ironic_database_name }}"
+      database_user: "{{ ironic_database_user }}"
+      database_password: "{{ ironic_database_password }}"
+      group: "ironic-api"
+    - database_name: "{{ ironic_inspector_database_name }}"
+      database_user: "{{ ironic_inspector_database_user }}"
+      database_password: "{{ ironic_inspector_database_password }}"
+      group: "ironic-inspector"
+  loop_control:
+    label: "{{ item.database_name }}"
+  when:
+    - not use_preconfigured_databases | bool
+    - inventory_hostname in groups[item.group]
+
+- include_tasks: bootstrap_service.yml
+
+- name: Running Ironic-PXE bootstrap container
+  vars:
+    ironic_pxe: "{{ ironic_services['ironic-pxe'] }}"
+  become: true
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    environment:
+      KOLLA_BOOTSTRAP:
+      KOLLA_CONFIG_STRATEGY: "{{ config_strategy }}"
+    image: "{{ ironic_pxe.image }}"
+    labels:
+      BOOTSTRAP:
+    name: "bootstrap_ironic_pxe"
+    restart_policy: no
+    volumes: "{{ ironic_pxe.volumes }}"
+  when: inventory_hostname in groups[ironic_pxe.group]

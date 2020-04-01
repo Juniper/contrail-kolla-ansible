@@ -1,0 +1,9 @@
+---
+- include_tasks: config.yml
+
+- include_tasks: bootstrap.yml
+
+- name: Flush handlers
+  meta: flush_handlers
+
+- include_tasks: post_config.yml

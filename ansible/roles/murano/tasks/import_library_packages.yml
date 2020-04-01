@@ -1,0 +1,58 @@
+---
+- name: Waiting for Murano API service to be ready on first node
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ murano_api_port }}"
+    connect_timeout: 1
+    timeout: 60
+  run_once: True
+  register: check_murano_port
+  until: check_murano_port is success
+  retries: 10
+  delay: 6
+  delegate_to: "{{ groups['murano-api'][0] }}"
+
+- name: Checking if Murano core and applications library packages exist
+  become: true
+  command: >
+    docker exec murano_api murano
+    --os-username {{ openstack_auth.username }}
+    --os-password {{ keystone_admin_password }}
+    --os-project-name {{ openstack_auth.project_name }}
+    --os-auth-url {{ keystone_admin_url }}
+    --murano-url {{ admin_protocol }}://{{ api_interface_address | put_address_in_context('url') }}:{{ murano_api_port }}
+    package-list
+  register: status
+  changed_when: False
+  run_once: True
+  delegate_to: "{{ groups['murano-api'][0] }}"
+
+- name: Importing Murano core library package
+  become: true
+  command: >
+    docker exec murano_api murano
+    --os-username {{ openstack_auth.username }}
+    --os-password {{ keystone_admin_password }}
+    --os-project-name {{ openstack_auth.project_name }}
+    --os-auth-url {{ keystone_admin_url }}
+    --murano-url {{ admin_protocol }}://{{ api_interface_address | put_address_in_context('url') }}:{{ murano_api_port }}
+    package-import --exists-action u --is-public /io.murano.zip
+  run_once: True
+  delegate_to: "{{ groups['murano-api'][0] }}"
+  when:
+    - status.stdout.find("io.murano") == -1 or kolla_action == "upgrade"
+
+- name: Importing Murano applications library package
+  become: true
+  command: >
+    docker exec murano_api murano
+    --os-username {{ openstack_auth.username }}
+    --os-password {{ keystone_admin_password }}
+    --os-project-name {{ openstack_auth.project_name }}
+    --os-auth-url {{ keystone_admin_url }}
+    --murano-url {{ admin_protocol }}://{{ api_interface_address | put_address_in_context('url') }}:{{ murano_api_port }}
+    package-import --exists-action u --is-public /io.murano.applications.zip
+  run_once: True
+  delegate_to: "{{ groups['murano-api'][0] }}"
+  when:
+    - status.stdout.find("io.murano.applications") == -1 or kolla_action == "upgrade"
