@@ -1,0 +1,85 @@
+{%- set wsrep_driver = '/usr/lib/galera/libgalera_smm.so' if kolla_base_distro in ['debian', 'ubuntu'] else '/usr/lib64/galera/libgalera_smm.so' %}
+{% set sst_method = 'mariabackup' %}
+
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+[mysqld]
+basedir=/usr
+bind-address={{ api_interface_address }}
+port={{ mariadb_port }}
+
+log-error=/var/log/kolla/mariadb/mariadb.log
+
+log-bin=mysql-bin
+binlog_format=ROW
+expire_logs_days=14
+default-storage-engine=innodb
+innodb_autoinc_lock_mode=2
+
+collation-server = utf8_general_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8
+
+datadir=/var/lib/mysql/
+
+wsrep_cluster_address=gcomm://{% if (groups['mariadb'] | length) > 1 %}{% for host in groups['mariadb'] %}{{ 'api' | kolla_address(host) | put_address_in_context('url') }}:{{ mariadb_wsrep_port }}{% if not loop.last %},{% endif %}{% endfor %}{% endif %}
+
+{% if api_address_family == 'ipv6' and kolla_base_distro == 'centos' %}
+# FIXME(jeffrey4l): Revert when using C8 (CentOS+Ussuri)
+# Use [::] to avoid galera issue.
+# for more info see https://github.com/codership/galera/issues/534#issuecomment-472607544
+wsrep_provider_options=gmcast.listen_addr=tcp://[::]:{{ mariadb_wsrep_port }};ist.recv_addr={{ api_interface_address | put_address_in_context('url') }}:{{ mariadb_ist_port }}
+{% else %}
+wsrep_provider_options=gmcast.listen_addr=tcp://{{ api_interface_address | put_address_in_context('url') }}:{{ mariadb_wsrep_port }};ist.recv_addr={{ api_interface_address | put_address_in_context('url') }}:{{ mariadb_ist_port }}
+{% endif %}
+
+wsrep_node_address={{ api_interface_address | put_address_in_context('url') }}:{{ mariadb_wsrep_port }}
+{% if api_address_family == 'ipv6' and kolla_base_distro == 'centos' %}
+# FIXME(yj.bai): Revert when using C8 (CentOS+Ussuri)
+# Use IPv6-resolvable hostname to avoid galera issue.
+wsrep_sst_receive_address={{ ansible_hostname }}:{{ mariadb_sst_port }}
+{% else %}
+wsrep_sst_receive_address={{ api_interface_address | put_address_in_context('url') }}:{{ mariadb_sst_port }}
+{% endif %}
+
+wsrep_provider={{ wsrep_driver }}
+wsrep_cluster_name="{{ database_cluster_name }}"
+wsrep_node_name={{ ansible_hostname }}
+wsrep_sst_method={{ sst_method }}
+wsrep_sst_auth={{ database_user }}:{{ database_password }}
+wsrep_slave_threads=4
+wsrep_notify_cmd=/usr/local/bin/wsrep-notify.sh
+wsrep_on = ON
+
+max_connections=10000
+
+key_buffer_size = '64M'
+max_heap_table_size = '64M'
+tmp_table_size = '64M'
+{% set dynamic_pool_size_mb = (hostvars[inventory_hostname]['ansible_memtotal_mb'] * 0.4) | round | int %}
+{% if dynamic_pool_size_mb < 8192 %}
+innodb_buffer_pool_size = '{{ dynamic_pool_size_mb }}M'
+{% else %}
+innodb_buffer_pool_size = '8192M'
+{% endif %}
+
+# The default value for innodb_lock_schedule_algorithm is VATS, but this does
+# not work with galera. Set FCFS explicitly to avoid a warning.
+# https://mariadb.com/kb/en/library/innodb-system-variables/#innodb_lock_schedule_algorithm.
+innodb_lock_schedule_algorithm = FCFS
+
+[server]
+pid-file=/var/lib/mysql/mariadb.pid
+
+[sst]
+{% if sst_method == 'mariabackup' and api_address_family == 'ipv6' %}
+# NOTE(yoctozepto): for IPv6 we need to tweak sockopt for socat (mariabackup sst backend)
+# see: https://mariadb.com/kb/en/library/xtrabackup-v2-sst-method/#performing-ssts-with-ipv6-addresses
+# and: https://jira.mariadb.org/browse/MDEV-18797
+# this can be removed when MDEV-18797 is resolved
+sockopt=",pf=ip6"
+{% endif %}

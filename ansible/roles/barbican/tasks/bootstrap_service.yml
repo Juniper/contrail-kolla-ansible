@@ -1,0 +1,20 @@
+---
+- name: Running barbican bootstrap container
+  vars:
+    barbican_api: "{{ barbican_services['barbican-api'] }}"
+  become: true
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    environment:
+      KOLLA_BOOTSTRAP:
+      KOLLA_CONFIG_STRATEGY: "{{ config_strategy }}"
+    image: "{{ barbican_api.image }}"
+    labels:
+      BOOTSTRAP:
+    name: "bootstrap_barbican"
+    restart_policy: no
+    volumes: "{{ barbican_api.volumes|reject('equalto', '')|list }}"
+  run_once: True
+  delegate_to: "{{ groups[barbican_api.group][0] }}"

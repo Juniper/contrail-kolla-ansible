@@ -1,0 +1,36 @@
+#!/bin/bash
+
+TOPLEVEL=$(git rev-parse --show-toplevel)
+RES=0
+
+cd $TOPLEVEL
+
+if [ "$1" = "--install" ]; then
+    ln -sf ../../tools/pre-commit-hook .git/hooks/pre-commit
+    exit
+fi
+
+tmpdir=$(mktemp -d precommit.XXXXXX) || exit 1
+trap "rm -rf $TOPLEVEL/$tmpdir" 0
+
+git diff --cached --name-only --diff-filter=ACMR |
+    xargs git checkout-index --prefix=$tmpdir/ --
+
+cd $tmpdir
+
+echo "=== starting pre-commit checks ==="
+
+echo "Checking the following files:"
+
+find . -type f
+
+echo "=== bashate checks ==="
+
+files=$(egrep -rlI '^#!/(bin/|usr/bin/env )(ba)?sh' .)
+[ "$files" ] && (bashate $files || RES=1)
+
+echo "=== yaml checks ==="
+
+${TOPLEVEL}/tools/validate-all-yaml.sh || RES=1
+
+exit $RES

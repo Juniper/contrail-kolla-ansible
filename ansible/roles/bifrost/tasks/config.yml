@@ -1,0 +1,36 @@
+---
+- name: Ensuring config directories exist
+  file:
+    path: "{{ node_config_directory }}/{{ item }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  become: true
+  with_items:
+    - "bifrost"
+
+- name: Generate bifrost configs
+  merge_yaml:
+    sources:
+      - "{{ role_path }}/templates/{{ item }}.yml.j2"
+      - "{{ node_custom_config }}/{{ item }}.yml"
+      - "{{ node_custom_config }}/bifrost/{{ item }}.yml"
+    dest: "{{ node_config_directory }}/bifrost/{{ item }}.yml"
+    mode: "0660"
+  become: true
+  with_items:
+    - "bifrost"
+    - "dib"
+    - "servers"
+
+- name: Template ssh keys
+  template:
+    src: "{{ item.src }}"
+    dest: "{{ node_config_directory }}/bifrost/{{ item.dest }}"
+    mode: "0660"
+  become: true
+  with_items:
+    - { src: "id_rsa", dest: "id_rsa" }
+    - { src: "id_rsa.pub", dest: "id_rsa.pub" }
+    - { src: "ssh_config", dest: "ssh_config" }

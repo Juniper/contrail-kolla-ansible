@@ -1,0 +1,12 @@
+---
+- include_tasks: port_checks.yml
+  when:
+    - inventory_hostname not in groups['deployment']|default([])
+
+- include_tasks: service_checks.yml
+
+- include_tasks: package_checks.yml
+
+- include_tasks: user_checks.yml
+
+- include_tasks: database_checks.yml

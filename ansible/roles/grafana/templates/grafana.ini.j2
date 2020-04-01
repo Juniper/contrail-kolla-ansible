@@ -1,0 +1,40 @@
+[paths]
+data = /var/lib/grafana
+logs = /var/log/kolla/grafana
+plugins = /var/lib/grafana/plugins
+provisioning = /etc/grafana/provisioning
+
+[server]
+protocol = http
+http_addr = {{ api_interface_address | put_address_in_context('url') }}
+http_port = {{ grafana_server_port }}
+
+router_logging = true
+
+static_root_path = public
+
+enable_gzip = false
+
+[database]
+type = mysql
+host = {{ grafana_database_address }}
+name = {{ grafana_database_name }}
+user = {{ grafana_database_user }}
+password = {{ grafana_database_password }}
+ssl_mode = disable
+
+[session]
+provider = mysql
+provider_config = {{ grafana_database_user }}:{{ grafana_database_password }}@tcp({{ grafana_database_address }})/{{ grafana_database_name }}
+
+cookie_name = grafana_sess
+cookie_secure = false
+session_life_time = 86400
+
+[analytics]
+reporting_enabled = false
+check_for_updates = false
+
+[security]
+admin_user = {{ grafana_admin_username }}
+admin_password = {{ grafana_admin_password }}

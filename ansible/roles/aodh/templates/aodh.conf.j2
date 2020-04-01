@@ -1,0 +1,56 @@
+#jinja2: trim_blocks: False
+[DEFAULT]
+auth_strategy = keystone
+log_dir = /var/log/kolla/aodh
+debug = {{ aodh_logging_debug }}
+evaluation_interval = {{ aodh_evaluation_interval }}
+transport_url = {{ rpc_transport_url }}
+
+[api]
+port = {{ aodh_api_listen_port }}
+host = {{ api_interface_address }}
+
+[database]
+connection = mysql+pymysql://{{ aodh_database_user }}:{{ aodh_database_password }}@{{ aodh_database_address }}/{{ aodh_database_name }}
+
+[keystone_authtoken]
+memcache_security_strategy = ENCRYPT
+memcache_secret_key = {{ memcache_secret_key }}
+memcached_servers = {% for host in groups['memcached'] %}{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
+www_authenticate_uri = {{ keystone_internal_url }}
+project_domain_name = {{ default_project_domain_name }}
+project_name = service
+user_domain_name = {{ default_user_domain_name }}
+username = {{ aodh_keystone_user }}
+password = {{ aodh_keystone_password }}
+auth_url = {{ keystone_admin_url }}
+auth_type = password
+
+[oslo_middleware]
+enable_proxy_headers_parsing = True
+
+{% if aodh_policy_file is defined %}
+[oslo_policy]
+policy_file = {{ aodh_policy_file }}
+{% endif %}
+
+[service_credentials]
+auth_url = {{ keystone_internal_url }}/v3
+region_name = {{ openstack_region_name }}
+password = {{ aodh_keystone_password }}
+username = {{ aodh_keystone_user }}
+project_name = service
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
+auth_type = password
+interface = internal
+
+[oslo_messaging_notifications]
+transport_url = {{ notify_transport_url }}
+{% if aodh_enabled_notification_topics %}
+driver = messagingv2
+topics = {{ aodh_enabled_notification_topics | map(attribute='name') | join(',') }}
+{% else %}
+driver = noop
+{% endif %}
+

@@ -1,0 +1,138 @@
+---
+project_name: "watcher"
+
+watcher_services:
+  watcher-api:
+    container_name: watcher_api
+    group: watcher-api
+    enabled: true
+    image: "{{ watcher_api_image_full }}"
+    volumes: "{{ watcher_api_default_volumes + watcher_api_extra_volumes }}"
+    dimensions: "{{ watcher_api_dimensions }}"
+    haproxy:
+      watcher_api:
+        enabled: "{{ enable_watcher }}"
+        mode: "http"
+        external: false
+        port: "{{ watcher_api_port }}"
+      watcher_api_external:
+        enabled: "{{ enable_watcher }}"
+        mode: "http"
+        external: true
+        port: "{{ watcher_api_port }}"
+  watcher-applier:
+    container_name: watcher_applier
+    group: watcher-applier
+    enabled: true
+    image: "{{ watcher_applier_image_full }}"
+    volumes: "{{ watcher_applier_default_volumes + watcher_applier_extra_volumes }}"
+    dimensions: "{{ watcher_applier_dimensions }}"
+  watcher-engine:
+    container_name: watcher_engine
+    group: watcher-engine
+    enabled: true
+    image: "{{ watcher_engine_image_full }}"
+    volumes: "{{ watcher_engine_default_volumes + watcher_engine_extra_volumes }}"
+    dimensions: "{{ watcher_engine_dimensions }}"
+
+
+####################
+# Database
+####################
+watcher_database_name: "watcher"
+watcher_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}watcher{% endif %}"
+watcher_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+watcher_install_type: "{{ kolla_install_type }}"
+watcher_tag: "{{ openstack_tag }}"
+
+watcher_engine_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ watcher_install_type }}-watcher-engine"
+watcher_engine_tag: "{{ watcher_tag }}"
+watcher_engine_image_full: "{{ watcher_engine_image }}:{{ watcher_engine_tag }}"
+
+watcher_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ watcher_install_type }}-watcher-api"
+watcher_api_tag: "{{ watcher_tag }}"
+watcher_api_image_full: "{{ watcher_api_image }}:{{ watcher_api_tag }}"
+
+watcher_applier_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ watcher_install_type }}-watcher-applier"
+watcher_applier_tag: "{{ watcher_tag }}"
+watcher_applier_image_full: "{{ watcher_applier_image }}:{{ watcher_applier_tag }}"
+
+watcher_api_dimensions: "{{ default_container_dimensions }}"
+watcher_applier_dimensions: "{{ default_container_dimensions }}"
+watcher_engine_dimensions: "{{ default_container_dimensions }}"
+
+watcher_api_default_volumes:
+  - "{{ node_config_directory }}/watcher-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ kolla_dev_repos_directory ~ '/watcher/watcher:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/watcher' if watcher_dev_mode | bool else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+watcher_applier_default_volumes:
+  - "{{ node_config_directory }}/watcher-applier/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ kolla_dev_repos_directory ~ '/watcher/watcher:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/watcher' if watcher_dev_mode | bool else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+watcher_engine_default_volumes:
+  - "{{ node_config_directory }}/watcher-engine/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ kolla_dev_repos_directory ~ '/watcher/watcher:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/watcher' if watcher_dev_mode | bool else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+
+watcher_extra_volumes: "{{ default_extra_volumes }}"
+watcher_api_extra_volumes: "{{ watcher_extra_volumes }}"
+watcher_applier_extra_volumes: "{{ watcher_extra_volumes }}"
+watcher_engine_extra_volumes: "{{ watcher_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+watcher_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ watcher_api_port }}"
+watcher_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ watcher_api_port }}"
+watcher_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ watcher_api_port }}"
+
+watcher_logging_debug: "{{ openstack_logging_debug }}"
+
+watcher_keystone_user: "watcher"
+
+openstack_watcher_auth: "{{ openstack_auth }}"
+
+
+####################
+# Kolla
+####################
+watcher_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+watcher_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+watcher_dev_mode: "{{ kolla_dev_mode }}"
+watcher_source_version: "{{ kolla_source_version }}"
+
+
+####################
+# Notifications
+####################
+watcher_notification_topics:
+  - name: notifications
+    enabled: "{{ enable_ceilometer | bool }}"
+
+watcher_enabled_notification_topics: "{{ watcher_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+####################
+# Keystone
+####################
+watcher_ks_services:
+  - name: "watcher"
+    type: "infra-optim"
+    description: "Infrastructure Optimization service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ watcher_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ watcher_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ watcher_public_endpoint }}'}
+
+watcher_ks_users:
+  - project: "service"
+    user: "{{ watcher_keystone_user }}"
+    password: "{{ watcher_keystone_password }}"
+    role: "admin"

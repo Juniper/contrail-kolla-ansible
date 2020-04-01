@@ -1,0 +1,9 @@
+apiVersion: 1
+
+datasources:
+- name: Prometheus
+  type: prometheus
+  access: proxy
+  orgId: 1
+  url: {{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ prometheus_port }}
+  version: 1

@@ -1,0 +1,45 @@
+---
+- name: Get container facts
+  become: true
+  kolla_container_facts:
+    name:
+      - neutron_server
+  register: container_facts
+
+- name: Checking free port for Neutron Server
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ neutron_server_listen_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - container_facts['neutron_server'] is not defined
+    - inventory_hostname in groups['neutron-server']
+
+- name: Checking number of network agents
+  local_action: fail msg="Number of network agents are less than two when enabling agent ha"
+  changed_when: false
+  run_once: True
+  when:
+    - enable_neutron_agent_ha | bool
+    - groups['neutron-dhcp-agent'] | length < 2
+      or groups['neutron-l3-agent'] | length < 2
+
+- name: Checking tenant network types
+  vars:
+    type_drivers: "{{ neutron_type_drivers.replace(' ', '').split(',') | reject('equalto', '') | list }}"
+    tenant_network_types: "{{ neutron_tenant_network_types.replace(' ', '').split(',') | reject('equalto', '') | list }}"
+  local_action: fail msg="Tenant network type '{{ item }}' is not in type drivers [{{ neutron_type_drivers }}]"
+  changed_when: false
+  when: item not in type_drivers
+  run_once: true
+  with_items: "{{ tenant_network_types }}"
+
+- name: Checking whether Ironic enabled
+  local_action: fail msg="Ironic must be enabled when using networking-baremetal/ironic-neutron-agent"
+  changed_when: false
+  run_once: True
+  when:
+    - enable_ironic_neutron_agent | bool
+    - not (enable_ironic | bool)

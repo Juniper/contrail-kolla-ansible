@@ -1,0 +1,5 @@
+---
+features:
+  - |
+    Implements Swift rolling upgrade logic, enabled via
+    ``swift_enable_rolling_upgrade``, which is ``true`` by default.

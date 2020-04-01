@@ -1,0 +1,11 @@
+FQDNLookup false
+LoadPlugin syslog
+LoadPlugin cpu
+LoadPlugin interface
+LoadPlugin load
+LoadPlugin memory
+LoadPlugin network
+
+<Plugin "network">
+    Server "{{ 'api' | kolla_address }}" "{{ collectd_udp_port }}"
+</Plugin>

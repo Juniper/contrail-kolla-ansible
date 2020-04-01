@@ -1,0 +1,17 @@
+---
+- include_tasks: register.yml
+  when: inventory_hostname in groups['watcher-api']
+
+- include_tasks: config.yml
+  when: inventory_hostname in groups['watcher-api'] or
+        inventory_hostname in groups['watcher-engine'] or
+        inventory_hostname in groups['watcher-applier']
+
+- include_tasks: clone.yml
+  when: watcher_dev_mode | bool
+
+- include_tasks: bootstrap.yml
+  when: inventory_hostname in groups['watcher-api']
+
+- name: Flush handlers
+  meta: flush_handlers

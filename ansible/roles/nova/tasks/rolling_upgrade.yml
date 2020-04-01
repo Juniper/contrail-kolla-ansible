@@ -1,0 +1,14 @@
+---
+# Create new set of configs on nodes
+- include_tasks: config.yml
+
+# TODO(donghm): Flush_handlers to restart nova services
+# should be run in serial nodes to decrease downtime if
+# the previous task did not run. Update when the
+# Ansible strategy module for rolling upgrade is finished.
+
+- name: Flush handlers
+  meta: flush_handlers
+
+# NOTE(dszumski): The Nova upgrade is not finished here and
+# continues in subsequent tasks.

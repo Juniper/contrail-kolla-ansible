@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds support for stopping a service with the ``kolla-ansible stop``
+    command.  This feature allows specific services to be stopped with
+    ``--tags`` and ``--limit`` to limit the changes to a subset of hosts.

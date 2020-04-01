@@ -1,0 +1,70 @@
+---
+- hosts: all
+  vars:
+    logs_dir: "/tmp/logs"
+  tasks:
+    - name: Print all facts
+      copy:
+        content: "{{ hostvars[inventory_hostname] | to_nice_json }}"
+        dest: "{{ logs_dir }}/facts.json"
+
+    # NOTE(yoctozepto): this might not have been run during the
+    # regular run due to some earlier failure, yet logs content may
+    # still provide insight into that other, breaking issue
+    - name: Run check-logs.sh script
+      script: check-logs.sh
+      failed_when: false
+      when: not zuul_success | bool
+
+    - name: Run diagnostics script
+      environment:
+        KOLLA_INTERNAL_VIP_ADDRESS: "{{ kolla_internal_vip_address }}"
+      script: get_logs.sh
+      register: get_logs_result
+      become: true
+      failed_when: false
+
+    - name: Print get_logs output
+      debug:
+        msg: "{{ get_logs_result.stdout }}"
+
+    - name: Download /etc/hosts file to executor
+      synchronize:
+        src: "/etc/hosts"
+        dest: "{{ zuul.executor.log_root }}/{{inventory_hostname }}/"
+        mode: pull
+      ignore_errors: yes
+
+    - name: dump all iptables rules
+      shell: "iptables-save > /tmp/logs/iptables"
+      become: true
+
+    - name: Download /tmp/logs file to executor
+      synchronize:
+        src: "/tmp/logs"
+        dest: "{{ zuul.executor.log_root }}/{{inventory_hostname }}/"
+        mode: pull
+        rsync_opts:
+          - "--quiet"
+
+- hosts: primary
+  tasks:
+    - name: check for existence of ara sqlite
+      stat:
+        path: "{{ ansible_env.HOME }}/.ara/ansible.sqlite"
+      register: ara_stat_result
+
+    - block:
+        - name: ensure ara-report folder existence
+          file:
+            path: "{{ zuul.executor.log_root }}/{{ inventory_hostname }}/ara-report"
+            state: directory
+          delegate_to: localhost
+          run_once: true
+
+        - name: download ara sqlite
+          synchronize:
+            src: "{{ ansible_env.HOME }}/.ara/ansible.sqlite"
+            dest: "{{ zuul.executor.log_root }}/{{ inventory_hostname }}/ara-report/"
+            mode: pull
+      when: ara_stat_result.stat.exists

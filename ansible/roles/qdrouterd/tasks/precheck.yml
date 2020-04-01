@@ -1,0 +1,31 @@
+---
+- name: Get container facts
+  become: true
+  kolla_container_facts:
+    name:
+      - qdrouterd
+  register: container_facts
+
+- name: Checking free port for Qdrouterd
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ qdrouterd_port }}"
+    connect_timeout: 1
+    timeout: 1
+    state: stopped
+  when:
+    - container_facts['qdrouterd'] is not defined
+    - inventory_hostname in groups['qdrouterd']
+
+- name: Check if all qdrouterd hostnames are resolvable
+  vars:
+    nss_database: "{{ 'ahostsv4' if api_address_family == 'ipv4' else 'ahostsv6' }}"
+  command: "getent {{ nss_database }} {{ hostvars[item]['ansible_hostname'] }}"
+  changed_when: false
+  register: qdrouterd_hostnames
+  with_items: "{{ groups['qdrouterd'] }}"
+
+- fail: msg="Hostname has to resolve to IP address of api_interface"
+  with_items: "{{ qdrouterd_hostnames.results }}"
+  when:
+    - "item.stdout.find('api' | kolla_address(item['item'])) == -1"

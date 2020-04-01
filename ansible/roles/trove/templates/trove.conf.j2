@@ -1,0 +1,63 @@
+[DEFAULT]
+debug = {{ trove_logging_debug }}
+
+log_dir = /var/log/kolla/trove
+
+host = {{ api_interface_address }}
+
+bind_port = {{ trove_api_port }}
+bind_host = {{ api_interface_address }}
+trove_api_workers = {{ openstack_service_workers }}
+auth_strategy = keystone
+
+transport_url = {{ rpc_transport_url }}
+
+trove_auth_url = {{ keystone_internal_url }}/v3
+
+os_region_name = {{ openstack_region_name }}
+
+nova_compute_endpoint_type = internalURL
+neutron_endpoint_type = internalURL
+cinder_endpoint_type = internalURL
+swift_endpoint_type = internalURL
+glance_endpoint_type = internalURL
+trove_endpoint_type = internalURL
+
+network_driver = trove.network.neutron.NeutronDriver
+
+network_label_regex = .*
+
+[database]
+connection = mysql+pymysql://{{ trove_database_user }}:{{ trove_database_password }}@{{ trove_database_address }}/{{ trove_database_name }}
+
+[keystone_authtoken]
+www_authenticate_uri = {{ keystone_internal_url }}
+project_domain_name = {{ default_project_domain_name }}
+project_name = service
+user_domain_name = {{ default_user_domain_name }}
+username = {{ trove_keystone_user }}
+password = {{ trove_keystone_password }}
+auth_url = {{ keystone_admin_url }}
+auth_type = password
+
+[oslo_messaging_notifications]
+transport_url = {{ notify_transport_url }}
+{% if trove_enabled_notification_topics %}
+driver = messagingv2
+topics = {{ trove_enabled_notification_topics | map(attribute='name') | join(',') }}
+{% else %}
+driver = noop
+{% endif %}
+
+{% if enable_osprofiler | bool %}
+[profiler]
+enabled = true
+trace_sqlalchemy = true
+hmac_keys = {{ osprofiler_secret }}
+connection_string = {{ osprofiler_backend_connection_string }}
+{% endif %}
+
+{% if trove_policy_file is defined %}
+[oslo_policy]
+policy_file = {{ trove_policy_file }}
+{% endif %}

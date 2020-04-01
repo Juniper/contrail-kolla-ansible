@@ -1,0 +1,45 @@
+{
+    "command": "/usr/sbin/grafana-server --config=/etc/grafana/grafana.ini",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/grafana.ini",
+            "dest": "/etc/grafana/grafana.ini",
+            "owner": "grafana",
+            "perm": "0600"
+        },
+{% if check_extra_conf_grafana is defined %}{% if check_extra_conf_grafana.matched > 0 %}{% for plugin in check_extra_conf_grafana.files %}
+        {
+            "source": "{{ container_config_directory }}/{{ plugin.path | basename }}",
+            "dest": "/etc/grafana/{{ plugin.path | basename }}",
+            "owner": "grafana",
+            "perm": "0600"
+        },
+{% endfor %}{% endif %}{% endif %}
+        {
+            "source": "{{ container_config_directory }}/grafana_home_dashboard.json",
+            "dest": "/usr/share/grafana/public/dashboards/home.json",
+            "owner": "root",
+            "perm": "0644",
+            "optional": true
+        },
+        {
+            "source": "{{ container_config_directory }}/prometheus.yaml",
+            "dest": "/etc/grafana/provisioning/datasources/prometheus.yaml",
+            "owner": "root",
+            "perm": "0644",
+            "optional": true
+        }
+    ],
+    "permissions": [
+        {
+            "path": "/var/lib/grafana",
+            "owner": "grafana:grafana",
+            "recurse": true
+        },
+        {
+            "path": "/var/log/kolla/grafana",
+            "owner": "grafana:grafana",
+            "recurse": true
+        }
+    ]
+}

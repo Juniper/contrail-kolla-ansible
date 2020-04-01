@@ -1,0 +1,125 @@
+---
+project_name: "blazar"
+
+blazar_services:
+  blazar-api:
+    container_name: blazar_api
+    group: blazar-api
+    enabled: true
+    image: "{{ blazar_api_image_full }}"
+    volumes: "{{ blazar_api_default_volumes + blazar_api_extra_volumes }}"
+    dimensions: "{{ blazar_api_dimensions }}"
+    haproxy:
+      blazar_api:
+        enabled: "{{ enable_blazar }}"
+        mode: "http"
+        external: false
+        port: "{{ blazar_api_port }}"
+      blazar_api_external:
+        enabled: "{{ enable_blazar }}"
+        mode: "http"
+        external: true
+        port: "{{ blazar_api_port }}"
+  blazar-manager:
+    container_name: blazar_manager
+    group: blazar-manager
+    enabled: true
+    image: "{{ blazar_manager_image_full }}"
+    volumes: "{{ blazar_manager_default_volumes + blazar_manager_extra_volumes }}"
+    dimensions: "{{ blazar_manager_dimensions }}"
+
+
+####################
+# Blazar
+####################
+blazar_aggregate_pool_name: "freepool"
+
+####################
+# Database
+####################
+blazar_database_name: "blazar"
+blazar_database_user: "blazar"
+blazar_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+blazar_install_type: "{{ kolla_install_type }}"
+blazar_tag: "{{ openstack_tag }}"
+
+blazar_manager_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ blazar_install_type }}-blazar-manager"
+blazar_manager_tag: "{{ blazar_tag }}"
+blazar_manager_image_full: "{{ blazar_manager_image }}:{{ blazar_manager_tag }}"
+
+blazar_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ blazar_install_type }}-blazar-api"
+blazar_api_tag: "{{ blazar_tag }}"
+blazar_api_image_full: "{{ blazar_api_image }}:{{ blazar_api_tag }}"
+
+blazar_api_dimensions: "{{ default_container_dimensions }}"
+blazar_manager_dimensions: "{{ default_container_dimensions }}"
+
+blazar_api_default_volumes:
+  - "{{ node_config_directory }}/blazar-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/blazar/blazar:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/blazar' if blazar_dev_mode | bool else '' }}"
+blazar_manager_default_volumes:
+  - "{{ node_config_directory }}/blazar-manager/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/blazar/blazar:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/blazar' if blazar_dev_mode | bool else '' }}"
+
+blazar_extra_volumes: "{{ default_extra_volumes }}"
+blazar_api_extra_volumes: "{{ blazar_extra_volumes }}"
+blazar_manager_extra_volumes: "{{ blazar_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+blazar_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ blazar_api_port }}/v1"
+blazar_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ blazar_api_port }}/v1"
+blazar_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ blazar_api_port }}/v1"
+
+blazar_logging_debug: "{{ openstack_logging_debug }}"
+
+blazar_keystone_user: "blazar"
+
+openstack_blazar_auth: "{{ openstack_auth }}"
+
+
+#####################
+## Kolla
+#####################
+blazar_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+blazar_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+blazar_dev_mode: "{{ kolla_dev_mode }}"
+blazar_source_version: "{{ kolla_source_version }}"
+
+
+####################
+# Notifications
+####################
+blazar_notification_topics:
+  - name: notifications
+    enabled: "{{ enable_ceilometer | bool }}"
+
+blazar_enabled_notification_topics: "{{ blazar_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+####################
+# Keystone
+####################
+blazar_ks_services:
+  - name: "blazar"
+    type: "reservation"
+    description: "OpenStack Reservation Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ blazar_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ blazar_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ blazar_public_endpoint }}'}
+
+blazar_ks_users:
+  - project: "service"
+    user: "{{ blazar_keystone_user }}"
+    password: "{{ blazar_keystone_password }}"
+    role: "admin"

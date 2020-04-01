@@ -1,0 +1,84 @@
+[DEFAULT]
+debug = {{ mistral_logging_debug }}
+
+log_dir = /var/log/kolla/mistral
+{% if service_name == 'mistral-engine' %}
+log_file = /var/log/kolla/mistral/mistral-engine.log
+{% elif service_name == 'mistral-event-engine' %}
+log_file = /var/log/kolla/mistral/mistral-event-engine.log
+{% elif service_name == 'mistral-executor' %}
+log_file = /var/log/kolla/mistral/mistral-executor.log
+{% endif %}
+
+# NOTE(elemoine): set use_stderr to False or the logs will also be sent to
+# stderr and collected by Docker
+use_stderr = False
+
+transport_url = {{ rpc_transport_url }}
+
+{% if service_name == 'mistral-api' %}
+[api]
+host = {{ api_interface_address }}
+port = {{ mistral_api_port }}
+api_workers = {{ openstack_service_workers }}
+{% elif service_name == 'mistral-engine' %}
+[engine]
+host = {{ api_interface_address }}
+{% elif service_name == 'mistral-event-engine' %}
+[event_engine]
+host = {{ api_interface_address }}
+{% elif service_name == 'mistral-executor' %}
+[executor]
+host = {{ api_interface_address }}
+{% endif %}
+
+[database]
+connection = mysql+pymysql://{{ mistral_database_user }}:{{ mistral_database_password }}@{{ mistral_database_address }}/{{ mistral_database_name }}
+max_retries = -1
+
+[keystone_authtoken]
+www_authenticate_uri = {{ keystone_internal_url }}/v3
+auth_url = {{ keystone_admin_url }}/v3
+auth_type = password
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
+project_name = service
+username = {{ mistral_keystone_user }}
+password = {{ mistral_keystone_password }}
+
+memcache_security_strategy = ENCRYPT
+memcache_secret_key = {{ memcache_secret_key }}
+memcached_servers = {% for host in groups['memcached'] %}{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
+
+
+[mistral]
+url = {{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ mistral_api_port }}
+
+[openstack_actions]
+os_actions_endpoint_type = internal
+default_region = {{ openstack_region_name }}
+
+[oslo_messaging_notifications]
+transport_url = {{ notify_transport_url }}
+{% if mistral_enabled_notification_topics %}
+driver = messagingv2
+topics = {{ mistral_enabled_notification_topics | map(attribute='name') | join(',') }}
+{% else %}
+driver = noop
+{% endif %}
+
+{% if mistral_policy_file is defined %}
+[oslo_policy]
+policy_file = {{ mistral_policy_file }}
+{% endif %}
+
+{% if enable_osprofiler | bool %}
+[profiler]
+enabled = true
+trace_sqlalchemy = true
+hmac_keys = {{ osprofiler_secret }}
+connection_string = {{ osprofiler_backend_connection_string }}
+{% endif %}
+
+[coordination]
+backend_url = {{ redis_connection_string }}

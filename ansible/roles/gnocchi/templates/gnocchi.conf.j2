@@ -1,0 +1,91 @@
+[DEFAULT]
+debug = {{ gnocchi_logging_debug }}
+
+log_dir = /var/log/kolla/gnocchi
+
+{% if enable_redis | bool %}
+coordination_url = {{ redis_connection_string }}
+{% endif %}
+
+{% if service_name == 'gnocchi-api' %}
+# Force gnocchi-api.log or will use app.wsgi
+log_file = /var/log/kolla/gnocchi/gnocchi-api.log
+{% endif %}
+
+[api]
+port = {{ gnocchi_api_listen_port }}
+host = {{ api_interface_address }}
+middlewares = keystonemiddleware.auth_token.AuthProtocol
+auth_mode = keystone
+
+[oslo_middleware]
+enable_proxy_headers_parsing = True
+
+[database]
+connection = mysql+pymysql://{{ gnocchi_database_user }}:{{ gnocchi_database_password }}@{{ gnocchi_database_address }}/{{ gnocchi_database_name }}
+max_pool_size = 50
+max_overflow = 1000
+max_retries = -1
+
+[statsd]
+resource_id = {{ gnocchi_resource_id }}
+user_id = {{ gnocchi_user_id }}
+project_id = {{ gnocchi_project_id }}
+archive_policy_name = low
+
+flush_delay=10
+
+[metricd]
+workers = {{ gnocchi_metricd_workers }}
+
+[indexer]
+url = mysql+pymysql://{{ gnocchi_database_user }}:{{ gnocchi_database_password }}@{{ gnocchi_database_address }}/{{ gnocchi_database_name }}
+
+[keystone_authtoken]
+www_authenticate_uri = {{ keystone_internal_url }}/v3
+project_domain_id = {{ default_project_domain_id }}
+project_name = service
+user_domain_id = {{ default_user_domain_id }}
+username = {{ gnocchi_keystone_user }}
+password = {{ gnocchi_keystone_password }}
+auth_url = {{ keystone_admin_url }}
+auth_type = password
+
+memcache_security_strategy = ENCRYPT
+memcache_secret_key = {{ memcache_secret_key }}
+memcached_servers = {% for host in groups['memcached'] %}{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
+
+{% if gnocchi_policy_file is defined %}
+[oslo_policy]
+policy_file = {{ gnocchi_policy_file }}
+{% endif %}
+
+[incoming]
+{% if gnocchi_incoming_storage == 'redis' %}
+driver = redis
+redis_url = {{ redis_connection_string }}
+{% endif %}
+
+[storage]
+{% if gnocchi_backend_storage == 'file' %}
+driver = file
+file_basepath = /var/lib/gnocchi
+{% elif gnocchi_backend_storage == 'ceph' %}
+driver = ceph
+ceph_pool = {{ gnocchi_pool_name }}
+ceph_username = gnocchi
+ceph_keyring = /etc/ceph/ceph.client.gnocchi.keyring
+ceph_conffile = /etc/ceph/ceph.conf
+{% elif gnocchi_backend_storage == 'swift' %}
+driver = swift
+swift_authurl = {{ keystone_internal_url }}/v3
+swift_auth_version = 3
+swift_user = service:{{ swift_keystone_user }}
+swift_key = {{ swift_keystone_password }}
+swift_project_name = {{ swift_admin_tenant_name }}
+{% endif %}
+
+{% if enable_grafana | bool %}
+[cors]
+allowed_origin = {{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ grafana_server_port }}
+{% endif %}

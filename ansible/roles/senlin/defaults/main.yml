@@ -1,0 +1,121 @@
+---
+project_name: "senlin"
+
+senlin_services:
+  senlin-api:
+    container_name: senlin_api
+    group: senlin-api
+    enabled: true
+    image: "{{ senlin_api_image_full }}"
+    volumes: "{{ senlin_api_default_volumes + senlin_api_extra_volumes }}"
+    dimensions: "{{ senlin_api_dimensions }}"
+    haproxy:
+      senlin_api:
+        enabled: "{{ enable_senlin }}"
+        mode: "http"
+        external: false
+        port: "{{ senlin_api_port }}"
+        listen_port: "{{ senlin_api_listen_port }}"
+      senlin_api_external:
+        enabled: "{{ enable_senlin }}"
+        mode: "http"
+        external: true
+        port: "{{ senlin_api_port }}"
+        listen_port: "{{ senlin_api_listen_port }}"
+  senlin-engine:
+    container_name: senlin_engine
+    group: senlin-engine
+    enabled: true
+    image: "{{ senlin_engine_image_full }}"
+    volumes: "{{ senlin_engine_default_volumes + senlin_engine_extra_volumes }}"
+    dimensions: "{{ senlin_engine_dimensions }}"
+
+####################
+# Database
+####################
+senlin_database_name: "senlin"
+senlin_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}senlin{% endif %}"
+senlin_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+senlin_install_type: "{{ kolla_install_type }}"
+senlin_tag: "{{ openstack_tag }}"
+
+senlin_engine_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ senlin_install_type }}-senlin-engine"
+senlin_engine_tag: "{{ senlin_tag }}"
+senlin_engine_image_full: "{{ senlin_engine_image }}:{{ senlin_engine_tag }}"
+
+senlin_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ senlin_install_type }}-senlin-api"
+senlin_api_tag: "{{ senlin_tag }}"
+senlin_api_image_full: "{{ senlin_api_image }}:{{ senlin_api_tag }}"
+
+senlin_api_dimensions: "{{ default_container_dimensions }}"
+senlin_engine_dimensions: "{{ default_container_dimensions }}"
+
+senlin_api_default_volumes:
+  - "{{ node_config_directory }}/senlin-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/senlin/senlin:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/senlin' if senlin_dev_mode | bool else '' }}"
+senlin_engine_default_volumes:
+  - "{{ node_config_directory }}/senlin-engine/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/senlin/senlin:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/senlin' if senlin_dev_mode | bool else '' }}"
+
+senlin_extra_volumes: "{{ default_extra_volumes }}"
+senlin_api_extra_volumes: "{{ senlin_extra_volumes }}"
+senlin_engine_extra_volumes: "{{ senlin_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+senlin_admin_endpoint: "{{ admin_protocol }}://{{ senlin_internal_fqdn | put_address_in_context('url') }}:{{ senlin_api_port }}"
+senlin_internal_endpoint: "{{ internal_protocol }}://{{ senlin_internal_fqdn | put_address_in_context('url') }}:{{ senlin_api_port }}"
+senlin_public_endpoint: "{{ public_protocol }}://{{ senlin_external_fqdn | put_address_in_context('url') }}:{{ senlin_api_port }}"
+
+senlin_logging_debug: "{{ openstack_logging_debug }}"
+
+senlin_keystone_user: "senlin"
+
+openstack_senlin_auth: "{{ openstack_auth }}"
+
+
+####################
+# Kolla
+####################
+senlin_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+senlin_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+senlin_dev_mode: "{{ kolla_dev_mode }}"
+senlin_source_version: "{{ kolla_source_version }}"
+
+
+####################
+# Notifications
+####################
+senlin_notification_topics:
+  - name: notifications
+    enabled: "{{ enable_ceilometer | bool }}"
+
+senlin_enabled_notification_topics: "{{ senlin_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+####################
+# Keystone
+####################
+senlin_ks_services:
+  - name: "senlin"
+    type: "clustering"
+    description: "Senlin Clustering Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ senlin_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ senlin_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ senlin_public_endpoint }}'}
+
+senlin_ks_users:
+  - project: "service"
+    user: "{{ senlin_keystone_user }}"
+    password: "{{ senlin_keystone_password }}"
+    role: "admin"

@@ -1,0 +1,50 @@
+---
+- name: Restart haproxy container
+  vars:
+    service_name: "haproxy"
+    service: "{{ haproxy_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    privileged: "{{ service.privileged | default(False) }}"
+    volumes: "{{ service.volumes }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  notify:
+    - Waiting for haproxy to start
+
+- name: Restart keepalived container
+  vars:
+    service_name: "keepalived"
+    service: "{{ haproxy_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "recreate_or_restart_container"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ service.container_name }}"
+    image: "{{ service.image }}"
+    privileged: "{{ service.privileged | default(False) }}"
+    volumes: "{{ service.volumes }}"
+    dimensions: "{{ service.dimensions }}"
+  when:
+    - kolla_action != "config"
+    - inventory_hostname in groups[service.group]
+    - service.enabled | bool
+  notify:
+    - Waiting for virtual IP to appear
+
+- name: Waiting for haproxy to start
+  wait_for:
+    host: "{{ api_interface_address }}"
+    port: "{{ haproxy_monitor_port }}"
+
+- name: Waiting for virtual IP to appear
+  wait_for:
+    host: "{{ kolla_internal_vip_address }}"
+    port: "{{ haproxy_monitor_port }}"

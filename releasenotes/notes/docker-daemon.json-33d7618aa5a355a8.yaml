@@ -1,0 +1,17 @@
+---
+features:
+  - |
+    Adds support for providing custom configuration options for the Docker
+    daemon via the ``docker_custom_config`` variable (JSON formatted).
+
+upgrade:
+  - |
+    Docker engine configuration changes are now applied in
+    ``/etc/docker/daemon.json`` file instead of altering the systemd unit
+    (which gets removed if present).
+
+deprecations:
+  - |
+    Configuring Docker daemon via ``docker_custom_option`` (used in systemd
+    unit file) is deprecated in favour of ``docker_custom_config`` variable
+    which adds options to ``/etc/docker/daemon.json``.

@@ -1,0 +1,23 @@
+{
+    "command": "/usr/share/kibana/bin/kibana",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/kibana.yml",
+            "dest": "/etc/kibana/kibana.yml",
+            "owner": "kibana",
+            "perm": "0640"
+        }
+    ],
+    "permissions": [
+        {
+            "path": "/var/log/kolla/kibana",
+            "owner": "kibana:kibana",
+            "recurse": true
+        },
+        {
+            "path": "/usr/share/kibana/optimize/bundles",
+            "owner": "kibana:kibana",
+            "recurse": true
+        }
+    ]
+}

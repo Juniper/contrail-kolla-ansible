@@ -1,0 +1,7 @@
+---
+features:
+  - |
+    Adds support for overriding the ``dnsmasq.conf`` configuration file used by
+    the Neutron DHCP agent via
+    ``{{ node_custom_config}}/neutron/dnsmasq.conf`` or
+    ``{{ node_custom_config }}/neutron/{{ inventory_hostname }}/dnsmasq.conf``.

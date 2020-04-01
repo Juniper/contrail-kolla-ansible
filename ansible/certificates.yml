@@ -1,0 +1,5 @@
+---
+- name: Apply role certificates
+  hosts: localhost
+  roles:
+    - certificates

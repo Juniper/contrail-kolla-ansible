@@ -1,0 +1,26 @@
+---
+- name: Running MariaDB bootstrap container
+  vars:
+    service_name: "mariadb"
+    service: "{{ mariadb_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    environment:
+      KOLLA_BOOTSTRAP:
+      KOLLA_CONFIG_STRATEGY: "{{ config_strategy }}"
+      DB_ROOT_PASSWORD: "{{ database_password }}"
+      DB_MAX_TIMEOUT: "{{ database_max_timeout }}"
+    image: "{{ service.image }}"
+    labels:
+      BOOTSTRAP:
+    name: "bootstrap_mariadb"
+    restart_policy: no
+    volumes: "{{ service.volumes }}"
+  notify:
+    - Bootstrap MariaDB cluster
+
+- set_fact:
+    bootstrap_host: "{{ inventory_hostname }}"

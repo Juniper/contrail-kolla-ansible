@@ -1,0 +1,63 @@
+[DEFAULT]
+debug = {{ ironic_logging_debug }}
+log_dir = /var/log/kolla/ironic-inspector
+
+{% if not enable_keystone | bool %}
+auth_strategy = noauth
+{% endif %}
+listen_address = {{ api_interface_address }}
+listen_port = {{ ironic_inspector_listen_port }}
+transport_url = {{ rpc_transport_url }}
+
+[oslo_messaging_notifications]
+transport_url = {{ notify_transport_url }}
+
+[ironic]
+{% if enable_keystone | bool %}
+auth_url = {{ keystone_admin_url }}
+auth_type = password
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
+project_name = service
+username = {{ ironic_inspector_keystone_user }}
+password = {{ ironic_inspector_keystone_password }}
+os_endpoint_type = internalURL
+{% else %}
+auth_type = none
+endpoint_override = {{ ironic_internal_endpoint }}
+{% endif %}
+
+{% if enable_keystone | bool %}
+[keystone_authtoken]
+www_authenticate_uri = {{ keystone_internal_url }}
+auth_url = {{ keystone_admin_url }}
+auth_type = password
+project_domain_id = {{ default_project_domain_id }}
+user_domain_id = {{ default_user_domain_id }}
+project_name = service
+username = {{ ironic_inspector_keystone_user }}
+password = {{ ironic_inspector_keystone_password }}
+
+memcache_security_strategy = ENCRYPT
+memcache_secret_key = {{ memcache_secret_key }}
+memcached_servers = {% for host in groups['memcached'] %}{{ 'api' | kolla_address(host) | put_address_in_context('memcache') }}:{{ memcached_port }}{% if not loop.last %},{% endif %}{% endfor %}
+{% endif %}
+
+{% if ironic_policy_file is defined %}
+[oslo_policy]
+policy_file = {{ ironic_policy_file }}
+{% endif %}
+
+[database]
+connection = mysql+pymysql://{{ ironic_inspector_database_user }}:{{ ironic_inspector_database_password }}@{{ ironic_inspector_database_address }}/{{ ironic_inspector_database_name }}
+
+[processing]
+ramdisk_logs_dir = /var/log/kolla/ironic-inspector
+
+[pxe_filter]
+driver = {{ ironic_inspector_pxe_filter }}
+
+{% if ironic_inspector_pxe_filter == 'iptables' %}
+[iptables]
+dnsmasq_interface = {{ ironic_dnsmasq_interface }}
+{% endif %}

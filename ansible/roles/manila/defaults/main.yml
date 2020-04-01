@@ -1,0 +1,221 @@
+---
+project_name: "manila"
+
+manila_services:
+  manila-api:
+    container_name: "manila_api"
+    group: "manila-api"
+    image: "{{ manila_api_image_full }}"
+    enabled: True
+    volumes: "{{ manila_api_default_volumes + manila_api_extra_volumes }}"
+    dimensions: "{{ manila_api_dimensions }}"
+    haproxy:
+      manila_api:
+        enabled: "{{ enable_manila }}"
+        mode: "http"
+        external: false
+        port: "{{ manila_api_port }}"
+      manila_api_external:
+        enabled: "{{ enable_manila }}"
+        mode: "http"
+        external: true
+        port: "{{ manila_api_port }}"
+  manila-scheduler:
+    container_name: "manila_scheduler"
+    group: "manila-scheduler"
+    image: "{{ manila_scheduler_image_full }}"
+    enabled: True
+    volumes: "{{ manila_scheduler_default_volumes + manila_scheduler_extra_volumes }}"
+    dimensions: "{{ manila_scheduler_dimensions }}"
+  manila-share:
+    container_name: "manila_share"
+    group: "manila-share"
+    image: "{{ manila_share_image_full }}"
+    enabled: True
+    privileged: True
+    volumes: "{{ manila_share_default_volumes + manila_share_extra_volumes }}"
+    dimensions: "{{ manila_share_dimensions }}"
+  manila-data:
+    container_name: "manila_data"
+    group: "manila-data"
+    image: "{{ manila_data_image_full }}"
+    enabled: True
+    privileged: True
+    volumes: "{{ manila_data_default_volumes + manila_data_extra_volumes }}"
+    dimensions: "{{ manila_data_dimensions }}"
+
+
+#####################
+## Ceph
+#####################
+
+ceph_client_manila_keyring_caps:
+  mon: >-
+    allow r,
+    allow command "auth del",
+    allow command "auth caps",
+    allow command "auth get",
+    allow command "auth get-or-create"
+  osd: 'allow rw'
+  mds: 'allow *'
+
+
+#####################
+## Database
+#####################
+manila_database_name: "manila"
+manila_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}manila{% endif %}"
+manila_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+#####################
+## Docker
+#####################
+manila_install_type: "{{ kolla_install_type }}"
+manila_tag: "{{ openstack_tag }}"
+
+manila_share_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ manila_install_type }}-manila-share"
+manila_share_tag: "{{ manila_tag }}"
+manila_share_image_full: "{{ manila_share_image }}:{{ manila_share_tag }}"
+
+manila_scheduler_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ manila_install_type }}-manila-scheduler"
+manila_scheduler_tag: "{{ manila_tag }}"
+manila_scheduler_image_full: "{{ manila_scheduler_image }}:{{ manila_scheduler_tag }}"
+
+manila_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ manila_install_type }}-manila-api"
+manila_api_tag: "{{ manila_tag }}"
+manila_api_image_full: "{{ manila_api_image }}:{{ manila_api_tag }}"
+
+manila_data_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ manila_install_type }}-manila-data"
+manila_data_tag: "{{ manila_tag }}"
+manila_data_image_full: "{{ manila_data_image }}:{{ manila_data_tag }}"
+
+manila_share_dimensions: "{{ default_container_dimensions }}"
+manila_scheduler_dimensions: "{{ default_container_dimensions }}"
+manila_api_dimensions: "{{ default_container_dimensions }}"
+manila_data_dimensions: "{{ default_container_dimensions }}"
+
+manila_share_default_volumes:
+  - "{{ node_config_directory }}/manila-share/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/run/:/run/:shared"
+  - "kolla_logs:/var/log/kolla/"
+  - "/lib/modules:/lib/modules:ro"
+  - "{{ kolla_dev_repos_directory ~ '/manila/manila:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/manila' if manila_dev_mode | bool else '' }}"
+manila_scheduler_default_volumes:
+  - "{{ node_config_directory }}/manila-scheduler/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/manila/manila:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/manila' if manila_dev_mode | bool else '' }}"
+manila_api_default_volumes:
+  - "{{ node_config_directory }}/manila-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/manila/manila:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/manila' if manila_dev_mode | bool else '' }}"
+manila_data_default_volumes:
+  - "{{ node_config_directory }}/manila-data/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/dev/:/dev/"
+  - "/run/:/run/:shared"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/manila/manila:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/manila' if manila_dev_mode | bool else '' }}"
+
+manila_extra_volumes: "{{ default_extra_volumes }}"
+manila_share_extra_volumes: "{{ manila_extra_volumes }}"
+manila_scheduler_extra_volumes: "{{ manila_extra_volumes }}"
+manila_api_extra_volumes: "{{ manila_extra_volumes }}"
+manila_data_extra_volumes: "{{ manila_extra_volumes }}"
+
+#####################
+## OpenStack
+#####################
+manila_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ manila_api_port }}/v1/%(tenant_id)s"
+manila_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ manila_api_port }}/v1/%(tenant_id)s"
+manila_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ manila_api_port }}/v1/%(tenant_id)s"
+manila_v2_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ manila_api_port }}/v2/%(tenant_id)s"
+manila_v2_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ manila_api_port }}/v2/%(tenant_id)s"
+manila_v2_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ manila_api_port }}/v2/%(tenant_id)s"
+
+manila_logging_debug: "{{ openstack_logging_debug }}"
+
+manila_keystone_user: "manila"
+manila_service_instance_user: "manila"
+manila_service_instance_password: "manila"
+
+openstack_manila_auth: "{{ openstack_auth }}"
+
+
+####################
+# Manila
+####################
+manila_backends:
+  - name: "generic"
+    driver: "generic"
+    enabled: "{{ enable_manila_backend_generic | bool }}"
+    protocols:
+      - "NFS"
+      - "CIFS"
+  - name: "hnas1"
+    driver: "hnas"
+    enabled: "{{ enable_manila_backend_hnas | bool }}"
+    protocols:
+      - "NFS"
+      - "CIFS"
+  - name: "cephfsnative1"
+    driver: "cephfsnative"
+    enabled: "{{ enable_manila_backend_cephfs_native | bool }}"
+    protocols:
+      - "CEPHFS"
+  - name: "cephfsnfs1"
+    driver: "cephfsnfs"
+    enabled: "{{ enable_manila_backend_cephfs_nfs | bool }}"
+    protocols:
+      - "NFS"
+      - "CIFS"
+
+manila_enabled_backends: "{{ manila_backends|selectattr('enabled', 'equalto', true)|list }}"
+
+
+####################
+# Kolla
+####################
+manila_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+manila_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+manila_dev_mode: "{{ kolla_dev_mode }}"
+manila_source_version: "{{ kolla_source_version }}"
+
+
+####################
+# Notifications
+####################
+manila_notification_topics:
+  - name: notifications
+    enabled: "{{ enable_ceilometer | bool }}"
+
+manila_enabled_notification_topics: "{{ manila_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+
+####################
+# Keystone
+####################
+manila_ks_services:
+  - name: "manila"
+    type: "share"
+    description: "Openstack Shared Filesystems"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ manila_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ manila_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ manila_public_endpoint }}'}
+  - name: "manilav2"
+    type: "sharev2"
+    description: "Openstack Shared Filesystems"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ manila_v2_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ manila_v2_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ manila_v2_public_endpoint }}'}
+
+manila_ks_users:
+  - project: "service"
+    user: "{{ manila_keystone_user }}"
+    password: "{{ manila_keystone_password }}"
+    role: "admin"

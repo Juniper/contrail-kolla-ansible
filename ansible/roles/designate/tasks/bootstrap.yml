@@ -1,0 +1,43 @@
+---
+- name: Creating Designate databases
+  become: true
+  kolla_toolbox:
+    module_name: mysql_db
+    module_args:
+      login_host: "{{ database_address }}"
+      login_port: "{{ database_port }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      name: "{{ item }}"
+  run_once: True
+  delegate_to: "{{ groups['designate-central'][0] }}"
+  with_items:
+    - "{{ designate_database_name }}"
+  when:
+    - not use_preconfigured_databases | bool
+
+- name: Creating Designate databases user and setting permissions
+  become: true
+  kolla_toolbox:
+    module_name: mysql_user
+    module_args:
+      login_host: "{{ database_address }}"
+      login_port: "{{ database_port }}"
+      login_user: "{{ database_user }}"
+      login_password: "{{ database_password }}"
+      name: "{{ item.database_user }}"
+      password: "{{ item.database_password }}"
+      host: "%"
+      priv: "{{ item.database_name }}.*:ALL"
+      append_privs: "yes"
+  run_once: True
+  delegate_to: "{{ groups['designate-central'][0] }}"
+  with_items:
+    - database_name: "{{ designate_database_name }}"
+      database_user: "{{ designate_database_user }}"
+      database_password: "{{ designate_database_password }}"
+  when:
+    - not use_preconfigured_databases | bool
+  no_log: true
+
+- include_tasks: bootstrap_service.yml

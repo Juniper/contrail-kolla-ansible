@@ -1,0 +1,6 @@
+#include "/etc/rndc.key";
+options {
+        default-key "rndc-key";
+        default-server {{ 'api' | kolla_address }};
+        default-port {{ designate_rndc_port }};
+};

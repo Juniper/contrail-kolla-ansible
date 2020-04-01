@@ -1,0 +1,136 @@
+---
+project_name: "magnum"
+
+magnum_services:
+  magnum-api:
+    container_name: magnum_api
+    group: magnum-api
+    enabled: true
+    image: "{{ magnum_api_image_full }}"
+    environment:
+      DUMMY_ENVIRONMENT: kolla_useless_env
+    volumes: "{{ magnum_api_default_volumes + magnum_api_extra_volumes }}"
+    dimensions: "{{ magnum_api_dimensions }}"
+    haproxy:
+      magnum_api:
+        enabled: "{{ enable_magnum }}"
+        mode: "http"
+        external: false
+        port: "{{ magnum_api_port }}"
+      magnum_api_external:
+        enabled: "{{ enable_magnum }}"
+        mode: "http"
+        external: true
+        port: "{{ magnum_api_port }}"
+  magnum-conductor:
+    container_name: magnum_conductor
+    group: magnum-conductor
+    enabled: true
+    image: "{{ magnum_conductor_image_full }}"
+    environment: "{{ container_proxy }}"
+    volumes: "{{ magnum_conductor_default_volumes + magnum_conductor_extra_volumes }}"
+    dimensions: "{{ magnum_conductor_dimensions }}"
+
+
+####################
+# Database
+####################
+magnum_database_name: "magnum"
+magnum_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}magnum{% endif %}"
+magnum_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Magnum
+####################
+enable_cluster_user_trust: False
+# The default cinder volume type to be used for container storage volume in clusters
+# that specify the docker-volume-size option. For example gp1, io1 etc
+default_docker_volume_type: ""
+
+
+####################
+# Docker
+####################
+magnum_install_type: "{{ kolla_install_type }}"
+magnum_tag: "{{ openstack_tag }}"
+
+magnum_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ magnum_install_type }}-magnum-api"
+magnum_api_tag: "{{ magnum_tag }}"
+magnum_api_image_full: "{{ magnum_api_image }}:{{ magnum_api_tag }}"
+
+magnum_conductor_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ magnum_install_type }}-magnum-conductor"
+magnum_conductor_tag: "{{ magnum_tag }}"
+magnum_conductor_image_full: "{{ magnum_conductor_image }}:{{ magnum_conductor_tag }}"
+
+magnum_api_dimensions: "{{ default_container_dimensions }}"
+magnum_conductor_dimensions: "{{ default_container_dimensions }}"
+
+magnum_api_default_volumes:
+  - "{{ node_config_directory }}/magnum-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ kolla_dev_repos_directory ~ '/magnum/magnum:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/magnum' if magnum_dev_mode | bool else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+magnum_conductor_default_volumes:
+  - "{{ node_config_directory }}/magnum-conductor/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "magnum:/var/lib/magnum/"
+  - "{{ kolla_dev_repos_directory ~ '/magnum/magnum:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/magnum' if magnum_dev_mode | bool else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+
+magnum_extra_volumes: "{{ default_extra_volumes }}"
+magnum_api_extra_volumes: "{{ magnum_extra_volumes }}"
+magnum_conductor_extra_volumes: "{{ magnum_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+magnum_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ magnum_api_port }}/v1"
+magnum_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ magnum_api_port }}/v1"
+magnum_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ magnum_api_port }}/v1"
+
+magnum_logging_debug: "{{ openstack_logging_debug }}"
+
+magnum_keystone_user: "magnum"
+magnum_trustee_domain_admin: "magnum_trustee_domain_admin"
+magnum_trustee_domain: "magnum"
+
+openstack_magnum_auth: "{{ openstack_auth }}"
+
+
+####################
+# Kolla
+####################
+magnum_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+magnum_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+magnum_dev_mode: "{{ kolla_dev_mode }}"
+magnum_source_version: "{{ kolla_source_version }}"
+
+
+####################
+# Notifications
+####################
+magnum_notification_topics:
+  - name: notifications
+    enabled: "{{ enable_ceilometer | bool }}"
+
+magnum_enabled_notification_topics: "{{ magnum_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+
+####################
+# Keystone
+####################
+magnum_ks_services:
+  - name: "magnum"
+    type: "container-infra"
+    description: "Container Infrastructure Management Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ magnum_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ magnum_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ magnum_public_endpoint }}'}
+
+magnum_ks_users:
+  - project: "service"
+    user: "{{ magnum_keystone_user }}"
+    password: "{{ magnum_keystone_password }}"
+    role: "admin"

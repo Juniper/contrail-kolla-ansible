@@ -1,0 +1,144 @@
+---
+project_name: "cloudkitty"
+
+cloudkitty_services:
+  cloudkitty-api:
+    container_name: "cloudkitty_api"
+    group: "cloudkitty-api"
+    image: "{{ cloudkitty_api_image_full }}"
+    enabled: True
+    volumes: "{{ cloudkitty_api_default_volumes + cloudkitty_api_extra_volumes }}"
+    dimensions: "{{ cloudkitty_api_dimensions }}"
+    haproxy:
+      cloudkitty_api:
+        enabled: "{{ enable_cloudkitty }}"
+        mode: "http"
+        external: false
+        port: "{{ cloudkitty_api_port }}"
+      cloudkitty_api_external:
+        enabled: "{{ enable_cloudkitty }}"
+        mode: "http"
+        external: true
+        port: "{{ cloudkitty_api_port }}"
+  cloudkitty-processor:
+    container_name: "cloudkitty_processor"
+    group: "cloudkitty-processor"
+    image: "{{ cloudkitty_processor_image_full }}"
+    enabled: True
+    volumes: "{{ cloudkitty_processor_default_volumes + cloudkitty_processor_extra_volumes }}"
+    dimensions: "{{ cloudkitty_processor_dimensions }}"
+
+
+####################
+# Database
+####################
+cloudkitty_database_name: "cloudkitty"
+cloudkitty_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}cloudkitty{% endif %}"
+cloudkitty_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+cloudkitty_install_type: "{{ kolla_install_type }}"
+cloudkitty_tag: "{{ openstack_tag }}"
+
+cloudkitty_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ cloudkitty_install_type }}-cloudkitty-api"
+cloudkitty_api_tag: "{{ cloudkitty_tag }}"
+cloudkitty_api_image_full: "{{ cloudkitty_api_image }}:{{ cloudkitty_api_tag }}"
+
+cloudkitty_processor_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ cloudkitty_install_type }}-cloudkitty-processor"
+cloudkitty_processor_tag: "{{ cloudkitty_tag }}"
+cloudkitty_processor_image_full: "{{ cloudkitty_processor_image }}:{{ cloudkitty_processor_tag }}"
+
+cloudkitty_processor_dimensions: "{{ default_container_dimensions }}"
+cloudkitty_api_dimensions: "{{ default_container_dimensions }}"
+
+cloudkitty_api_default_volumes:
+  - "{{ node_config_directory }}/cloudkitty-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cloudkitty/cloudkitty:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cloudkitty' if cloudkitty_dev_mode | bool else '' }}"
+cloudkitty_processor_default_volumes:
+  - "{{ node_config_directory }}/cloudkitty-processor/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/cloudkitty/cloudkitty:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/cloudkitty' if cloudkitty_dev_mode | bool else '' }}"
+
+cloudkitty_extra_volumes: "{{ default_extra_volumes }}"
+cloudkitty_processor_extra_volumes: "{{ cloudkitty_extra_volumes }}"
+cloudkitty_api_extra_volumes: "{{ cloudkitty_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+cloudkitty_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ cloudkitty_api_port }}"
+cloudkitty_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ cloudkitty_api_port }}"
+cloudkitty_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ cloudkitty_api_port }}"
+
+cloudkitty_logging_debug: "{{ openstack_logging_debug }}"
+
+cloudkitty_keystone_user: "cloudkitty"
+
+openstack_cloudkitty_auth: "{{ openstack_auth }}"
+
+
+####################
+# Cloudkitty
+####################
+cloudkitty_openstack_keystone_default_role: "rating"
+
+####################
+# Kolla
+####################
+cloudkitty_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+cloudkitty_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+cloudkitty_dev_mode: "{{ kolla_dev_mode }}"
+cloudkitty_source_version: "{{ kolla_source_version }}"
+cloudkitty_custom_metrics_yaml_file: "metrics.yml"
+
+####################
+# Storage backend
+####################
+# Valid options are 'sqlalchemy' or 'influxdb'. The default value is
+# 'influxdb', which matches the default in Cloudkitty since the Stein release.
+# When the backend is "influxdb", we also enable Influxdb.
+# Also, when using 'influxdb' as the backend, we trigger the configuration/use
+# of Cloudkitty storage backend version 2.
+cloudkitty_storage_backend: "influxdb"
+
+# InfluxDB retention policy to use (defaults to autogen).
+# cloudkitty_influxdb_retention_policy: "autogen"
+
+# Set to true to use SSL for InfluxDB connections.
+# cloudkitty_influxdb_use_ssl: false
+
+# Path of the CA certificate to trust for HTTPS connections.
+# cloudkitty_influxdb_cafile: "/full/qualified/path/to/CAs/certificates"
+
+# Set to true to authorize insecure HTTPS connections to InfluxDB.
+# This means, HTTPS connections without validating the certificate used by InfluxDB
+# cloudkitty_influxdb_insecure_connections: false
+
+cloudkitty_influxdb_name: "cloudkitty"
+
+####################
+# Keystone
+####################
+cloudkitty_ks_services:
+  - name: "cloudkitty"
+    type: "rating"
+    description: "OpenStack Rating"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ cloudkitty_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ cloudkitty_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ cloudkitty_public_endpoint }}'}
+
+cloudkitty_ks_users:
+  - project: "service"
+    user: "{{ cloudkitty_keystone_user }}"
+    password: "{{ cloudkitty_keystone_password }}"
+    role: "admin"
+
+cloudkitty_ks_roles:
+  - "{{ cloudkitty_openstack_keystone_default_role }}"

@@ -1,0 +1,145 @@
+---
+project_name: "zun"
+
+zun_services:
+  zun-api:
+    container_name: zun_api
+    group: zun-api
+    enabled: true
+    image: "{{ zun_api_image_full }}"
+    volumes: "{{ zun_api_default_volumes + zun_api_extra_volumes }}"
+    dimensions: "{{ zun_api_dimensions }}"
+    haproxy:
+      zun_api:
+        enabled: "{{ enable_zun }}"
+        mode: "http"
+        external: false
+        port: "{{ zun_api_port }}"
+      zun_api_external:
+        enabled: "{{ enable_zun }}"
+        mode: "http"
+        external: true
+        port: "{{ zun_api_port }}"
+  zun-wsproxy:
+    container_name: zun_wsproxy
+    group: zun-wsproxy
+    enabled: true
+    image: "{{ zun_wsproxy_image_full }}"
+    volumes: "{{ zun_wsproxy_default_volumes + zun_wsproxy_extra_volumes }}"
+    dimensions: "{{ zun_wsproxy_dimensions }}"
+    haproxy:
+      zun_wsproxy:
+        enabled: "{{ enable_zun }}"
+        mode: "http"
+        external: false
+        port: "{{ zun_wsproxy_port }}"
+      zun_wsproxy_external:
+        enabled: "{{ enable_zun }}"
+        mode: "http"
+        external: true
+        port: "{{ zun_wsproxy_port }}"
+  zun-compute:
+    container_name: zun_compute
+    group: zun-compute
+    enabled: true
+    image: "{{ zun_compute_image_full }}"
+    privileged: True
+    volumes: "{{ zun_compute_default_volumes + zun_compute_extra_volumes }}"
+    dimensions: "{{ zun_compute_dimensions }}"
+
+####################
+## Database
+####################
+zun_database_name: "zun"
+zun_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}zun{% endif %}"
+zun_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+## Docker
+####################
+zun_install_type: "{{ kolla_install_type }}"
+zun_tag: "{{ openstack_tag }}"
+
+zun_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ zun_install_type }}-zun-api"
+zun_api_tag: "{{ zun_tag }}"
+zun_api_image_full: "{{ zun_api_image }}:{{ zun_api_tag }}"
+
+zun_wsproxy_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ zun_install_type }}-zun-wsproxy"
+zun_wsproxy_tag: "{{ zun_tag }}"
+zun_wsproxy_image_full: "{{ zun_wsproxy_image }}:{{ zun_wsproxy_tag }}"
+
+zun_compute_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ zun_install_type }}-zun-compute"
+zun_compute_tag: "{{ zun_tag }}"
+zun_compute_image_full: "{{ zun_compute_image }}:{{ zun_compute_tag }}"
+
+zun_api_dimensions: "{{ default_container_dimensions }}"
+zun_wsproxy_dimensions: "{{ default_container_dimensions }}"
+zun_compute_dimensions: "{{ default_container_dimensions }}"
+
+zun_api_default_volumes:
+  - "{{ node_config_directory }}/zun-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ kolla_dev_repos_directory ~ '/zun/zun:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/zun' if zun_dev_mode | bool else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+zun_wsproxy_default_volumes:
+  - "{{ node_config_directory }}/zun-wsproxy/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "{{ kolla_dev_repos_directory ~ '/zun/zun:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/zun' if zun_dev_mode | bool else '' }}"
+  - "kolla_logs:/var/log/kolla/"
+zun_compute_default_volumes:
+  - "{{ node_config_directory }}/zun-compute/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/zun/zun:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/zun' if zun_dev_mode | bool else '' }}"
+  - "/run:/run:shared"
+  - "/usr/lib/docker:/usr/lib/docker"
+  - "/var/lib/docker:/var/lib/docker"
+  - "/lib/modules:/lib/modules:ro"
+  - "/dev:/dev"
+  - "{% if enable_iscsid | bool %}iscsi_info:/etc/iscsi{% endif %}"
+
+zun_extra_volumes: "{{ default_extra_volumes }}"
+zun_api_extra_volumes: "{{ zun_extra_volumes }}"
+zun_wsproxy_extra_volumes: "{{ zun_extra_volumes }}"
+zun_compute_extra_volumes: "{{ zun_extra_volumes }}"
+
+####################
+## OpenStack
+####################
+zun_admin_endpoint: "{{ admin_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ zun_api_port }}/v1/"
+zun_internal_endpoint: "{{ internal_protocol }}://{{ kolla_internal_fqdn | put_address_in_context('url') }}:{{ zun_api_port }}/v1/"
+zun_public_endpoint: "{{ public_protocol }}://{{ kolla_external_fqdn | put_address_in_context('url') }}:{{ zun_api_port }}/v1/"
+
+zun_logging_debug: "{{ openstack_logging_debug }}"
+
+zun_keystone_user: "zun"
+
+openstack_zun_auth: "{{ openstack_auth }}"
+
+
+####################
+# Kolla
+####################
+zun_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+zun_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+zun_dev_mode: "{{ kolla_dev_mode }}"
+zun_source_version: "{{ kolla_source_version }}"
+
+####################
+# Keystone
+####################
+zun_ks_services:
+  - name: "zun"
+    type: "container"
+    description: "Container Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ zun_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ zun_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ zun_public_endpoint }}'}
+
+zun_ks_users:
+  - project: "service"
+    user: "{{ zun_keystone_user }}"
+    password: "{{ zun_keystone_password }}"
+    role: "admin"

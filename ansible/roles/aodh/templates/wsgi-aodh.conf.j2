@@ -1,0 +1,39 @@
+{% if aodh_install_type == 'binary' %}
+    {% set python_path = '/usr/lib/python3/dist-packages' if kolla_base_distro in ['debian', 'ubuntu'] else '/usr/lib/python' ~ distro_python_version ~ '/site-packages' %}
+{% else %}
+    {% set python_path = '/var/lib/kolla/venv/lib/python' + distro_python_version + '/site-packages' %}
+{% endif %}
+{% set binary_path = '/usr/bin' if aodh_install_type == 'binary' else '/var/lib/kolla/venv/bin' %}
+Listen {{ api_interface_address | put_address_in_context('url') }}:{{ aodh_api_listen_port }}
+
+ServerSignature Off
+ServerTokens Prod
+TraceEnable off
+
+{% if aodh_logging_debug | bool %}
+LogLevel info
+{% endif %}
+
+<Directory "{{ binary_path }}">
+    <FilesMatch "^aodh-api$">
+      Options Indexes FollowSymLinks MultiViews
+      AllowOverride None
+      Require all granted
+    </FilesMatch>
+</Directory>
+
+<VirtualHost *:{{ aodh_api_listen_port }}>
+  ## Logging
+  ErrorLog "/var/log/kolla/aodh/aodh_wsgi_error.log"
+  ServerSignature Off
+  LogFormat "%{X-Forwarded-For}i %l %u %t \"%r\" %>s %b %D \"%{Referer}i\" \"%{User-Agent}i\"" logformat
+  CustomLog "/var/log/kolla/aodh/aodh_wsgi_access.log" logformat
+  WSGIApplicationGroup %{GLOBAL}
+  WSGIDaemonProcess aodh group=aodh processes={{ openstack_service_workers }} threads=1 user=aodh python-path={{ python_path }}
+  WSGIProcessGroup aodh
+{% if aodh_install_type == 'binary' and kolla_base_distro in ['debian', 'ubuntu'] %}
+  WSGIScriptAlias / "{{ binary_path }}/python3-aodh-api"
+{% else %}
+  WSGIScriptAlias / "{{ binary_path }}/aodh-api"
+{% endif %}
+</VirtualHost>

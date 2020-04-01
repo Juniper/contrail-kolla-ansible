@@ -1,0 +1,24 @@
+{
+    "command": "aodh-evaluator",
+    "config_files": [
+        {
+            "source": "{{ container_config_directory }}/aodh.conf",
+            "dest": "/etc/aodh/aodh.conf",
+            "owner": "aodh",
+            "perm": "0600"
+        }{% if aodh_policy_file is defined %},
+        {
+            "source": "{{ container_config_directory }}/{{ aodh_policy_file }}",
+            "dest": "/etc/aodh/{{ aodh_policy_file }}",
+            "owner": "aodh",
+            "perm": "0600"
+        }{% endif %}
+    ],
+    "permissions": [
+        {
+            "path": "/var/log/kolla/aodh",
+            "owner": "aodh:kolla",
+            "recurse": true
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+---
+features:
+  - |
+    Adds support for configuring ``glance-cache``, enabled with
+    ``enable_glance_image_cache``. The cache size is configured via
+    ``glance_cache_max_size``.

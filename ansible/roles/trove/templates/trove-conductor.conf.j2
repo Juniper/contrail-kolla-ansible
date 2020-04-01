@@ -1,0 +1,32 @@
+[DEFAULT]
+debug = {{ trove_logging_debug }}
+
+log_dir = /var/log/kolla/trove
+trove_auth_url = {{ keystone_internal_url }}/v3
+conductor_manager = trove.conductor.manager.Manager
+control_exchange = trove
+
+transport_url = {{ rpc_transport_url }}
+
+os_region_name = {{ openstack_region_name }}
+
+[oslo_messaging_notifications]
+transport_url = {{ notify_transport_url }}
+{% if trove_enabled_notification_topics %}
+driver = messagingv2
+topics = {{ trove_enabled_notification_topics | map(attribute='name') | join(',') }}
+{% else %}
+driver = noop
+{% endif %}
+
+[database]
+connection = mysql+pymysql://{{ trove_database_user }}:{{ trove_database_password }}@{{ trove_database_address }}/{{ trove_database_name }}
+max_retries = -1
+
+{% if enable_osprofiler | bool %}
+[profiler]
+enabled = true
+trace_sqlalchemy = true
+hmac_keys = {{ osprofiler_secret }}
+connection_string = {{ osprofiler_backend_connection_string }}
+{% endif %}

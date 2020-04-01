@@ -1,0 +1,234 @@
+---
+project_name: "designate"
+
+designate_services:
+  designate-api:
+    container_name: designate_api
+    group: designate-api
+    enabled: true
+    image: "{{ designate_api_image_full }}"
+    volumes: "{{ designate_api_default_volumes + designate_api_extra_volumes }}"
+    dimensions: "{{ designate_api_dimensions }}"
+    haproxy:
+      designate_api:
+        enabled: "{{ enable_designate }}"
+        mode: "http"
+        external: false
+        port: "{{ designate_api_port }}"
+        listen_port: "{{ designate_api_listen_port }}"
+      designate_api_external:
+        enabled: "{{ enable_designate }}"
+        mode: "http"
+        external: true
+        port: "{{ designate_api_port }}"
+        listen_port: "{{ designate_api_listen_port }}"
+  designate-backend-bind9:
+    container_name: designate_backend_bind9
+    group: designate-backend-bind9
+    enabled: "{{ designate_backend == 'bind9' }}"
+    image: "{{ designate_backend_bind9_image_full }}"
+    volumes: "{{ designate_backend_bind9_default_volumes + designate_backend_bind9_extra_volumes }}"
+    dimensions: "{{ designate_backend_bind9_dimensions }}"
+  designate-central:
+    container_name: designate_central
+    group: designate-central
+    enabled: true
+    image: "{{ designate_central_image_full }}"
+    volumes: "{{ designate_central_default_volumes + designate_central_extra_volumes }}"
+    dimensions: "{{ designate_central_dimensions }}"
+  designate-mdns:
+    container_name: designate_mdns
+    group: designate-mdns
+    enabled: true
+    image: "{{ designate_mdns_image_full }}"
+    volumes: "{{ designate_mdns_default_volumes + designate_mdns_extra_volumes }}"
+    dimensions: "{{ designate_mdns_dimensions }}"
+  designate-producer:
+    container_name: designate_producer
+    group: designate-producer
+    enabled: true
+    image: "{{ designate_producer_image_full }}"
+    volumes: "{{ designate_producer_default_volumes + designate_producer_extra_volumes }}"
+    dimensions: "{{ designate_producer_dimensions }}"
+  designate-worker:
+    container_name: designate_worker
+    group: designate-worker
+    enabled: true
+    image: "{{ designate_worker_image_full }}"
+    volumes: "{{ designate_worker_default_volumes + designate_worker_extra_volumes }}"
+    dimensions: "{{ designate_worker_dimensions }}"
+  designate-sink:
+    container_name: designate_sink
+    group: designate-sink
+    enabled: true
+    image: "{{ designate_sink_image_full }}"
+    volumes: "{{ designate_sink_default_volumes + designate_sink_extra_volumes }}"
+    dimensions: "{{ designate_sink_dimensions }}"
+
+
+####################
+# Database
+####################
+designate_database_name: "designate"
+designate_database_user: "{% if use_preconfigured_databases | bool and use_common_mariadb_user | bool %}{{ database_user }}{% else %}designate{% endif %}"
+designate_database_address: "{{ database_address | put_address_in_context('url') }}:{{ database_port }}"
+
+
+####################
+# Docker
+####################
+designate_install_type: "{{ kolla_install_type }}"
+designate_tag: "{{ openstack_tag }}"
+
+designate_central_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ designate_install_type }}-designate-central"
+designate_central_tag: "{{ designate_tag }}"
+designate_central_image_full: "{{ designate_central_image }}:{{ designate_central_tag }}"
+
+designate_producer_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ designate_install_type }}-designate-producer"
+designate_producer_tag: "{{ designate_tag }}"
+designate_producer_image_full: "{{ designate_producer_image }}:{{ designate_producer_tag }}"
+
+designate_api_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ designate_install_type }}-designate-api"
+designate_api_tag: "{{ designate_tag }}"
+designate_api_image_full: "{{ designate_api_image }}:{{ designate_api_tag }}"
+
+designate_backend_bind9_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ designate_install_type }}-designate-backend-bind9"
+designate_backend_bind9_tag: "{{ designate_tag }}"
+designate_backend_bind9_image_full: "{{ designate_backend_bind9_image }}:{{ designate_backend_bind9_tag }}"
+
+designate_mdns_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ designate_install_type }}-designate-mdns"
+designate_mdns_tag: "{{ designate_tag }}"
+designate_mdns_image_full: "{{ designate_mdns_image }}:{{ designate_mdns_tag }}"
+
+designate_sink_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ designate_install_type }}-designate-sink"
+designate_sink_tag: "{{ designate_tag }}"
+designate_sink_image_full: "{{ designate_sink_image }}:{{ designate_sink_tag }}"
+
+designate_worker_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ designate_install_type }}-designate-worker"
+designate_worker_tag: "{{ designate_tag }}"
+designate_worker_image_full: "{{ designate_worker_image }}:{{ designate_worker_tag }}"
+
+designate_api_dimensions: "{{ default_container_dimensions }}"
+designate_backend_bind9_dimensions: "{{ default_container_dimensions }}"
+designate_central_dimensions: "{{ default_container_dimensions }}"
+designate_mdns_dimensions: "{{ default_container_dimensions }}"
+designate_producer_dimensions: "{{ default_container_dimensions }}"
+designate_worker_dimensions: "{{ default_container_dimensions }}"
+designate_sink_dimensions: "{{ default_container_dimensions }}"
+
+designate_api_default_volumes:
+  - "{{ node_config_directory }}/designate-api/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/designate/designate:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/designate' if designate_dev_mode | bool else '' }}"
+designate_backend_bind9_default_volumes:
+  - "{{ node_config_directory }}/designate-backend-bind9/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "designate_backend_bind9:/var/lib/named/"
+designate_central_default_volumes:
+  - "{{ node_config_directory }}/designate-central/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/designate/designate:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/designate' if designate_dev_mode | bool else '' }}"
+designate_mdns_default_volumes:
+  - "{{ node_config_directory }}/designate-mdns/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/designate/designate:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/designate' if designate_dev_mode | bool else '' }}"
+designate_producer_default_volumes:
+  - "{{ node_config_directory }}/designate-producer/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/designate/designate:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/designate' if designate_dev_mode | bool else '' }}"
+designate_worker_default_volumes:
+  - "{{ node_config_directory }}/designate-worker/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/designate/designate:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/designate' if designate_dev_mode | bool else '' }}"
+designate_sink_default_volumes:
+  - "{{ node_config_directory }}/designate-sink/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "{{ kolla_dev_repos_directory ~ '/designate/designate:/var/lib/kolla/venv/lib/python' ~ distro_python_version ~ '/site-packages/designate' if designate_dev_mode | bool else '' }}"
+
+designate_extra_volumes: "{{ default_extra_volumes }}"
+designate_api_extra_volumes: "{{ designate_extra_volumes }}"
+designate_backend_bind9_extra_volumes: "{{ designate_extra_volumes }}"
+designate_central_extra_volumes: "{{ designate_extra_volumes }}"
+designate_mdns_extra_volumes: "{{ designate_extra_volumes }}"
+designate_producer_extra_volumes: "{{ designate_extra_volumes }}"
+designate_worker_extra_volumes: "{{ designate_extra_volumes }}"
+designate_sink_extra_volumes: "{{ designate_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+designate_admin_endpoint: "{{ admin_protocol }}://{{ designate_internal_fqdn | put_address_in_context('url') }}:{{ designate_api_port }}"
+designate_internal_endpoint: "{{ internal_protocol }}://{{ designate_internal_fqdn | put_address_in_context('url') }}:{{ designate_api_port }}"
+designate_public_endpoint: "{{ public_protocol }}://{{ designate_external_fqdn | put_address_in_context('url') }}:{{ designate_api_port }}"
+
+designate_logging_debug: "{{ openstack_logging_debug }}"
+
+designate_keystone_user: "designate"
+
+openstack_designate_auth: "{{ openstack_auth }}"
+
+
+####################
+# Kolla
+####################
+designate_git_repository: "{{ kolla_dev_repos_git }}/{{ project_name }}"
+designate_dev_repos_pull: "{{ kolla_dev_repos_pull }}"
+designate_dev_mode: "{{ kolla_dev_mode }}"
+designate_source_version: "{{ kolla_source_version }}"
+
+####################
+## Designate
+#####################
+designate_dnssec_validation: "yes"
+designate_recursion: "no"
+## Example for designate_forwarders_addresses: "10.199.200.1; 10.199.100.1"
+designate_forwarders_addresses: ""
+
+####################
+# Infoblox
+####################
+designate_backend_infoblox_nameservers: ""
+designate_infoblox_host: ""
+designate_infoblox_wapi_url: ""
+designate_infoblox_ssl_verify: "true"
+designate_infoblox_auth_username: ""
+designate_infoblox_auth_password: ""
+designate_infoblox_multi_tenant: "false"
+designate_infoblox_ns_group: ""
+
+
+####################
+# Notifications
+####################
+designate_notifications_topic_name: "notifications_designate"
+
+designate_notification_topics:
+  - name: "{{ designate_notifications_topic_name }}"
+    enabled: True
+
+designate_enabled_notification_topics: "{{ designate_notification_topics | selectattr('enabled', 'equalto', true) | list }}"
+
+####################
+# Keystone
+####################
+designate_ks_services:
+  - name: "designate"
+    type: "dns"
+    description: "Designate DNS Service"
+    endpoints:
+      - {'interface': 'admin', 'url': '{{ designate_admin_endpoint }}'}
+      - {'interface': 'internal', 'url': '{{ designate_internal_endpoint }}'}
+      - {'interface': 'public', 'url': '{{ designate_public_endpoint }}'}
+
+designate_ks_users:
+  - project: "service"
+    user: "{{ designate_keystone_user }}"
+    password: "{{ designate_keystone_password }}"
+    role: "admin"

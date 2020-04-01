@@ -1,0 +1,28 @@
+---
+- name: Running Heat bootstrap container
+  vars:
+    heat_api: "{{ heat_services['heat-api'] }}"
+  become: true
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    environment:
+      KOLLA_BOOTSTRAP:
+      KOLLA_CONFIG_STRATEGY: "{{ config_strategy }}"
+      OS_AUTH_URL: "{{ openstack_auth.auth_url }}"
+      OS_IDENTITY_API_VERSION: "3"
+      OS_INTERFACE: "internal"
+      OS_USERNAME: "{{ openstack_auth.username }}"
+      OS_PASSWORD: "{{ openstack_auth.password }}"
+      OS_PROJECT_NAME: "{{ openstack_auth.project_name }}"
+      OS_REGION_NAME: "{{ openstack_region_name }}"
+      HEAT_DOMAIN_ADMIN_PASSWORD: "{{ heat_domain_admin_password }}"
+    image: "{{ heat_api.image }}"
+    labels:
+      BOOTSTRAP:
+    name: "bootstrap_heat"
+    restart_policy: no
+    volumes: "{{ heat_api.volumes|reject('equalto', '')|list }}"
+  run_once: True
+  delegate_to: "{{ groups[heat_api.group][0] }}"

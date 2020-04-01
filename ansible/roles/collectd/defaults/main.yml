@@ -1,0 +1,36 @@
+---
+project_name: "collectd"
+
+collectd_services:
+  collectd:
+    container_name: collectd
+    group: collectd
+    enabled: true
+    image: "{{ collectd_image_full }}"
+    privileged: True
+    volumes: "{{ collectd_default_volumes + collectd_extra_volumes }}"
+    dimensions: "{{ collectd_dimensions }}"
+
+####################
+# Docker
+####################
+collectd_install_type: "{{ kolla_install_type }}"
+collectd_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ collectd_install_type }}-collectd"
+collectd_tag: "{{ openstack_tag }}"
+collectd_image_full: "{{ collectd_image }}:{{ collectd_tag }}"
+
+collectd_dimensions: "{{ default_container_dimensions }}"
+
+collectd_default_volumes:
+  - "{{ node_config_directory }}/collectd/:{{ container_config_directory }}/:ro"
+  - "{{node_config_directory }}/collectd/collectd.conf.d/:/etc/collectd/collectd.conf.d/"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "kolla_logs:/var/log/kolla/"
+  - "/sys/:/sys/:ro"
+  - "/dev/:/dev/:ro"
+collectd_extra_volumes: "{{ default_extra_volumes }}"
+
+####################
+# OpenStack
+####################
+collectd_logging_debug: "{{ openstack_logging_debug }}"

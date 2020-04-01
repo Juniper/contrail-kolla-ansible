@@ -1,0 +1,80 @@
+---
+- name: Ensuring config directories exist
+  file:
+    path: "{{ node_config_directory }}/{{ item.key }}"
+    state: "directory"
+    owner: "{{ config_owner_user }}"
+    group: "{{ config_owner_group }}"
+    mode: "0770"
+  become: true
+  when:
+    - item.value.host_in_groups | bool
+    - item.value.enabled | bool
+  with_dict: "{{ tacker_services }}"
+
+- name: Check if policies shall be overwritten
+  local_action: stat path="{{ item }}"
+  run_once: True
+  register: tacker_policy
+  with_first_found:
+    - files: "{{ supported_policy_format_list }}"
+      paths:
+        - "{{ node_custom_config }}/tacker/"
+      skip: true
+
+- name: Set tacker policy file
+  set_fact:
+    tacker_policy_file: "{{ tacker_policy.results.0.stat.path | basename }}"
+    tacker_policy_file_path: "{{ tacker_policy.results.0.stat.path }}"
+  when:
+    - tacker_policy.results
+
+- name: Copying over config.json files for services
+  template:
+    src: "{{ item.key }}.json.j2"
+    dest: "{{ node_config_directory }}/{{ item.key }}/config.json"
+    mode: "0660"
+  become: true
+  with_dict: "{{ tacker_services }}"
+  when:
+    - item.value.host_in_groups | bool
+    - item.value.enabled
+  notify:
+    - Restart {{ item.key }} container
+
+- name: Copying over tacker.conf
+  vars:
+    service_name: "{{ item.key }}"
+  merge_configs:
+    sources:
+      - "{{ role_path }}/templates/tacker.conf.j2"
+      - "{{ node_custom_config }}/global.conf"
+      - "{{ node_custom_config }}/tacker.conf"
+      - "{{ node_custom_config }}/tacker/{{ item.key }}.conf"
+      - "{{ node_custom_config }}/tacker/{{ inventory_hostname }}/tacker.conf"
+    dest: "{{ node_config_directory }}/{{ item.key }}/tacker.conf"
+    mode: "0660"
+  become: true
+  with_dict: "{{ tacker_services }}"
+  when:
+    - item.value.host_in_groups | bool
+    - item.value.enabled | bool
+  notify:
+    - Restart {{ item.key }} container
+
+- name: Copying over existing policy file
+  template:
+    src: "{{ tacker_policy_file_path }}"
+    dest: "{{ node_config_directory }}/{{ item.key }}/{{ tacker_policy_file }}"
+    mode: "0660"
+  become: true
+  when:
+    - item.value.host_in_groups | bool
+    - item.value.enabled | bool
+    - tacker_policy_file is defined
+  with_dict: "{{ tacker_services }}"
+  notify:
+    - Restart {{ item.key }} container
+
+- include_tasks: check-containers.yml
+  when: kolla_action != "config"

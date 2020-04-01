@@ -1,0 +1,40 @@
+---
+service_ks_register_region_name: "{{ openstack_region_name }}"
+service_ks_register_auth: {}
+service_ks_cacert: "{{ openstack_cacert }}"
+service_ks_register_interface: "{{ openstack_interface }}"
+service_ks_register_endpoint_region: "{{ openstack_region_name }}"
+service_ks_register_domain: "default"
+# A list of services to register with Keystone. Each service definition should
+# provide the following fields:
+# 'name'
+# 'description'
+# 'type'
+# 'endpoints'
+# The 'endpoints' field should be a list, with each item having the following
+# fields:
+# 'url'
+# 'interface'
+service_ks_register_services: []
+# A list of users and associated roles for this service to register with
+# Keystone. Each item should provide the following fields:
+# 'project'
+# 'user'
+# 'password'
+# 'role'
+# The project, user and role will be created if they do not exist, and the user
+# will be granted the role in the project.
+service_ks_register_users: []
+# A list of roles to register with Keystone.
+service_ks_register_roles: []
+# A list of existing users and associated roles for this service to register
+# with Keystone. Each item should provide the following fields:
+# 'project'
+# 'user'
+# 'role'
+# The user will be granted the role in the project.
+service_ks_register_user_roles: []
+# Number of retries for each task.
+service_ks_register_retries: 5
+# Delay between task retries.
+service_ks_register_delay: 10

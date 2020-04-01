@@ -1,0 +1,26 @@
+---
+- name: Creating rabbitmq volume
+  become: true
+  kolla_docker:
+    action: "create_volume"
+    common_options: "{{ docker_common_options }}"
+    name: "{{ project_name }}"
+  register: rabbitmq_volume
+
+- name: Running RabbitMQ bootstrap container
+  vars:
+    service_name: "rabbitmq"
+    service: "{{ rabbitmq_services[service_name] }}"
+  become: true
+  kolla_docker:
+    action: "start_container"
+    common_options: "{{ docker_common_options }}"
+    detach: False
+    environment: "{{ service.bootstrap_environment }}"
+    image: "{{ service.image }}"
+    labels:
+      BOOTSTRAP:
+    name: "{{ project_name }}_bootstrap"
+    restart_policy: no
+    volumes: "{{ service.volumes }}"
+  when: rabbitmq_volume is changed

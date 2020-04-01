@@ -1,0 +1,4 @@
+---
+features:
+  - Adds support for deploying the OpenStack Cyborg service. Cyborg is a
+    service for managing hardware accelerators.

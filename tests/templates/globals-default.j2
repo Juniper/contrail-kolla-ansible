@@ -1,0 +1,123 @@
+---
+# Force the use of python2 on Ubuntu/Debian and CentOS7 remote hosts. This is
+# necessary for delegate_to: localhost, which will otherwise use the local
+# python interpreter (python3).  On CentOS 7, that fails due to a lack of
+# python3 bindings for SELinux.  https://bugs.centos.org/view.php?id=16389
+ansible_python_interpreter: /usr/bin/python{{ '2' if ansible_os_family != 'RedHat' or ansible_distribution_major_version == '7' else '3' }}
+
+kolla_base_distro: "{{ base_distro }}"
+kolla_install_type: "{{ install_type }}"
+network_interface: "{{ api_interface_name }}"
+network_address_family: "{{ address_family }}"
+docker_restart_policy: "no"
+# TODO(mgoddard): Always do this in Ussuri cycle.
+{% if not is_previous_release or previous_release != 'stein' %}
+docker_custom_config:
+  debug: true
+  registry-mirrors:
+    - {{ infra_dockerhub_mirror }}
+{% endif %}
+
+# Use a random router id, otherwise it may result in the same router id
+# in the CI gate.
+keepalived_virtual_router_id: "{{ 250 | random(1) }}"
+
+enable_openstack_core: "{{ openstack_core_enabled }}"
+enable_horizon: "{{ dashboard_enabled }}"
+enable_heat: "{{ openstack_core_tested }}"
+
+{% if scenario != 'bifrost' %}
+kolla_internal_vip_address: "{{ kolla_internal_vip_address }}"
+neutron_external_interface: "fake_interface"
+openstack_logging_debug: "True"
+openstack_service_workers: "1"
+{% endif %}
+
+{% if need_build_image and not is_previous_release %}
+# NOTE(Jeffrey4l): use different a docker namespace name in case it pull image from hub.docker.io when deplying
+docker_namespace: "lokolla"
+# NOTE(yoctozepto): use hostname or FQDN to be compatible between IPv4 and IPv6
+# docker does not support referencing registry via an IPv6 address
+# see: https://github.com/moby/moby/issues/39033
+docker_registry: "primary:4000"
+openstack_tag: "{{ build_image_tag }}"
+{% else %}
+# use docker hub images
+docker_namespace: "kolla"
+{% if need_build_image and is_previous_release %}
+# NOTE(mgoddard): Ensure that the insecure local registry is trusted, since it
+# will be the source of images during the upgrade.
+# NOTE(yoctozepto): this is required here for CI because we run templating
+# of docker systemd command only once
+docker_custom_option: "--insecure-registry primary:4000"
+{% endif %}
+{% if is_previous_release %}
+openstack_release: "{{ previous_release }}"
+{% endif %}
+{% endif %}
+
+{% if scenario == "ceph" %}
+enable_ceph: "yes"
+enable_ceph_mds: "yes"
+enable_ceph_rgw: "yes"
+enable_ceph_rgw_keystone: "yes"
+enable_ceph_nfs: "yes"
+enable_cinder: "yes"
+ceph_pool_pg_num: 8
+ceph_pool_pgp_num: 8
+{% if address_family == 'ipv6' %}
+# NOTE(yoctozepto): ceph won't accept IPv6 address as hostname (due to ':', '.' were fine)
+# hence use inventory name as the others do
+# this is Train feature so would fail upgrades from Stein
+ceph_mon_host_type: "INVENTORY"
+ceph_osd_host_type: "INVENTORY"
+{% endif %}
+# This is experimental feature, disable if gate fail.
+# In multinode jobs without ceph rolling upgrade fails.
+glance_enable_rolling_upgrade: "yes"
+{% endif %}
+
+{% if scenario == "zun" %}
+enable_zun: "yes"
+enable_kuryr: "yes"
+enable_etcd: "yes"
+docker_configure_for_zun: "yes"
+enable_cinder: "yes"
+# lvm backup driver for cinder-backup does not exist
+enable_cinder_backup: "no"
+enable_cinder_backend_lvm: "yes"
+{% endif %}
+
+{% if scenario == "swift" %}
+enable_swift: "yes"
+{% endif %}
+
+{% if scenario == "scenario_nfv" %}
+enable_tacker: "yes"
+enable_neutron_sfc: "yes"
+enable_mistral: "yes"
+enable_redis: "yes"
+enable_barbican: "yes"
+enable_heat: "yes"
+{% endif %}
+
+{% if scenario == "ironic" %}
+enable_ironic: "yes"
+ironic_dnsmasq_dhcp_range: "10.42.0.2,10.42.0.254"
+{% endif %}
+
+{% if scenario == "masakari" %}
+enable_masakari: "yes"
+{% endif %}
+
+{% if scenario == "cells" %}
+enable_cells: "yes"
+{% endif %}
+
+{% if scenario == "mariadb" %}
+enable_chrony: "no"
+enable_fluentd: "no"
+enable_mariadb: "yes"
+enable_memcached: "no"
+enable_rabbitmq: "no"
+{% endif %}

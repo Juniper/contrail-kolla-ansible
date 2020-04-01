@@ -1,0 +1,74 @@
+---
+project_name: "haproxy"
+
+haproxy_services:
+  haproxy:
+    container_name: haproxy
+    group: haproxy
+    enabled: true
+    image: "{{ haproxy_image_full }}"
+    privileged: True
+    volumes: "{{ haproxy_default_volumes + haproxy_extra_volumes }}"
+    dimensions: "{{ haproxy_dimensions }}"
+  keepalived:
+    container_name: keepalived
+    group: haproxy
+    enabled: "{{ enable_keepalived | bool }}"
+    image: "{{ keepalived_image_full }}"
+    privileged: True
+    volumes: "{{ keepalived_default_volumes + keepalived_extra_volumes }}"
+    dimensions: "{{ keepalived_dimensions }}"
+
+
+####################
+# Docker
+####################
+keepalived_install_type: "{{ kolla_install_type }}"
+keepalived_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ keepalived_install_type }}-keepalived"
+keepalived_tag: "{{ openstack_tag }}"
+keepalived_image_full: "{{ keepalived_image }}:{{ keepalived_tag }}"
+
+haproxy_install_type: "{{ kolla_install_type }}"
+haproxy_image: "{{ docker_registry ~ '/' if docker_registry else '' }}{{ docker_namespace }}/{{ kolla_base_distro }}-{{ haproxy_install_type }}-haproxy"
+haproxy_tag: "{{ openstack_tag }}"
+haproxy_image_full: "{{ haproxy_image }}:{{ haproxy_tag }}"
+
+syslog_server: "{{ api_interface_address }}"
+syslog_haproxy_facility: "local1"
+
+# Traffic mode. Valid options are [ multicast, unicast ]
+keepalived_traffic_mode: "multicast"
+
+# Extended global configuration, optimization options.
+haproxy_max_connections: 40000
+haproxy_processes: 1
+haproxy_process_cpu_map: "no"
+# Matches the mariadb 10000 max connections limit
+haproxy_defaults_max_connections: 10000
+
+haproxy_dimensions: "{{ default_container_dimensions }}"
+keepalived_dimensions: "{{ default_container_dimensions }}"
+
+haproxy_default_volumes:
+  - "{{ node_config_directory }}/haproxy/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "haproxy_socket:/var/lib/kolla/haproxy/"
+keepalived_default_volumes:
+  - "{{ node_config_directory }}/keepalived/:{{ container_config_directory }}/:ro"
+  - "/etc/localtime:/etc/localtime:ro"
+  - "/lib/modules:/lib/modules:ro"
+  - "haproxy_socket:/var/lib/kolla/haproxy/"
+
+haproxy_extra_volumes: "{{ default_extra_volumes }}"
+keepalived_extra_volumes: "{{ default_extra_volumes }}"
+
+# Default timeout values
+haproxy_http_request_timeout: "10s"
+haproxy_queue_timeout: "1m"
+haproxy_connect_timeout: "10s"
+haproxy_client_timeout: "1m"
+haproxy_server_timeout: "1m"
+haproxy_check_timeout: "10s"
+
+# Check http://www.haproxy.org/download/1.5/doc/configuration.txt for available options
+haproxy_defaults_balance: "roundrobin"
