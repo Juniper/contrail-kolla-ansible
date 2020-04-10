@@ -13,10 +13,6 @@
     - (neutron_l3_agent.enabled | bool and neutron_l3_agent.host_in_groups | bool)
       or (neutron_vpnaas_agent.enabled | bool and  neutron_vpnaas_agent.host_in_groups | bool)
 
-- name: Evaluate contrail version from image tag
-  set_fact:
-    contrail_version: "{{ neutron_opencontrail_init_image_full | get_contrail_version }}"
-
 - name: Ensuring config directories exist
   file:
     path: "{{ node_config_directory }}/{{ item.key }}"
