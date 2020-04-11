@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "e9a8c236_0f397916",
+        "filename": "ansible/roles/neutron/templates/neutron.conf.j2",
+        "patchSetId": 9
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 64
+      },
+      "writtenOn": "2020-04-11T00:18:39Z",
+      "side": 1,
+      "message": "@edouard, shouldnt each config line has to validate for branch?\njust for sake of readability, may be create neutron.conf.j2.v2 for newer release?",
+      "revId": "bd7a639f14c900fa900815c2e274e807ef6bff77",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
