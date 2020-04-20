@@ -116,7 +116,7 @@ nova_services:
     ipc_mode: "host"
     environment:
         PYTHONPATH: "{% if neutron_plugin_agent == 'opencontrail' %}/opt/plugin/site-packages{% endif %}"
-        PATH: "{% if neutron_plugin_agent == 'opencontrail' %}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/plugin/bin{% endif %}"
+        PATH: "{% if neutron_plugin_agent == 'opencontrail' %}/var/lib/kolla/venv/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/opt/plugin/bin{% endif %}"
     volumes:
       - "{{ node_config_directory }}/nova-compute/:{{ container_config_directory }}/:ro"
       - "/etc/localtime:/etc/localtime:ro"
