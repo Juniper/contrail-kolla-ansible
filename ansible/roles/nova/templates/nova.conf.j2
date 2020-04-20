@@ -91,6 +91,7 @@ password = {{ neutron_keystone_password }}
 region_name = {{ openstack_region_name }}
 valid_interfaces = internal
 
+{% if not service_name.startswith('nova-compute') %}
 [database]
 connection = mysql+pymysql://{{ nova_cell0_database_user }}:{{ nova_cell0_database_password }}@{{ nova_cell0_database_address }}/{{ nova_cell0_database_name }}
 max_pool_size = 50
@@ -100,6 +101,7 @@ max_retries = -1
 [api_database]
 connection = mysql+pymysql://{{ nova_api_database_user }}:{{ nova_api_database_password }}@{{ nova_api_database_address }}/{{ nova_api_database_name }}
 max_retries = -1
+{% endif %}
 
 [cache]
 backend = oslo_cache.memcache_pool
