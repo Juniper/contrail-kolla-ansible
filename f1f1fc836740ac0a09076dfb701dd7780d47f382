@@ -22,6 +22,30 @@
       "revId": "f1f1fc836740ac0a09076dfb701dd7780d47f382",
       "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
       "unresolved": true
+    },
+    {
+      "key": {
+        "uuid": "bf0d1360_306b4184",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 447
+      },
+      "writtenOn": "2020-05-14T11:10:59Z",
+      "side": 1,
+      "message": "1) I checked experimentally that this step fails for all values if nova is not available.\n\n2) I tried to locate, where those host aggregates are used. I couldn\u0027t find any place.\n\n3) This step was created two years ago by Nitish Krishna. Unfortunately he has already left Juniper, so I couldn\u0027t ask him about his intention. This was supposed to be a fix for a bug #1783692, but old bugs from Launchpad are not available anymore.\n\n4) I checked experimentally that with this patch I could deploy CEM without compute nodes. A few basic tests didn\u0027t reveal any problems with CFM-related activities (CFM-only deployments are the reason why we want to have deployments without compute nodes).",
+      "parentUuid": "7e1524e5_424ecc17",
+      "range": {
+        "startLine": 67,
+        "startChar": 10,
+        "endLine": 67,
+        "endChar": 21
+      },
+      "revId": "f1f1fc836740ac0a09076dfb701dd7780d47f382",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
     }
   ]
 }
