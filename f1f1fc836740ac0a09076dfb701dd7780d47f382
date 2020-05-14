@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "key": {
+        "uuid": "7e1524e5_424ecc17",
+        "filename": "ansible/post-deploy-contrail.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 382
+      },
+      "writtenOn": "2020-05-14T10:28:11Z",
+      "side": 1,
+      "message": "it\u0027s not compute only, right?",
+      "range": {
+        "startLine": 67,
+        "startChar": 10,
+        "endLine": 67,
+        "endChar": 21
+      },
+      "revId": "f1f1fc836740ac0a09076dfb701dd7780d47f382",
+      "serverId": "c72cd27d-1743-4a55-84a4-cd13b8400c52",
+      "unresolved": true
+    }
+  ]
+}
