@@ -34,7 +34,7 @@
     when:
       - hostvars[item].TSN_EVPN_MODE is defined
       - hostvars[item]['TSN_EVPN_MODE'] | bool
-    with_items: "{{ groups['compute'] }}"
+    with_items: "{{ groups['compute'] if 'compute' in groups else [] }}"
     tags: always
 
   ## Need to create Host Aggregates to separate Baremetal and Virtual Hosts
@@ -57,6 +57,7 @@
     register: command_result
     failed_when: "command_result.rc == 1 and 'already exists' not in command_result.stderr"
     run_once: yes
+    when: enable_nova | bool
 
   - name: Add compute hosts to virtual-hosts Aggregate Group
     command: >
@@ -73,9 +74,10 @@
     when:
       - hostvars[item].TSN_EVPN_MODE is defined
       - not hostvars[item]['TSN_EVPN_MODE'] | bool
+      - enable_nova | bool
     register: command_result
     failed_when: "command_result.rc == 1 and 'already has host' not in command_result.stderr"
-    with_items: "{{ groups['compute'] }}"
+    with_items: "{{ groups['compute'] if 'compute' in groups else [] }}"
     run_once: yes
 
   - name: Add controller/Ironic hosts to baremetal-hosts Aggregate Group
@@ -95,6 +97,7 @@
     failed_when: "command_result.rc == 1 and 'already has host' not in command_result.stderr"
     when:
       - enable_ironic | bool
+      - enable_nova | bool
     run_once: yes
 
   - name: Contrail default swift container and Temp-URL-Key creation
