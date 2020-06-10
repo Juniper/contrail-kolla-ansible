@@ -1,4 +1,0 @@
----
-features:
-  - Add support for basic multiple regions, that is to say, many
-    OpenStack with a shared Keystone (same users) and Horizon.

@@ -1,4 +1,0 @@
----
-features:
-  - Import Murano core library during install required
-    for Murano operation.

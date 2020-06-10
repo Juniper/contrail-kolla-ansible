@@ -1,3 +1,0 @@
----
-fixes:
-  - Change the service listening port of MDNS by dns_interface.

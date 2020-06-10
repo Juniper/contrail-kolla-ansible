@@ -1,4 +1,0 @@
----
-features:
-  - Use [oslo_messaging_notifications]/driver option in cinder.conf
-    to enable block storage meters.

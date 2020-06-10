@@ -1,4 +1,0 @@
----
-features:
-  - Allow the use of a database backend for Horizon
-    sessions.

@@ -1,5 +1,0 @@
----
-features:
-  - |
-    ``opendaylight_release`` variable is removed, version is discovered automatically
-    while booting features.

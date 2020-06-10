@@ -1,6 +1,0 @@
----
-features:
-  - |
-    Add a new parameter for changing selinux state. The default value is
-    "permissive". Update a parameter named "disable_selinux", use
-    "change_selinux" instead of it.

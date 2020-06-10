@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Deploy prometheus-alertmanager (https://prometheus.io/docs/alerting/alertmanager/)
-    as part of the prometheus monitoring stack.

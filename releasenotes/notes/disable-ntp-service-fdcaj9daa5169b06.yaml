@@ -1,4 +1,0 @@
----
-upgrade:
-  - |
-    Disable ntp service as kolla use chrony container by default.

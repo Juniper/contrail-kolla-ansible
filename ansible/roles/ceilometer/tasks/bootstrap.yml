@@ -1,3 +1,0 @@
----
-# TODO(Jeffrey4l): fix idempotent
-- include_tasks: bootstrap_service.yml

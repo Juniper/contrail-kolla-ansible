@@ -1,4 +1,0 @@
----
-features:
-  - Introduce a new property "enable_neutron_dvr".
-    Set to "yes" to deploy Neutron with DVR.

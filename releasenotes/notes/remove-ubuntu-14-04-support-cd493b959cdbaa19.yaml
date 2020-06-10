@@ -1,5 +1,0 @@
----
-deprecations:
-  - |
-    Ubuntu 14.04 related stuff has been removed.
-    Last Openstack version supported on Ubuntu 14.04 was Mitaka.

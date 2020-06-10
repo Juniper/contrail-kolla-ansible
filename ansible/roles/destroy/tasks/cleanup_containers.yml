@@ -1,3 +1,0 @@
----
-- name: Destroying all Kolla containers and volumes
-  script: ../tools/cleanup-containers
