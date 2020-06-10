@@ -1,4 +1,0 @@
----
-features:
-  - |
-    Configures Prometheus as a Vitrage datasource automatically.

@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Adds support for booting bare metal nodes with Ironic using iPXE.
-    This is enabled via the ``enable_ironic_ipxe`` flag.

@@ -1,4 +1,0 @@
----
-features:
-  - Adds support for providing custom kibana configuration via
-    ``/etc/kolla/config/kibana/kibana.yml``.

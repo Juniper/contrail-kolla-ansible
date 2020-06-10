@@ -1,8 +1,0 @@
----
-upgrade:
-  - Set RabbitMQ ``cluster_partition_handling`` to ``pause_minority``.
-    This is to avoid split-brain.
-    The setting is overridable using custom config.
-    Note this new config requires at least 3-node RabbitMQ cluster
-    to provide HA (High Availability).
-    See production architecture guide for more info.

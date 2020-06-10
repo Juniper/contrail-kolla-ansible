@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Cinder-api service has been migrated to run under
-    an apache wsgi process.

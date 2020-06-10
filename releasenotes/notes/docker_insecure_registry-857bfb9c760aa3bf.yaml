@@ -1,6 +1,0 @@
----
-upgrade:
-  - |
-    Add option `docker_registry_insecure` to enable the SSL verification
-    for the docker registry. Default value is true when a private
-    registry is defined.

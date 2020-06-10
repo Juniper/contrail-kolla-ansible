@@ -1,8 +1,0 @@
----
-features:
-  - |
-    Redis has been implemented as mistral coordination backend.
-upgrade:
-  - |
-    Redis is a required feature for mistral, please ensure redis
-    is enabled before upgrading mistral.

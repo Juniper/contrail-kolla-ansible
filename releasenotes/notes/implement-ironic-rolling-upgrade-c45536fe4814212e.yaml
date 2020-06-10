@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Implement Ironic rolling upgrade logic, enabled by default at
-    ironic_enable_rolling_upgrade: "yes" in etc/kolla/globals.yml file.

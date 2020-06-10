@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Adds support for configuring ulimit in containers, extending the dimension
-    support added in Rocky release.

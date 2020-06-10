@@ -1,4 +1,0 @@
----
-upgrade:
-  - |
-    Support for deployment of OracleLinux containers has been removed.

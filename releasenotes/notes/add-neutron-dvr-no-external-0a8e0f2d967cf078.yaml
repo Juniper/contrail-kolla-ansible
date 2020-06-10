@@ -1,6 +1,0 @@
----
-features:
-  - Add dvr_no_external l3 dvr agent mode.
-    Introduce inner-compute and external-compute nodes group in inventory
-    file to distinguish compute nodes which do not have external reachability
-    from compute nodes which can reach outside.

@@ -1,6 +1,0 @@
----
-features:
-  - |
-    Adds support for deploying the `Prometheus Elasticsearch exporter
-    <https://github.com/justwatchcom/elasticsearch_exporter/>`__ as part of the
-    prometheus monitoring exporters stack.

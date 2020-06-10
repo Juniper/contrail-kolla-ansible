@@ -1,3 +1,0 @@
----
-features:
-  - "Add support for neutron-fwaas. Set 'enable_neutron_fwaas: yes' to enable."

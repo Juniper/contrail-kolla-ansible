@@ -1,5 +1,0 @@
----
-features:
-  - |
-    Adds support for deploying the Monasca fork of Grafana, which includes
-    Keystone integration.

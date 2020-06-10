@@ -1,7 +1,0 @@
----
-- name: Cloning ceilometer source repository for development
-  git:
-    repo: "{{ ceilometer_git_repository }}"
-    dest: "{{ kolla_dev_repos_directory }}/ceilometer"
-    update: "{{ ceilometer_dev_repos_pull }}"
-    version: "{{ ceilometer_source_version }}"

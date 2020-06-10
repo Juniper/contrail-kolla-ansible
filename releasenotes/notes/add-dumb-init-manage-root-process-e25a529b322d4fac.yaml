@@ -1,3 +1,0 @@
----
-features:
-  - use dumb-init to manage the pid 1 process

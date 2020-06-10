@@ -1,3 +1,0 @@
----
-features:
-  - Automatically expire MariaDB binary logs after 14 days.

@@ -1,3 +1,0 @@
----
-fixes:
-  - Integrates gnocchi with ceph to resolve the lack of HA.

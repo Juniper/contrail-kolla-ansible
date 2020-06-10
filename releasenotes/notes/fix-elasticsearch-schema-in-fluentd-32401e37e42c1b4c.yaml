@@ -1,5 +1,0 @@
----
-fixes:
-  - |
-    Fix elasticsearch schema in fluentd when ``kolla_enable_tls_internal`` is
-    true.

@@ -1,4 +1,0 @@
----
-features:
-  - Allow operators to customise the installation of pip
-    within kolla-toolbox.
