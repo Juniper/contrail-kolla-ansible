@@ -1,6 +1,0 @@
----
-- name: Apply role bifrost
-  hosts: localhost
-  roles:
-    - { role: bifrost,
-        tags: bifrost}

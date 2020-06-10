@@ -1,8 +1,0 @@
----
-- include_tasks: config.yml
-
-- include_tasks: lookup_cluster.yml
-
-- include_tasks: start.yml
-
-- include_tasks: check.yml

@@ -1,8 +1,0 @@
----
-- include_tasks: config.yml
-
-- include_tasks: bootstrap_service.yml
-
-- include: start.yml
-
-- include_tasks: update_pools.yml

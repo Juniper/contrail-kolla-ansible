@@ -1,6 +1,0 @@
----
-- include_tasks: config.yml
-
-- include: clean_heka.yml
-
-- include: start.yml

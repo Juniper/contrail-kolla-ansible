@@ -1,5 +1,0 @@
----
-- name: Apply role certificates
-  hosts: all
-  roles:
-    - certificates

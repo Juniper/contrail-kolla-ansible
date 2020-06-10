@@ -1,3 +1,0 @@
----
-- name: Destroying all Kolla containers and volumes
-  command: /tmp/kolla-cleanup/tools/cleanup-containers

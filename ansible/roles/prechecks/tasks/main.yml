@@ -1,6 +1,0 @@
----
-- include_tasks: port_checks.yml
-
-- include_tasks: service_checks.yml
-
-- include_tasks: package_checks.yml
