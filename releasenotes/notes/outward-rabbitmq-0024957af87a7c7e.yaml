@@ -1,5 +1,0 @@
----
-features:
-  - Add a new 'outward facing' rabbitmq, for services
-    which require a user facing message queue such as
-    Murano or Trove.

@@ -1,5 +1,0 @@
----
-features:
-  - Add Karbor ansible role, Karbor is an OpenStack project
-    that provides a pluggable framework for protecting and
-    restoring Data and Metadata.

@@ -1,3 +1,0 @@
----
-features:
-  - Allow cinder-volume to use Oracle ZFS Storage Appliance iSCSI backend.

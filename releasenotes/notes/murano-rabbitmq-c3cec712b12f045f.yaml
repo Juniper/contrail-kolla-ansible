@@ -1,4 +1,0 @@
----
-features:
-  - RabbitMQ now has a vhost entry so the engine can communicate
-    with murano agents running in user VMs.

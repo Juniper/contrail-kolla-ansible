@@ -1,1 +1,0 @@
-../kolla_ansible/cmd/genpwd.py
