@@ -1,4 +1,14 @@
 ---
+
+- name: Hack to remove docker-py and reinstall to avoid multiple python docker related issues
+  pip:
+    name: 'docker-py'
+    state: absent
+
+- name: re-install docker-py 
+  pip:
+    name: 'docker-py'
+
 - name: Ensuring config directories exist
   file:
     path: "{{ node_config_directory }}/{{ item }}"
